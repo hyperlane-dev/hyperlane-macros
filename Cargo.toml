@@ -1,0 +1,46 @@
+[package]
+name = "hyperlane-macro"
+version = "0.1.1"
+edition = "2024"
+authors = ["root@ltpp.vip"] 
+license = "MIT"
+description = """hyperlane macro"""
+keywords = ["http", "request", "response", "tcp", "cross-platform"]
+repository = "https://github.com/eastspire/hyperlane-macro.git"
+categories = ["network-programming", "web-programming"]
+exclude = [
+    "target",
+    "Cargo.lock",
+    "sh",
+    ".github",
+    "logs",
+    "img",
+    "**/*.log",
+    "debug"
+]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+
+[profile.dev]
+incremental = false
+opt-level = 3
+lto = true
+panic = "unwind"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
+
+[profile.release]
+incremental = false
+opt-level = 3
+lto = true
+panic = "unwind"
+debug = false
+codegen-units = 1
+strip = "debuginfo"
