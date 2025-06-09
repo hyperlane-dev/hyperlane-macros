@@ -28,54 +28,53 @@ cargo add hyperlane-macros
 
 ```rust
 use hyperlane::*;
-use hyperlane_macros::*;
 
-#[methods(get, post)]
+#[hyperlane_macros::methods(get, post)]
 async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await.send().await;
 }
 
-#[get]
+#[hyperlane_macros::get]
 async fn get(ctx: Context) {
     let _ = ctx.set_response_body("get").await.send().await;
 }
 
-#[post]
+#[hyperlane_macros::post]
 async fn post(ctx: Context) {
     let _ = ctx.set_response_body("post").await.send().await;
 }
 
-#[connect]
+#[hyperlane_macros::connect]
 async fn connect(ctx: Context) {
     let _ = ctx.set_response_body("connect").await.send().await;
 }
 
-#[delete]
+#[hyperlane_macros::delete]
 async fn delete(ctx: Context) {
     let _ = ctx.set_response_body("delete").await.send().await;
 }
 
-#[head]
+#[hyperlane_macros::head]
 async fn head(ctx: Context) {
     let _ = ctx.set_response_body("head").await.send().await;
 }
 
-#[options]
+#[hyperlane_macros::options]
 async fn options(ctx: Context) {
     let _ = ctx.set_response_body("options").await.send().await;
 }
 
-#[patch]
+#[hyperlane_macros::patch]
 async fn patch(ctx: Context) {
     let _ = ctx.set_response_body("patch").await.send().await;
 }
 
-#[put]
+#[hyperlane_macros::put]
 async fn put(ctx: Context) {
     let _ = ctx.set_response_body("put").await.send().await;
 }
 
-#[trace]
+#[hyperlane_macros::trace]
 async fn trace(ctx: Context) {
     let _ = ctx.set_response_body("trace").await.send().await;
 }
