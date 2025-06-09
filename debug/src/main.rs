@@ -1,5 +1,5 @@
 use hyperlane::*;
-use hyperlane_macro::*;
+use hyperlane_macros::*;
 
 #[methods(get, post)]
 async fn get_post(ctx: Context) {

@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-hyperlane-macro = { path = "../" }
+hyperlane-macros = { path = "../" }
 hyperlane = "5.25.1"
