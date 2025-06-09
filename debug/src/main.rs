@@ -1,14 +1,54 @@
 use hyperlane::*;
 use hyperlane_macro::*;
 
-#[methods(post, get)]
-async fn a(ctx: Context) {
-    let _ = ctx.set_response_body("a").await.send().await;
+#[methods(get, post)]
+async fn get_post(ctx: Context) {
+    let _ = ctx.set_response_body("get_post").await.send().await;
 }
 
 #[get]
-async fn b(ctx: Context) {
-    let _ = ctx.set_response_body("b").await.send().await;
+async fn get(ctx: Context) {
+    let _ = ctx.set_response_body("get").await.send().await;
+}
+
+#[post]
+async fn post(ctx: Context) {
+    let _ = ctx.set_response_body("post").await.send().await;
+}
+
+#[connect]
+async fn connect(ctx: Context) {
+    let _ = ctx.set_response_body("connect").await.send().await;
+}
+
+#[delete]
+async fn delete(ctx: Context) {
+    let _ = ctx.set_response_body("delete").await.send().await;
+}
+
+#[head]
+async fn head(ctx: Context) {
+    let _ = ctx.set_response_body("head").await.send().await;
+}
+
+#[options]
+async fn options(ctx: Context) {
+    let _ = ctx.set_response_body("options").await.send().await;
+}
+
+#[patch]
+async fn patch(ctx: Context) {
+    let _ = ctx.set_response_body("patch").await.send().await;
+}
+
+#[put]
+async fn put(ctx: Context) {
+    let _ = ctx.set_response_body("put").await.send().await;
+}
+
+#[trace]
+async fn trace(ctx: Context) {
+    let _ = ctx.set_response_body("trace").await.send().await;
 }
 
 fn error_handler(error: String) {
@@ -22,8 +62,16 @@ async fn main() {
     server.host("0.0.0.0").await;
     server.port(60000).await;
     server.error_handler(error_handler).await;
-    server.route("/a", a).await;
-    server.route("/b", b).await;
+    server.route("/get_post", get_post).await;
+    server.route("/get", get).await;
+    server.route("/post", post).await;
+    server.route("/connect", connect).await;
+    server.route("/delete", delete).await;
+    server.route("/head", head).await;
+    server.route("/options", options).await;
+    server.route("/patch", patch).await;
+    server.route("/put", put).await;
+    server.route("/trace", trace).await;
     let test = || async move {
         server.run().await.unwrap();
     };
