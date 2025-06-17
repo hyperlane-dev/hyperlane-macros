@@ -144,6 +144,8 @@ async fn unknown_all(ctx: Context) {
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
+    server.host("0.0.0.0").await;
+    server.port(60000).await;
     server.route("/get_post", get_post).await;
     server.route("/get", get).await;
     server.route("/post", post).await;
