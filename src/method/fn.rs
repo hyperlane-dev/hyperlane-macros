@@ -228,3 +228,33 @@ pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
         }
     })
 }
+
+pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
+    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
+    let vis: &Visibility = &input_fn.vis;
+    let sig: &Signature = &input_fn.sig;
+    let block: &Box<Block> = &input_fn.block;
+    let attrs: &Vec<Attribute> = &input_fn.attrs;
+
+    match parse_context_from_fn(sig) {
+        Ok(context) => {
+            let gen_code: proc_macro2::TokenStream = quote! {
+                #(#attrs)*
+                #vis #sig {
+                    if !#context.get_request().await.is_unknown_method() {
+                        return;
+                    }
+                    if !#context.get_request().await.is_unknown_upgrade() {
+                        return;
+                    }
+                    if !#context.get_request().await.is_unknown_version() {
+                        return;
+                    }
+                    #block
+                }
+            };
+            gen_code.into()
+        }
+        Err(err) => err.to_compile_error().into(),
+    }
+}

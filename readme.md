@@ -24,86 +24,94 @@ To use this crate, you can run cmd:
 cargo add hyperlane-macros
 ```
 
-## Use
+## Available Macros
+
+### HTTP Method Macros
+
+- `#[methods(method1, method2, ...)]` - Accepts multiple HTTP methods
+- `#[get]` - GET method handler
+- `#[post]` - POST method handler
+- `#[put]` - PUT method handler
+- `#[delete]` - DELETE method handler
+- `#[patch]` - PATCH method handler
+- `#[head]` - HEAD method handler
+- `#[options]` - OPTIONS method handler
+- `#[connect]` - CONNECT method handler
+- `#[trace]` - TRACE method handler
+
+### Protocol Check Macros
+
+- `#[ws]` - WebSocket check
+- `#[http]` - HTTP check
+- `#[h2c]` - HTTP/2 Cleartext check
+- `#[http0_9]` - HTTP/0.9 check
+- `#[http1_0]` - HTTP/1.0 check
+- `#[http1_1]` - HTTP/1.1 check
+- `#[http1_1_or_higher]` - HTTP/1.1 or higher version check
+- `#[http2]` - HTTP/2 check
+- `#[http3]` - HTTP/3 check
+- `#[tls]` - TLS check
+
+### Response Setting Macros
+
+- `#[code(status_code)]` - Set response status code
+- `#[reason_phrase("phrase")]` - Set response reason phrase
+
+### Send Operation Macros
+
+- `#[send]` - Send response
+- `#[send_body]` - Send response body
+- `#[send_once]` - Send response once
+- `#[send_once_body]` - Send response body once
+
+### Filter Macros
+
+- `#[filter_unknown_method]` - Filter unknown HTTP methods
+- `#[filter_unknown_upgrade]` - Filter unknown upgrade requests
+- `#[filter_unknown_version]` - Filter unknown HTTP versions
+- `#[filter_unknown]` - Combined filter for unknown method, upgrade, and version
+
+## Example Usage
 
 ```rust
 use hyperlane::*;
 
 #[hyperlane_macros::methods(get, post)]
+#[hyperlane_macros::http]
+#[hyperlane_macros::code(200)]
+#[hyperlane_macros::reason_phrase("OK")]
+#[hyperlane_macros::send]
 async fn get_post(ctx: Context) {
-    let _ = ctx.set_response_body("get_post").await.send().await;
+    let _ = ctx.set_response_body("get_post").await;
 }
 
 #[hyperlane_macros::get]
-async fn get(ctx: Context) {
-    let _ = ctx.set_response_body("get").await.send().await;
+#[hyperlane_macros::ws]
+#[hyperlane_macros::send_body]
+async fn websocket(ctx: Context) {
+    let _ = ctx.set_response_body("websocket").await;
 }
 
-#[hyperlane_macros::post]
-async fn post(ctx: Context) {
-    let _ = ctx.set_response_body("post").await.send().await;
+#[hyperlane_macros::http2]
+#[hyperlane_macros::send]
+async fn http2(ctx: Context) {
+    let _ = ctx.set_response_body("http2").await;
 }
 
-#[hyperlane_macros::connect]
-async fn connect(ctx: Context) {
-    let _ = ctx.set_response_body("connect").await.send().await;
-}
-
-#[hyperlane_macros::delete]
-async fn delete(ctx: Context) {
-    let _ = ctx.set_response_body("delete").await.send().await;
-}
-
-#[hyperlane_macros::head]
-async fn head(ctx: Context) {
-    let _ = ctx.set_response_body("head").await.send().await;
-}
-
-#[hyperlane_macros::options]
-async fn options(ctx: Context) {
-    let _ = ctx.set_response_body("options").await.send().await;
-}
-
-#[hyperlane_macros::patch]
-async fn patch(ctx: Context) {
-    let _ = ctx.set_response_body("patch").await.send().await;
-}
-
-#[hyperlane_macros::put]
-async fn put(ctx: Context) {
-    let _ = ctx.set_response_body("put").await.send().await;
-}
-
-#[hyperlane_macros::trace]
-async fn trace(ctx: Context) {
-    let _ = ctx.set_response_body("trace").await.send().await;
-}
-
-fn error_handler(error: String) {
-    eprintln!("{}", error);
-    let _ = std::io::Write::flush(&mut std::io::stderr());
+#[hyperlane_macros::filter_unknown]
+#[hyperlane_macros::send]
+async fn unknown_all(ctx: Context) {
+    let _ = ctx.set_response_body("unknown all").await;
 }
 
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
-    server.host("0.0.0.0").await;
-    server.port(60000).await;
-    server.error_handler(error_handler).await;
     server.route("/get_post", get_post).await;
-    server.route("/get", get).await;
-    server.route("/post", post).await;
-    server.route("/connect", connect).await;
-    server.route("/delete", delete).await;
-    server.route("/head", head).await;
-    server.route("/options", options).await;
-    server.route("/patch", patch).await;
-    server.route("/put", put).await;
-    server.route("/trace", trace).await;
-    let test = || async move {
-        server.run().await.unwrap();
-    };
-    let _ = tokio::time::timeout(std::time::Duration::from_secs(60), test()).await;
+    server.route("/ws", websocket).await;
+    server.route("/http2", http2).await;
+    server.route("/unknown-all", unknown_all).await;
+    server.run().await.unwrap();
 }
 ```
 

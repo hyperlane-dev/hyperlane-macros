@@ -69,6 +69,78 @@ async fn http_only(ctx: Context) {
     let _ = ctx.set_response_body("http").await;
 }
 
+#[hyperlane_macros::h2c]
+#[hyperlane_macros::send]
+async fn h2c(ctx: Context) {
+    let _ = ctx.set_response_body("h2c").await;
+}
+
+#[hyperlane_macros::http0_9]
+#[hyperlane_macros::send]
+async fn http0_9(ctx: Context) {
+    let _ = ctx.set_response_body("http0.9").await;
+}
+
+#[hyperlane_macros::http1_0]
+#[hyperlane_macros::send]
+async fn http1_0(ctx: Context) {
+    let _ = ctx.set_response_body("http1.0").await;
+}
+
+#[hyperlane_macros::http1_1]
+#[hyperlane_macros::send]
+async fn http1_1(ctx: Context) {
+    let _ = ctx.set_response_body("http1.1").await;
+}
+
+#[hyperlane_macros::http1_1_or_higher]
+#[hyperlane_macros::send]
+async fn http1_1_or_higher(ctx: Context) {
+    let _ = ctx.set_response_body("http1.1+").await;
+}
+
+#[hyperlane_macros::http2]
+#[hyperlane_macros::send]
+async fn http2(ctx: Context) {
+    let _ = ctx.set_response_body("http2").await;
+}
+
+#[hyperlane_macros::http3]
+#[hyperlane_macros::send]
+async fn http3(ctx: Context) {
+    let _ = ctx.set_response_body("http3").await;
+}
+
+#[hyperlane_macros::tls]
+#[hyperlane_macros::send]
+async fn tls(ctx: Context) {
+    let _ = ctx.set_response_body("tls").await;
+}
+
+#[hyperlane_macros::filter_unknown_method]
+#[hyperlane_macros::send]
+async fn unknown_method(ctx: Context) {
+    let _ = ctx.set_response_body("unknown method").await;
+}
+
+#[hyperlane_macros::filter_unknown_upgrade]
+#[hyperlane_macros::send]
+async fn unknown_upgrade(ctx: Context) {
+    let _ = ctx.set_response_body("unknown upgrade").await;
+}
+
+#[hyperlane_macros::filter_unknown_version]
+#[hyperlane_macros::send]
+async fn unknown_version(ctx: Context) {
+    let _ = ctx.set_response_body("unknown version").await;
+}
+
+#[hyperlane_macros::filter_unknown]
+#[hyperlane_macros::send]
+async fn unknown_all(ctx: Context) {
+    let _ = ctx.set_response_body("unknown all").await;
+}
+
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
@@ -84,6 +156,18 @@ async fn main() {
     server.route("/trace", trace).await;
     server.route("/ws", websocket).await;
     server.route("/http", http_only).await;
+    server.route("/h2c", h2c).await;
+    server.route("/http0.9", http0_9).await;
+    server.route("/http1.0", http1_0).await;
+    server.route("/http1.1", http1_1).await;
+    server.route("/http1.1+", http1_1_or_higher).await;
+    server.route("/http2", http2).await;
+    server.route("/http3", http3).await;
+    server.route("/tls", tls).await;
+    server.route("/unknown-method", unknown_method).await;
+    server.route("/unknown-upgrade", unknown_upgrade).await;
+    server.route("/unknown-version", unknown_version).await;
+    server.route("/unknown-all", unknown_all).await;
     let test = || async move {
         server.run().await.unwrap();
     };

@@ -99,3 +99,63 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_once_body_macro(item)
 }
+
+#[proc_macro_attribute]
+pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    h2c_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http0_9_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_0_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_1_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_1_or_higher_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http2_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http3_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    tls_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn filter_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    filter_unknown_method_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn filter_unknown_upgrade(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    filter_unknown_upgrade_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn filter_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    filter_unknown_version_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    filter_unknown_macro(item)
+}
