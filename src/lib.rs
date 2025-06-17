@@ -1,13 +1,10 @@
 mod common;
 mod hook;
-mod r#impl;
 mod method;
-mod r#struct;
 
 pub(crate) use common::*;
 pub(crate) use hook::*;
 pub(crate) use method::*;
-pub(crate) use r#struct::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;

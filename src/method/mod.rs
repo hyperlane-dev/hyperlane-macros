@@ -1,11 +1,13 @@
-mod filters;
-mod http_methods;
-mod protocol_checks;
-mod response_settings;
-mod send_operations;
+mod filter;
+mod http;
+mod protocol;
+mod request;
+mod response;
+mod send;
 
-pub(crate) use filters::*;
-pub(crate) use http_methods::*;
-pub(crate) use protocol_checks::*;
-pub(crate) use response_settings::*;
-pub(crate) use send_operations::*;
+pub(crate) use filter::*;
+pub(crate) use http::*;
+pub(crate) use protocol::*;
+pub(crate) use request::*;
+pub(crate) use response::*;
+pub(crate) use send::*;
