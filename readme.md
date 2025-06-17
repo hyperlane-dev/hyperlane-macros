@@ -76,7 +76,9 @@ cargo add hyperlane-macros
 - `#[pre_hook(function_name)]` - Execute function before the marked code
 - `#[post_hook(function_name)]` - Execute function after the marked code
 
-**⚠️ Best Practice Warning**: When using `pre_hook` or `post_hook` macros, it is **not recommended** to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
+### Best Practice Warning
+
+- When using `pre_hook` or `post_hook` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
 
 ## Example Usage
 
