@@ -66,17 +66,6 @@ async fn websocket(ctx: Context) {
 #[hyperlane_macros::http]
 #[hyperlane_macros::send]
 async fn http_only(ctx: Context) {
-    ctx.get_request().await.is_h2c();
-    ctx.get_request().await.is_http0_9();
-    ctx.get_request().await.is_http1_0();
-    ctx.get_request().await.is_http1_1();
-    ctx.get_request().await.is_http1_1_or_higher();
-    ctx.get_request().await.is_http2();
-    ctx.get_request().await.is_http3();
-    ctx.get_request().await.is_tls();
-    ctx.get_request().await.is_unknown_method();
-    ctx.get_request().await.is_unknown_upgrade();
-    ctx.get_request().await.is_unknown_version();
     let _ = ctx.set_response_body("http").await;
 }
 
