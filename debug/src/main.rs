@@ -2,7 +2,7 @@ use hyperlane::*;
 
 #[hyperlane_macros::methods(get, post)]
 #[hyperlane_macros::http]
-#[hyperlane_macros::code(200)]
+#[hyperlane_macros::status_code(200)]
 #[hyperlane_macros::reason_phrase("OK")]
 #[hyperlane_macros::send]
 async fn get_post(ctx: Context) {

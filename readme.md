@@ -54,7 +54,7 @@ cargo add hyperlane-macros
 
 ### Response Setting Macros
 
-- `#[code(status_code)]` - Set response status code
+- `#[status_code(code)]` - Set response status code
 - `#[reason_phrase("phrase")]` - Set response reason phrase
 
 ### Send Operation Macros
@@ -78,7 +78,7 @@ use hyperlane::*;
 
 #[hyperlane_macros::methods(get, post)]
 #[hyperlane_macros::http]
-#[hyperlane_macros::code(200)]
+#[hyperlane_macros::status_code(200)]
 #[hyperlane_macros::reason_phrase("OK")]
 #[hyperlane_macros::send]
 async fn get_post(ctx: Context) {

@@ -4,7 +4,7 @@ pub(crate) fn create_method_check(
     method_name: &str,
     span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> proc_macro2::TokenStream {
-    let check_method = Ident::new(&format!("is_{}", method_name), span);
+    let check_method: Ident = Ident::new(&format!("is_{}", method_name), span);
     move |context| {
         quote! {
             if !#context.get_request().await.#check_method() {
@@ -21,17 +21,18 @@ pub(crate) fn expand_check_macro(
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Box<Block> = &input_fn.block;
+    let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
 
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let check_expr: proc_macro2::TokenStream = check_fn(context);
+            let stmts: &Vec<Stmt> = &block.stmts;
             let gen_code: proc_macro2::TokenStream = quote! {
                 #(#attrs)*
                 #vis #sig {
                     #check_expr
-                    #block
+                    #(#stmts)*
                 }
             };
             gen_code.into()
@@ -65,7 +66,7 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Box<Block> = &input_fn.block;
+    let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
 
     match parse_context_from_fn(sig) {
@@ -81,11 +82,12 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
                     return;
                 }
             };
+            let stmts: &Vec<Stmt> = &block.stmts;
             let gen_code: proc_macro2::TokenStream = quote! {
                 #(#attrs)*
                 #vis #sig {
                     #check_expr
-                    #block
+                    #(#stmts)*
                 }
             };
             gen_code.into()
@@ -133,18 +135,19 @@ fn expand_response_setting_macro<T>(
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Box<Block> = &input_fn.block;
+    let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
 
     match parse_context_from_fn(sig) {
         Ok(context) => match parse_attr(attr) {
             Ok(value) => {
                 let setter: proc_macro2::TokenStream = generate_setter(context, value);
+                let stmts: &Vec<Stmt> = &block.stmts;
                 let gen_code: proc_macro2::TokenStream = quote! {
                     #(#attrs)*
                     #vis #sig {
                         #setter
-                        #block
+                        #(#stmts)*
                     }
                 };
                 gen_code.into()
@@ -155,21 +158,25 @@ fn expand_response_setting_macro<T>(
     }
 }
 
-pub(crate) fn code_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    expand_response_setting_macro(attr, item, parse_literal_int, |context, code| {
-        quote! {
-            #context.set_response_status_code(hyperlane::ResponseStatusCode::from(#code)).await;
+macro_rules! impl_response_setting_macro {
+    ($name:ident, $parse_fn:ident, $setter_fn:ident) => {
+        pub(crate) fn $name(attr: TokenStream, item: TokenStream) -> TokenStream {
+            expand_response_setting_macro(attr, item, $parse_fn, |context, value| {
+                let setter = Ident::new(stringify!($setter_fn), proc_macro2::Span::call_site());
+                quote! {
+                    #context.#setter(#value).await;
+                }
+            })
         }
-    })
+    };
 }
 
-pub(crate) fn reason_phrase_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    expand_response_setting_macro(attr, item, parse_literal_str, |context, phrase| {
-        quote! {
-            #context.set_response_reason_phrase(#phrase).await;
-        }
-    })
-}
+impl_response_setting_macro!(code_macro, parse_literal_int, set_response_status_code);
+impl_response_setting_macro!(
+    reason_phrase_macro,
+    parse_literal_str,
+    set_response_reason_phrase
+);
 
 fn expand_send_macro(
     input: TokenStream,
@@ -178,16 +185,17 @@ fn expand_send_macro(
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Box<Block> = &input_fn.block;
+    let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
 
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let send_expr: proc_macro2::TokenStream = send_fn(context);
+            let stmts: &Vec<Stmt> = &block.stmts;
             let gen_code: proc_macro2::TokenStream = quote! {
                 #(#attrs)*
                 #vis #sig {
-                    #block
+                    #(#stmts)*
                     let _ = #send_expr;
                 }
             };
@@ -233,11 +241,12 @@ pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Box<Block> = &input_fn.block;
+    let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
 
     match parse_context_from_fn(sig) {
         Ok(context) => {
+            let stmts: &Vec<Stmt> = &block.stmts;
             let gen_code: proc_macro2::TokenStream = quote! {
                 #(#attrs)*
                 #vis #sig {
@@ -250,7 +259,7 @@ pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
                     if !#context.get_request().await.is_unknown_version() {
                         return;
                     }
-                    #block
+                    #(#stmts)*
                 }
             };
             gen_code.into()

@@ -71,7 +71,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn code(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
     code_macro(attr, item)
 }
 
