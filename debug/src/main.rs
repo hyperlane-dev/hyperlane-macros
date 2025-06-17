@@ -1,18 +1,25 @@
 use hyperlane::*;
 
 #[hyperlane_macros::methods(get, post)]
+#[hyperlane_macros::http]
+#[hyperlane_macros::code(200)]
+#[hyperlane_macros::reason_phrase("OK")]
+#[hyperlane_macros::send]
 async fn get_post(ctx: Context) {
-    let _ = ctx.set_response_body("get_post").await.send().await;
+    let _ = ctx.set_response_body("get_post").await;
 }
 
 #[hyperlane_macros::get]
+#[hyperlane_macros::ws]
+#[hyperlane_macros::send_body]
 async fn get(ctx: Context) {
-    let _ = ctx.set_response_body("get").await.send().await;
+    let _ = ctx.set_response_body("get").await;
 }
 
 #[hyperlane_macros::post]
+#[hyperlane_macros::send_once]
 async fn post(ctx: Context) {
-    let _ = ctx.set_response_body("post").await.send().await;
+    let _ = ctx.set_response_body("post").await;
 }
 
 #[hyperlane_macros::connect]
@@ -50,17 +57,32 @@ async fn trace(ctx: Context) {
     let _ = ctx.set_response_body("trace").await.send().await;
 }
 
-fn error_handler(error: String) {
-    eprintln!("{}", error);
-    let _ = std::io::Write::flush(&mut std::io::stderr());
+#[hyperlane_macros::ws]
+#[hyperlane_macros::send_once_body]
+async fn websocket(ctx: Context) {
+    let _ = ctx.set_response_body("websocket").await;
+}
+
+#[hyperlane_macros::http]
+#[hyperlane_macros::send]
+async fn http_only(ctx: Context) {
+    ctx.get_request().await.is_h2c();
+    ctx.get_request().await.is_http0_9();
+    ctx.get_request().await.is_http1_0();
+    ctx.get_request().await.is_http1_1();
+    ctx.get_request().await.is_http1_1_or_higher();
+    ctx.get_request().await.is_http2();
+    ctx.get_request().await.is_http3();
+    ctx.get_request().await.is_tls();
+    ctx.get_request().await.is_unknown_method();
+    ctx.get_request().await.is_unknown_upgrade();
+    ctx.get_request().await.is_unknown_version();
+    let _ = ctx.set_response_body("http").await;
 }
 
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
-    server.host("0.0.0.0").await;
-    server.port(60000).await;
-    server.error_handler(error_handler).await;
     server.route("/get_post", get_post).await;
     server.route("/get", get).await;
     server.route("/post", post).await;
@@ -71,6 +93,8 @@ async fn main() {
     server.route("/patch", patch).await;
     server.route("/put", put).await;
     server.route("/trace", trace).await;
+    server.route("/ws", websocket).await;
+    server.route("/http", http_only).await;
     let test = || async move {
         server.run().await.unwrap();
     };
