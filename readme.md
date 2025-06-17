@@ -84,7 +84,6 @@ cargo add hyperlane-macros
 
 ```rust
 use hyperlane::*;
-use hyperlane::*;
 
 #[hyperlane_macros::get]
 #[hyperlane_macros::http]
