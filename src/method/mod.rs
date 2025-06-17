@@ -1,8 +1,11 @@
-mod r#fn;
-mod r#impl;
-mod r#macro;
-mod r#struct;
+mod filters;
+mod http_methods;
+mod protocol_checks;
+mod response_settings;
+mod send_operations;
 
-pub(crate) use r#fn::*;
-pub(crate) use r#macro::*;
-pub(crate) use r#struct::*;
+pub(crate) use filters::*;
+pub(crate) use http_methods::*;
+pub(crate) use protocol_checks::*;
+pub(crate) use response_settings::*;
+pub(crate) use send_operations::*;

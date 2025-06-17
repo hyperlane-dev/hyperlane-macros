@@ -1,31 +1,33 @@
 use hyperlane::*;
 
-async fn test_before_hook(ctx: Context) {
+#[hyperlane_macros::get]
+#[hyperlane_macros::http]
+async fn test_pre_hook(ctx: Context) {
     println!(
-        "执行前置钩子函数，参数类型: {:?}",
+        "Executing pre hook function, parameter type: {:?}",
         std::any::type_name_of_val(&ctx)
     );
 }
 
-async fn test_after_hook(ctx: Context) {
+#[hyperlane_macros::status_code(200)]
+#[hyperlane_macros::send]
+async fn test_post_hook(ctx: Context) {
     println!(
-        "执行后置钩子函数，参数类型: {:?}",
+        "Executing post hook function, parameter type: {:?}",
         std::any::type_name_of_val(&ctx)
     );
 }
 
-#[hyperlane_macros::before_hook(test_before_hook)]
-#[hyperlane_macros::get]
-#[hyperlane_macros::after_hook(test_after_hook)]
-#[hyperlane_macros::send]
-async fn test_before_hook_macro(ctx: Context) {
-    let _ = ctx.set_response_body("测试before_hook宏").await;
+#[hyperlane_macros::pre_hook(test_pre_hook)]
+#[hyperlane_macros::post_hook(test_post_hook)]
+async fn test_pre_hook_macro(ctx: Context) {
+    let _ = ctx.set_response_body("Testing pre_hook macro").await;
 }
 
 #[hyperlane_macros::get]
 #[hyperlane_macros::send]
-async fn test_after_hook_macro(ctx: Context) {
-    let _ = ctx.set_response_body("测试after_hook宏").await;
+async fn test_post_hook_macro(ctx: Context) {
+    let _ = ctx.set_response_body("Testing post_hook macro").await;
 }
 
 #[hyperlane_macros::methods(get, post)]
@@ -198,8 +200,8 @@ async fn main() {
     server.route("/unknown-upgrade", unknown_upgrade).await;
     server.route("/unknown-version", unknown_version).await;
     server.route("/unknown-all", unknown_all).await;
-    server.route("/test-execute", test_before_hook_macro).await;
-    server.route("/test-post-hook", test_after_hook_macro).await;
+    server.route("/test-execute", test_pre_hook_macro).await;
+    server.route("/test-post-hook", test_post_hook_macro).await;
     let test = || async move {
         server.run().await.unwrap();
     };

@@ -1,8 +1,16 @@
+mod common;
+mod hook;
+mod r#impl;
 mod method;
+mod r#struct;
 
+pub(crate) use common::*;
+pub(crate) use hook::*;
 pub(crate) use method::*;
+pub(crate) use r#struct::*;
 
 pub(crate) use proc_macro::TokenStream;
+pub(crate) use proc_macro2::TokenStream as TokenStream2;
 pub(crate) use quote::quote;
 pub(crate) use syn::{
     parse::{Parse, ParseStream},
@@ -161,11 +169,11 @@ pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn before_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    before_hook_macro(attr, item)
+pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    pre_hook_macro(attr, item)
 }
 
 #[proc_macro_attribute]
-pub fn after_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    after_hook_macro(attr, item)
+pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    post_hook_macro(attr, item)
 }
