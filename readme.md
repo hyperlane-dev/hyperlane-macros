@@ -71,10 +71,23 @@ cargo add hyperlane-macros
 - `#[filter_unknown_version]` - Filter unknown HTTP versions
 - `#[filter_unknown]` - Combined filter for unknown method, upgrade, and version
 
+### Hook Macros
+
+- `#[before_hook(function_name)]` - Execute function before the marked code
+- `#[after_hook(function_name)]` - Execute function after the marked code
+
 ## Example Usage
 
 ```rust
 use hyperlane::*;
+
+async fn before_hook_function(ctx: Context) {
+    println!("前置钩子执行");
+}
+
+async fn after_hook_function(ctx: Context) {
+    println!("后置钩子执行");
+}
 
 #[hyperlane_macros::methods(get, post)]
 #[hyperlane_macros::http]
@@ -83,6 +96,14 @@ use hyperlane::*;
 #[hyperlane_macros::send]
 async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await;
+}
+
+#[hyperlane_macros::before_hook(before_hook_function)]
+#[hyperlane_macros::after_hook(after_hook_function)]
+#[hyperlane_macros::get]
+#[hyperlane_macros::send]
+async fn hook_example(ctx: Context) {
+    let _ = ctx.set_response_body("hook example").await;
 }
 
 #[hyperlane_macros::get]

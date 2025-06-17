@@ -159,3 +159,13 @@ pub fn filter_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStr
 pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
     filter_unknown_macro(item)
 }
+
+#[proc_macro_attribute]
+pub fn before_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    before_hook_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn after_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    after_hook_macro(attr, item)
+}
