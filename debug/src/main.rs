@@ -209,32 +209,32 @@ async fn route_params(ctx: Context) {
 }
 
 #[send]
-#[query("test" => request_query_option)]
-async fn query(ctx: Context) {
-    if let Some(data) = request_query_option {
+#[request_query("test" => request_request_query_option)]
+async fn request_query(ctx: Context) {
+    if let Some(data) = request_request_query_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
 #[send]
-#[querys(request_querys)]
-async fn querys(ctx: Context) {
-    let response: String = format!("{:?}", request_querys);
+#[request_querys(request_request_querys)]
+async fn request_querys(ctx: Context) {
+    let response: String = format!("{:?}", request_request_querys);
     let _ = ctx.set_response_body(response).await;
 }
 
 #[send]
-#[header(HOST => request_header_option)]
-async fn header(ctx: Context) {
-    if let Some(data) = request_header_option {
+#[request_header(HOST => request_request_header_option)]
+async fn request_header(ctx: Context) {
+    if let Some(data) = request_request_header_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
 #[send]
-#[headers(request_headers)]
-async fn headers(ctx: Context) {
-    let response: String = format!("{:?}", request_headers);
+#[request_headers(request_request_headers)]
+async fn request_headers(ctx: Context) {
+    let response: String = format!("{:?}", request_request_headers);
     let _ = ctx.set_response_body(response).await;
 }
 
@@ -273,10 +273,10 @@ async fn main() {
     server.route("/attributes", attributes).await;
     server.route("/route-param", route_param).await;
     server.route("/route-params", route_params).await;
-    server.route("/query", query).await;
-    server.route("/querys", querys).await;
-    server.route("/header", header).await;
-    server.route("/headers", headers).await;
+    server.route("/request_query", request_query).await;
+    server.route("/request_querys", request_querys).await;
+    server.route("/request_header", request_header).await;
+    server.route("/request_headers", request_headers).await;
     let test = || async move {
         server.run().await.unwrap();
     };

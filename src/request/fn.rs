@@ -54,44 +54,44 @@ pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenS
     })
 }
 
-pub(crate) fn query_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let query: QueryData = parse_macro_input!(attr as QueryData);
-    let variable: Ident = query.variable;
-    let key_name: Expr = query.key_name;
+pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let request_query: QueryData = parse_macro_input!(attr as QueryData);
+    let variable: Ident = request_query.variable;
+    let key_name: Expr = request_query.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestQuerysValue = #context.get_request_query(#key_name).await;
+            let #variable: OptionRequestQuerysValue = #context.get_request_request_query(#key_name).await;
         }
     })
 }
 
-pub(crate) fn querys_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let query: QuerysData = parse_macro_input!(attr as QuerysData);
-    let variable: Ident = query.variable;
+pub(crate) fn request_querys_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let request_query: QuerysData = parse_macro_input!(attr as QuerysData);
+    let variable: Ident = request_query.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestQuerys = #context.get_request_querys().await;
+            let #variable: RequestQuerys = #context.get_request_request_querys().await;
         }
     })
 }
 
-pub(crate) fn header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let header: HeaderData = parse_macro_input!(attr as HeaderData);
-    let variable: Ident = header.variable;
-    let key_name: Expr = header.key_name;
+pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let request_header: HeaderData = parse_macro_input!(attr as HeaderData);
+    let variable: Ident = request_header.variable;
+    let key_name: Expr = request_header.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestHeadersValue = #context.get_request_header(#key_name).await;
+            let #variable: OptionRequestHeadersValue = #context.get_request_request_header(#key_name).await;
         }
     })
 }
 
-pub(crate) fn headers_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let headers: HeadersData = parse_macro_input!(attr as HeadersData);
-    let variable: Ident = headers.variable;
+pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let request_headers: HeadersData = parse_macro_input!(attr as HeadersData);
+    let variable: Ident = request_headers.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestHeaders = #context.get_request_headers().await;
+            let #variable: RequestHeaders = #context.get_request_request_headers().await;
         }
     })
 }

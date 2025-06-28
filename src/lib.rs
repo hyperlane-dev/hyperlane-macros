@@ -9,7 +9,7 @@
 //! - **HTTP Method Handlers**: Macros for all standard HTTP methods (GET, POST, PUT, DELETE, etc.)
 //! - **Protocol Validation**: Support for HTTP versions, WebSocket, TLS, and HTTP/2 cleartext
 //! - **Response Management**: Status code setting, reason phrase customization, and response sending
-//! - **Request Data Extraction**: Body parsing, header extraction, query parameters, and route parameters
+//! - **Request Data Extraction**: Body parsing, request header extraction, request query parameters, and route parameters
 //! - **Filter Mechanisms**: Unknown method, upgrade, and version filtering
 //! - **Hook System**: Pre and post execution hooks for request processing
 //! - **Stream Management**: Connection state handling for aborted and closed streams
@@ -313,7 +313,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Restricts function execution to WebSocket upgrade requests only.
 ///
 /// This attribute macro ensures the decorated function only executes when the incoming request
-/// is a valid WebSocket upgrade request with proper headers and protocol negotiation.
+/// is a valid WebSocket upgrade request with proper request headers and protocol negotiation.
 ///
 /// # Usage
 ///
@@ -428,7 +428,7 @@ pub fn reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 /// Automatically sends the complete response after function execution.
 ///
-/// This attribute macro ensures that the response (headers and body) is automatically sent
+/// This attribute macro ensures that the response (request headers and body) is automatically sent
 /// to the client after the function completes execution.
 ///
 /// # Usage
@@ -454,7 +454,7 @@ pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Automatically sends only the response body after function execution.
 ///
 /// This attribute macro ensures that only the response body is automatically sent
-/// to the client after the function completes, handling headers separately.
+/// to the client after the function completes, handling request headers separately.
 ///
 /// # Usage
 ///
@@ -818,7 +818,7 @@ pub fn filter_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStre
 /// Handles requests with unknown or non-standard upgrade protocols.
 ///
 /// This attribute macro configures the function to handle requests that specify
-/// unrecognized upgrade protocols, providing a fallback for non-standard upgrade headers.
+/// unrecognized upgrade protocols, providing a fallback for non-standard upgrade request headers.
 ///
 /// # Usage
 ///
@@ -1095,10 +1095,10 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_params_macro(attr, item)
 }
 
-/// Extracts a specific query parameter into a variable.
+/// Extracts a specific request query parameter into a variable.
 ///
-/// This attribute macro retrieves a specific query parameter by key and makes it
-/// available as a variable. Query parameters are extracted from the URL query string.
+/// This attribute macro retrieves a specific request query parameter by key and makes it
+/// available as a variable. Query parameters are extracted from the URL request query string.
 ///
 /// # Usage
 ///
@@ -1107,10 +1107,10 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 ///
 /// // For URL like "/search?q=rust&limit=10"
-/// #[query("q" => search_term)]
+/// #[request_query("q" => search_term)]
 /// async fn search(ctx: Context) {
 ///     if let Some(term) = search_term {
-///         // Use the query parameter
+///         // Use the request query parameter
 ///     }
 /// }
 /// ```
@@ -1118,14 +1118,14 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
 /// The variable will be available as an `Option<String>` in the function scope.
 #[proc_macro_attribute]
-pub fn query(attr: TokenStream, item: TokenStream) -> TokenStream {
-    query_macro(attr, item)
+pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_query_macro(attr, item)
 }
 
-/// Extracts all query parameters into a collection variable.
+/// Extracts all request query parameters into a collection variable.
 ///
-/// This attribute macro retrieves all available query parameters from the URL query string
-/// and makes them available as a collection for comprehensive query parameter access.
+/// This attribute macro retrieves all available request query parameters from the URL request query string
+/// and makes them available as a collection for comprehensive request query parameter access.
 ///
 /// # Usage
 ///
@@ -1134,25 +1134,25 @@ pub fn query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 ///
 /// // For URL like "/search?q=rust&limit=10&sort=date"
-/// #[querys(all_params)]
+/// #[request_querys(all_params)]
 /// async fn search_with_params(ctx: Context) {
 ///     for (key, value) in all_params {
-///         // Process each query parameter
+///         // Process each request query parameter
 ///     }
 /// }
 /// ```
 ///
-/// The macro accepts a variable name that will contain all query parameters.
+/// The macro accepts a variable name that will contain all request query parameters.
 /// The variable will be available as a collection in the function scope.
 #[proc_macro_attribute]
-pub fn querys(attr: TokenStream, item: TokenStream) -> TokenStream {
-    querys_macro(attr, item)
+pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_querys_macro(attr, item)
 }
 
-/// Extracts a specific HTTP header into a variable.
+/// Extracts a specific HTTP request header into a variable.
 ///
-/// This attribute macro retrieves a specific HTTP header by name and makes it
-/// available as a variable. Header values are extracted from the request headers collection.
+/// This attribute macro retrieves a specific HTTP request header by name and makes it
+/// available as a variable. Header values are extracted from the request request headers collection.
 ///
 /// # Usage
 ///
@@ -1160,32 +1160,32 @@ pub fn querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// #[header(HOST => host_header)]
+/// #[request_header(HOST => host_request_header)]
 /// async fn handle_with_host(ctx: Context) {
-///     if let Some(host) = host_header {
-///         // Use the host header value
+///     if let Some(host) = host_request_header {
+///         // Use the host request_header value
 ///     }
 /// }
 ///
-/// #[header("Content-Type" => content_type)]
+/// #[request_header("Content-Type" => content_type)]
 /// async fn handle_with_content_type(ctx: Context) {
 ///     if let Some(ct) = content_type {
-///         // Use the content type header
+///         // Use the content type request_header
 ///     }
 /// }
 /// ```
 ///
-/// The macro accepts a header name-to-variable mapping in the format `HEADER_NAME => variable_name`
+/// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
 /// or `"Header-Name" => variable_name`. The variable will be available as an `Option<String>`.
 #[proc_macro_attribute]
-pub fn header(attr: TokenStream, item: TokenStream) -> TokenStream {
-    header_macro(attr, item)
+pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_header_macro(attr, item)
 }
 
-/// Extracts all HTTP headers into a collection variable.
+/// Extracts all HTTP request headers into a collection variable.
 ///
-/// This attribute macro retrieves all available HTTP headers from the request
-/// and makes them available as a collection for comprehensive header access.
+/// This attribute macro retrieves all available HTTP request headers from the request
+/// and makes them available as a collection for comprehensive request header access.
 ///
 /// # Usage
 ///
@@ -1193,17 +1193,17 @@ pub fn header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// #[headers(all_headers)]
-/// async fn handle_with_all_headers(ctx: Context) {
-///     for (name, value) in all_headers {
-///         // Process each header
+/// #[request_headers(all_request_headers)]
+/// async fn handle_with_all_request_headers(ctx: Context) {
+///     for (name, value) in all_request_headers {
+///         // Process each request_header
 ///     }
 /// }
 /// ```
 ///
-/// The macro accepts a variable name that will contain all HTTP headers.
+/// The macro accepts a variable name that will contain all HTTP request headers.
 /// The variable will be available as a collection in the function scope.
 #[proc_macro_attribute]
-pub fn headers(attr: TokenStream, item: TokenStream) -> TokenStream {
-    headers_macro(attr, item)
+pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_headers_macro(attr, item)
 }
