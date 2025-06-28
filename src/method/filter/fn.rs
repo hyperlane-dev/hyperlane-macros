@@ -1,33 +1,19 @@
 use crate::*;
 
 pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
-    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
-    let vis: &Visibility = &input_fn.vis;
-    let sig: &Signature = &input_fn.sig;
-    let block: &Block = &input_fn.block;
-    let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_context_from_fn(sig) {
-        Ok(context) => {
-            let stmts: &Vec<Stmt> = &block.stmts;
-            let gen_code: TokenStream2 = quote! {
-                #(#attrs)*
-                #vis #sig {
-                    if !#context.get_request().await.is_unknown_method() {
-                        return;
-                    }
-                    if !#context.get_request().await.is_unknown_upgrade() {
-                        return;
-                    }
-                    if !#context.get_request().await.is_unknown_version() {
-                        return;
-                    }
-                    #(#stmts)*
-                }
-            };
-            gen_code.into()
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            if !#context.get_request().await.is_unknown_method() {
+                return;
+            }
+            if !#context.get_request().await.is_unknown_upgrade() {
+                return;
+            }
+            if !#context.get_request().await.is_unknown_version() {
+                return;
+            }
         }
-        Err(err) => err.to_compile_error().into(),
-    }
+    })
 }
 
 macro_rules! impl_filter_macro {

@@ -1,8 +1,8 @@
 use crate::*;
 
-pub(crate) fn expand_check_macro(
+pub(crate) fn expand_macro_with_before_insertion(
     input: TokenStream,
-    check_fn: impl FnOnce(&Ident) -> TokenStream2,
+    before_fn: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
@@ -11,12 +11,12 @@ pub(crate) fn expand_check_macro(
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_fn(sig) {
         Ok(context) => {
-            let check_expr: TokenStream2 = check_fn(context);
+            let before_code: TokenStream2 = before_fn(context);
             let stmts: &Vec<Stmt> = &block.stmts;
             let gen_code: TokenStream2 = quote! {
                 #(#attrs)*
                 #vis #sig {
-                    #check_expr
+                    #before_code
                     #(#stmts)*
                 }
             };
@@ -24,6 +24,51 @@ pub(crate) fn expand_check_macro(
         }
         Err(err) => err.to_compile_error().into(),
     }
+}
+
+pub(crate) fn expand_macro_with_after_insertion(
+    input: TokenStream,
+    after_fn: impl FnOnce(&Ident) -> TokenStream2,
+) -> TokenStream {
+    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let vis: &Visibility = &input_fn.vis;
+    let sig: &Signature = &input_fn.sig;
+    let block: &Block = &input_fn.block;
+    let attrs: &Vec<Attribute> = &input_fn.attrs;
+    match parse_context_from_fn(sig) {
+        Ok(context) => {
+            let after_code: TokenStream2 = after_fn(context);
+            let stmts: &Vec<Stmt> = &block.stmts;
+            let gen_code: TokenStream2 = quote! {
+                #(#attrs)*
+                #vis #sig {
+                    #(#stmts)*
+                    #after_code
+                }
+            };
+            gen_code.into()
+        }
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+pub(crate) fn expand_macro_with_attr_and_before_insertion<T>(
+    attr: TokenStream,
+    item: TokenStream,
+    parse_attr: impl FnOnce(TokenStream) -> syn::Result<T>,
+    before_fn: impl FnOnce(&Ident, T) -> TokenStream2,
+) -> TokenStream {
+    match parse_attr(attr) {
+        Ok(value) => expand_macro_with_before_insertion(item, |context| before_fn(context, value)),
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+pub(crate) fn expand_check_macro(
+    input: TokenStream,
+    check_fn: impl FnOnce(&Ident) -> TokenStream2,
+) -> TokenStream {
+    expand_macro_with_before_insertion(input, check_fn)
 }
 
 pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
