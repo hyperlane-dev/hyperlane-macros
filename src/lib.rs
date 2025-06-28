@@ -1,10 +1,26 @@
+mod aborted;
+mod closed;
 mod common;
+mod filter;
+mod flush;
 mod hook;
-mod method;
+mod http;
+mod protocol;
+mod request;
+mod response;
+mod send;
 
+pub(crate) use aborted::*;
+pub(crate) use closed::*;
 pub(crate) use common::*;
+pub(crate) use filter::*;
+pub(crate) use flush::*;
 pub(crate) use hook::*;
-pub(crate) use method::*;
+pub(crate) use http::*;
+pub(crate) use protocol::*;
+pub(crate) use request::*;
+pub(crate) use response::*;
+pub(crate) use send::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
@@ -106,6 +122,21 @@ pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
+pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    flush_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    aborted_macro(item)
+}
+
+#[proc_macro_attribute]
+pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    closed_macro(item)
+}
+
+#[proc_macro_attribute]
 pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
     h2c_macro(item)
 }
@@ -178,4 +209,44 @@ pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn body(attr: TokenStream, item: TokenStream) -> TokenStream {
     body_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
+    attribute_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
+    attributes_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
+    route_param_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
+    route_params_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn query(attr: TokenStream, item: TokenStream) -> TokenStream {
+    query_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn querys(attr: TokenStream, item: TokenStream) -> TokenStream {
+    querys_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn header(attr: TokenStream, item: TokenStream) -> TokenStream {
+    header_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn headers(attr: TokenStream, item: TokenStream) -> TokenStream {
+    headers_macro(attr, item)
 }
