@@ -2,6 +2,8 @@ use hyperlane::*;
 use hyperlane_macros::*;
 use serde::{Deserialize, Serialize};
 
+const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct TestData {
     name: String,
@@ -176,7 +178,7 @@ async fn body(ctx: Context) {
 }
 
 #[send]
-#[attribute(test => request_attribute_option: TestData)]
+#[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {
     if let Some(data) = request_attribute_option {
         let response: String = format!("name={}, age={}", data.name, data.age);
@@ -192,7 +194,7 @@ async fn attributes(ctx: Context) {
 }
 
 #[send]
-#[route_param(test => request_route_param)]
+#[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {
     if let Some(data) = request_route_param {
         let _ = ctx.set_response_body(data).await;
@@ -207,7 +209,7 @@ async fn route_params(ctx: Context) {
 }
 
 #[send]
-#[query(test => request_query_option)]
+#[query("test" => request_query_option)]
 async fn query(ctx: Context) {
     if let Some(data) = request_query_option {
         let _ = ctx.set_response_body(data).await;
@@ -222,7 +224,7 @@ async fn querys(ctx: Context) {
 }
 
 #[send]
-#[header(host => request_header_option)]
+#[header(HOST => request_header_option)]
 async fn header(ctx: Context) {
     if let Some(data) = request_header_option {
         let _ = ctx.set_response_body(data).await;

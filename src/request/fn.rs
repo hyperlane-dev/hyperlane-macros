@@ -15,11 +15,10 @@ pub(crate) fn attribute_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let attribute: AttributeData = parse_macro_input!(attr as AttributeData);
     let variable: Ident = attribute.variable;
     let type_name: Type = attribute.type_name;
-    let key_name: Ident = attribute.key_name;
-    let key_name_literal: LitStr = LitStr::new(&key_name.to_string(), key_name.span());
+    let key_name: Expr = attribute.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: Option<#type_name> = #context.get_attribute::<#type_name>(#key_name_literal).await;
+            let #variable: Option<#type_name> = #context.get_attribute::<#type_name>(#key_name).await;
         }
     })
 }
@@ -37,11 +36,10 @@ pub(crate) fn attributes_macro(attr: TokenStream, item: TokenStream) -> TokenStr
 pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_param: RouteParamData = parse_macro_input!(attr as RouteParamData);
     let variable: Ident = route_param.variable;
-    let key_name: Ident = route_param.key_name;
-    let key_name_literal: LitStr = LitStr::new(&key_name.to_string(), key_name.span());
+    let key_name: Expr = route_param.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionString = #context.get_route_param(#key_name_literal).await;
+            let #variable: OptionString = #context.get_route_param(#key_name).await;
         }
     })
 }
@@ -59,11 +57,10 @@ pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenS
 pub(crate) fn query_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let query: QueryData = parse_macro_input!(attr as QueryData);
     let variable: Ident = query.variable;
-    let key_name: Ident = query.key_name;
-    let key_name_literal: LitStr = LitStr::new(&key_name.to_string(), key_name.span());
+    let key_name: Expr = query.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestQuerysValue = #context.get_request_query(#key_name_literal).await;
+            let #variable: OptionRequestQuerysValue = #context.get_request_query(#key_name).await;
         }
     })
 }
@@ -81,11 +78,10 @@ pub(crate) fn querys_macro(attr: TokenStream, item: TokenStream) -> TokenStream 
 pub(crate) fn header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let header: HeaderData = parse_macro_input!(attr as HeaderData);
     let variable: Ident = header.variable;
-    let key_name: Ident = header.key_name;
-    let key_name_literal: LitStr = LitStr::new(&key_name.to_string(), key_name.span());
+    let key_name: Expr = header.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestHeadersValue = #context.get_request_header(#key_name_literal).await;
+            let #variable: OptionRequestHeadersValue = #context.get_request_header(#key_name).await;
         }
     })
 }

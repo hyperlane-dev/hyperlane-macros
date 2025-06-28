@@ -12,7 +12,7 @@ pub(crate) struct BodyData {
 pub(crate) struct AttributeData {
     pub(crate) variable: Ident,
     pub(crate) type_name: Type,
-    pub(crate) key_name: Ident,
+    pub(crate) key_name: Expr,
 }
 
 pub(crate) struct AttributesData {
@@ -21,7 +21,7 @@ pub(crate) struct AttributesData {
 
 pub(crate) struct RouteParamData {
     pub(crate) variable: Ident,
-    pub(crate) key_name: Ident,
+    pub(crate) key_name: Expr,
 }
 
 pub(crate) struct RouteParamsData {
@@ -30,7 +30,7 @@ pub(crate) struct RouteParamsData {
 
 pub(crate) struct QueryData {
     pub(crate) variable: Ident,
-    pub(crate) key_name: Ident,
+    pub(crate) key_name: Expr,
 }
 
 pub(crate) struct QuerysData {
@@ -39,7 +39,7 @@ pub(crate) struct QuerysData {
 
 pub(crate) struct HeaderData {
     pub(crate) variable: Ident,
-    pub(crate) key_name: Ident,
+    pub(crate) key_name: Expr,
 }
 
 pub(crate) struct HeadersData {

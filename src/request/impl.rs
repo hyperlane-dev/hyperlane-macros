@@ -22,7 +22,7 @@ impl Parse for BodyData {
 
 impl Parse for AttributeData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let key_name: Ident = input.parse()?;
+        let key_name: Expr = input.parse()?;
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         input.parse::<Token![:]>()?;
@@ -44,7 +44,7 @@ impl Parse for AttributesData {
 
 impl Parse for RouteParamData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let key_name: Ident = input.parse()?;
+        let key_name: Expr = input.parse()?;
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         Ok(RouteParamData { key_name, variable })
@@ -60,7 +60,7 @@ impl Parse for RouteParamsData {
 
 impl Parse for QueryData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let key_name: Ident = input.parse()?;
+        let key_name: Expr = input.parse()?;
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         Ok(QueryData { key_name, variable })
@@ -76,7 +76,7 @@ impl Parse for QuerysData {
 
 impl Parse for HeaderData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let key_name: Ident = input.parse()?;
+        let key_name: Expr = input.parse()?;
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         Ok(HeaderData { key_name, variable })
