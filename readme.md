@@ -93,7 +93,7 @@ cargo add hyperlane-macros
 
 ### Attributes Macros
 
-- `#[attributes(variable_name)]`
+- `#[attributes(variable_name)]` - Get all attributes as a HashMap
 
 ### Route param Macros
 
@@ -101,23 +101,23 @@ cargo add hyperlane-macros
 
 ### Route params Macros
 
-- `#[route_params(variable_name)]`
+- `#[route_params(variable_name)]` - Get all route parameters
 
 ### Query Macros
 
-- `#[query(key => variable_name)]`
+- `#[query(key => variable_name)]` - Get specific query parameter
 
 ### Querys Macros
 
-- `#[querys(variable_name)]`
+- `#[querys(variable_name)]` - Get all query parameters
 
 ### Header Macros
 
-- `#[header(key => variable_name)]`
+- `#[header(key => variable_name)]` - Get specific HTTP header
 
 ### Headers Macros
 
-- `#[headers(variable_name)]`
+- `#[headers(variable_name)]` - Get all HTTP headers
 
 ### Hook Macros
 
