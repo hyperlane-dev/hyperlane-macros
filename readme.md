@@ -54,8 +54,8 @@ cargo add hyperlane-macros
 
 ### Response Setting Macros
 
-- `#[status_code(code)]` - Set response status code
-- `#[reason_phrase("phrase")]` - Set response reason phrase
+- `#[response_status_code(code)]` - Set response status code
+- `#[response_reason_phrase("phrase")]` - Set response reason phrase
 
 ### Send Operation Macros
 
@@ -149,7 +149,7 @@ async fn ctx_pre_hook(ctx: Context) {}
 
 #[flush]
 #[send]
-#[status_code(200)]
+#[response_status_code(200)]
 async fn ctx_post_hook(ctx: Context) {}
 
 #[send]
@@ -161,8 +161,8 @@ async fn ctx_hook(ctx: Context) {
 
 #[closed]
 #[send]
-#[reason_phrase("OK")]
-#[status_code(200)]
+#[response_reason_phrase("OK")]
+#[response_status_code(200)]
 #[methods(get, post)]
 #[http]
 async fn get_post(ctx: Context) {
@@ -342,32 +342,32 @@ async fn route_params(ctx: Context) {
 }
 
 #[send]
-#[request_query("test" => request_request_query_option)]
+#[request_query("test" => request_query_option)]
 async fn request_query(ctx: Context) {
-    if let Some(data) = request_request_query_option {
+    if let Some(data) = request_query_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
 #[send]
-#[request_querys(request_request_querys)]
+#[request_querys(request_querys)]
 async fn request_querys(ctx: Context) {
-    let response: String = format!("{:?}", request_request_querys);
+    let response: String = format!("{:?}", request_querys);
     let _ = ctx.set_response_body(response).await;
 }
 
 #[send]
-#[request_header(HOST => request_request_header_option)]
+#[request_header(HOST => request_header_option)]
 async fn request_header(ctx: Context) {
-    if let Some(data) = request_request_header_option {
+    if let Some(data) = request_header_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
 #[send]
-#[request_headers(request_request_headers)]
+#[request_headers(request_headers)]
 async fn request_headers(ctx: Context) {
-    let response: String = format!("{:?}", request_request_headers);
+    let response: String = format!("{:?}", request_headers);
     let _ = ctx.set_response_body(response).await;
 }
 

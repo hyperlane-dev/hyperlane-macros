@@ -36,13 +36,14 @@ macro_rules! impl_response_setting_macro {
 }
 
 impl_response_setting_macro!(
-    code_macro,
+    response_status_code_macro,
     parse_literal_int,
     set_response_status_code,
     ResponseStatusCode
 );
+
 impl_response_setting_macro!(
-    reason_phrase_macro,
+    response_reason_phrase_macro,
     parse_literal_str,
     set_response_reason_phrase
 );

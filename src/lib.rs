@@ -369,17 +369,17 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// #[status_code(200)]
+/// #[response_status_code(200)]
 /// async fn success_handler(ctx: Context) {
 ///     // Response will have status code 200
 /// }
 ///
-/// #[status_code(404)]
+/// #[response_status_code(404)]
 /// async fn not_found_handler(ctx: Context) {
 ///     // Response will have status code 404
 /// }
 ///
-/// #[status_code(500)]
+/// #[response_status_code(500)]
 /// async fn error_handler(ctx: Context) {
 ///     // Response will have status code 500
 /// }
@@ -388,8 +388,8 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
-    code_macro(attr, item)
+pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_status_code_macro(attr, item)
 }
 
 /// Sets the HTTP reason phrase for the response.
@@ -403,17 +403,17 @@ pub fn status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// #[reason_phrase("OK")]
+/// #[response_reason_phrase("OK")]
 /// async fn success_handler(ctx: Context) {
 ///     // Response will have reason phrase "OK"
 /// }
 ///
-/// #[reason_phrase("Not Found")]
+/// #[response_reason_phrase("Not Found")]
 /// async fn not_found_handler(ctx: Context) {
 ///     // Response will have reason phrase "Not Found"
 /// }
 ///
-/// #[reason_phrase("Internal Server Error")]
+/// #[response_reason_phrase("Internal Server Error")]
 /// async fn error_handler(ctx: Context) {
 ///     // Response will have reason phrase "Internal Server Error"
 /// }
@@ -422,8 +422,8 @@ pub fn status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a string literal for the reason phrase and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
-    reason_phrase_macro(attr, item)
+pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_reason_phrase_macro(attr, item)
 }
 
 /// Automatically sends the complete response after function execution.
