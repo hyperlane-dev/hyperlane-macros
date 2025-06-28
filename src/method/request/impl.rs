@@ -7,3 +7,15 @@ impl Parse for RequestMethods {
         })
     }
 }
+
+impl Parse for BodyParams {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variable: Ident = input.parse()?;
+        input.parse::<Token![,]>()?;
+        let type_name: Type = input.parse()?;
+        Ok(BodyParams {
+            variable,
+            type_name,
+        })
+    }
+}

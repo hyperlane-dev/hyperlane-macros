@@ -174,3 +174,8 @@ pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     post_hook_macro(attr, item)
 }
+
+#[proc_macro_attribute]
+pub fn body(attr: TokenStream, item: TokenStream) -> TokenStream {
+    body_macro(attr, item)
+}

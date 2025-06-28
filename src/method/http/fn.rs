@@ -42,7 +42,6 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {

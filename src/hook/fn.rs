@@ -7,7 +7,6 @@ pub(crate) fn pre_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStrea
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
@@ -31,7 +30,6 @@ pub(crate) fn post_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;

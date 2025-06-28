@@ -1,12 +1,12 @@
 use crate::*;
 
 fn parse_literal_str(input: TokenStream) -> syn::Result<String> {
-    let lit = syn::parse::<LitStr>(input)?;
+    let lit: LitStr = syn::parse::<LitStr>(input)?;
     Ok(lit.value())
 }
 
 fn parse_literal_int(input: TokenStream) -> syn::Result<usize> {
-    let lit = syn::parse::<LitInt>(input)?;
+    let lit: LitInt = syn::parse::<LitInt>(input)?;
     lit.base10_parse()
 }
 
@@ -21,7 +21,6 @@ fn expand_response_setting_macro<T>(
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => match parse_attr(attr) {
             Ok(value) => {

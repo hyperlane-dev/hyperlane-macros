@@ -9,7 +9,6 @@ fn expand_send_macro(
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let send_expr: TokenStream2 = send_fn(context);

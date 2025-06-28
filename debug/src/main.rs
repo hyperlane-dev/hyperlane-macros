@@ -1,174 +1,188 @@
 use hyperlane::*;
+use hyperlane_macros::*;
+use serde::{Deserialize, Serialize};
 
-#[hyperlane_macros::get]
-#[hyperlane_macros::http]
-async fn test_pre_hook(ctx: Context) {
-    println!(
-        "Executing pre hook function, parameter type: {:?}",
-        std::any::type_name_of_val(&ctx)
-    );
+#[derive(Debug, Serialize, Deserialize)]
+struct TestData {
+    name: String,
+    age: u32,
 }
 
-#[hyperlane_macros::status_code(200)]
-#[hyperlane_macros::send]
-async fn test_post_hook(ctx: Context) {
-    println!(
-        "Executing post hook function, parameter type: {:?}",
-        std::any::type_name_of_val(&ctx)
-    );
-}
+#[get]
+#[http]
+async fn test_pre_hook(ctx: Context) {}
 
-#[hyperlane_macros::pre_hook(test_pre_hook)]
-#[hyperlane_macros::post_hook(test_post_hook)]
+#[send]
+#[status_code(200)]
+async fn test_post_hook(ctx: Context) {}
+
+#[pre_hook(test_pre_hook)]
+#[post_hook(test_post_hook)]
 async fn test_pre_hook_macro(ctx: Context) {
     let _ = ctx.set_response_body("Testing pre_hook macro").await;
 }
 
-#[hyperlane_macros::get]
-#[hyperlane_macros::send]
+#[send]
+#[get]
 async fn test_post_hook_macro(ctx: Context) {
     let _ = ctx.set_response_body("Testing post_hook macro").await;
 }
 
-#[hyperlane_macros::methods(get, post)]
-#[hyperlane_macros::http]
-#[hyperlane_macros::status_code(200)]
-#[hyperlane_macros::reason_phrase("OK")]
-#[hyperlane_macros::send]
+#[send]
+#[reason_phrase("OK")]
+#[status_code(200)]
+#[methods(get, post)]
+#[http]
 async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await;
 }
 
-#[hyperlane_macros::get]
-#[hyperlane_macros::ws]
-#[hyperlane_macros::send_body]
+#[send_body]
+#[ws]
+#[get]
 async fn get(ctx: Context) {
     let _ = ctx.set_response_body("get").await;
 }
 
-#[hyperlane_macros::post]
-#[hyperlane_macros::send_once]
+#[send_once]
+#[post]
 async fn post(ctx: Context) {
     let _ = ctx.set_response_body("post").await;
 }
 
-#[hyperlane_macros::connect]
+#[connect]
 async fn connect(ctx: Context) {
     let _ = ctx.set_response_body("connect").await.send().await;
 }
 
-#[hyperlane_macros::delete]
+#[delete]
 async fn delete(ctx: Context) {
     let _ = ctx.set_response_body("delete").await.send().await;
 }
 
-#[hyperlane_macros::head]
+#[head]
 async fn head(ctx: Context) {
     let _ = ctx.set_response_body("head").await.send().await;
 }
 
-#[hyperlane_macros::options]
+#[options]
 async fn options(ctx: Context) {
     let _ = ctx.set_response_body("options").await.send().await;
 }
 
-#[hyperlane_macros::patch]
+#[patch]
 async fn patch(ctx: Context) {
     let _ = ctx.set_response_body("patch").await.send().await;
 }
 
-#[hyperlane_macros::put]
+#[put]
 async fn put(ctx: Context) {
     let _ = ctx.set_response_body("put").await.send().await;
 }
 
-#[hyperlane_macros::trace]
+#[trace]
 async fn trace(ctx: Context) {
     let _ = ctx.set_response_body("trace").await.send().await;
 }
 
-#[hyperlane_macros::ws]
-#[hyperlane_macros::send_once_body]
+#[send_once_body]
+#[ws]
 async fn websocket(ctx: Context) {
     let _ = ctx.set_response_body("websocket").await;
 }
 
-#[hyperlane_macros::http]
-#[hyperlane_macros::send]
+#[send]
+#[http]
 async fn http_only(ctx: Context) {
     let _ = ctx.set_response_body("http").await;
 }
 
-#[hyperlane_macros::h2c]
-#[hyperlane_macros::send]
+#[send]
+#[h2c]
 async fn h2c(ctx: Context) {
     let _ = ctx.set_response_body("h2c").await;
 }
 
-#[hyperlane_macros::http0_9]
-#[hyperlane_macros::send]
+#[send]
+#[http0_9]
 async fn http0_9(ctx: Context) {
     let _ = ctx.set_response_body("http0.9").await;
 }
 
-#[hyperlane_macros::http1_0]
-#[hyperlane_macros::send]
+#[send]
+#[http1_0]
 async fn http1_0(ctx: Context) {
     let _ = ctx.set_response_body("http1.0").await;
 }
 
-#[hyperlane_macros::http1_1]
-#[hyperlane_macros::send]
+#[send]
+#[http1_1]
 async fn http1_1(ctx: Context) {
     let _ = ctx.set_response_body("http1.1").await;
 }
 
-#[hyperlane_macros::http1_1_or_higher]
-#[hyperlane_macros::send]
+#[send]
+#[http1_1_or_higher]
 async fn http1_1_or_higher(ctx: Context) {
     let _ = ctx.set_response_body("http1.1+").await;
 }
 
-#[hyperlane_macros::http2]
-#[hyperlane_macros::send]
+#[send]
+#[http2]
 async fn http2(ctx: Context) {
     let _ = ctx.set_response_body("http2").await;
 }
 
-#[hyperlane_macros::http3]
-#[hyperlane_macros::send]
+#[send]
+#[http3]
 async fn http3(ctx: Context) {
     let _ = ctx.set_response_body("http3").await;
 }
 
-#[hyperlane_macros::tls]
-#[hyperlane_macros::send]
+#[send]
+#[tls]
 async fn tls(ctx: Context) {
     let _ = ctx.set_response_body("tls").await;
 }
 
-#[hyperlane_macros::filter_unknown_method]
-#[hyperlane_macros::send]
+#[send]
+#[filter_unknown_method]
 async fn unknown_method(ctx: Context) {
     let _ = ctx.set_response_body("unknown method").await;
 }
 
-#[hyperlane_macros::filter_unknown_upgrade]
-#[hyperlane_macros::send]
+#[send]
+#[filter_unknown_upgrade]
 async fn unknown_upgrade(ctx: Context) {
     let _ = ctx.set_response_body("unknown upgrade").await;
 }
 
-#[hyperlane_macros::filter_unknown_version]
-#[hyperlane_macros::send]
+#[send]
+#[filter_unknown_version]
 async fn unknown_version(ctx: Context) {
     let _ = ctx.set_response_body("unknown version").await;
 }
 
-#[hyperlane_macros::filter_unknown]
-#[hyperlane_macros::send]
+#[send]
+#[filter_unknown]
 async fn unknown_all(ctx: Context) {
     let _ = ctx.set_response_body("unknown all").await;
+}
+
+#[send]
+#[body(request_data, TestData)]
+#[post]
+async fn test_body_macro(ctx: Context) {
+    match request_data {
+        Ok(data) => {
+            let response: String = format!("Received: name={}, age={}", data.name, data.age);
+            let _ = ctx.set_response_body(response).await;
+        }
+        Err(err) => {
+            let error_msg: String = format!("JSON parse error: {:?}", err);
+            let _ = ctx.set_response_body(error_msg).await;
+        }
+    }
 }
 
 #[tokio::main]
@@ -202,6 +216,7 @@ async fn main() {
     server.route("/unknown-all", unknown_all).await;
     server.route("/test-execute", test_pre_hook_macro).await;
     server.route("/test-post-hook", test_post_hook_macro).await;
+    server.route("/test-body", test_body_macro).await;
     let test = || async move {
         server.run().await.unwrap();
     };

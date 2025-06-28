@@ -6,7 +6,6 @@ pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
