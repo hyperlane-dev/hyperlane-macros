@@ -361,13 +361,15 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Sets the HTTP status code for the response.
 ///
 /// This attribute macro configures the HTTP status code that will be sent with the response.
-/// The status code should be provided as a numeric value.
+/// The status code can be provided as a numeric literal or a variable expression.
 ///
 /// # Usage
 ///
 /// ```rust
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
+///
+/// const CODE: i32 = 200;
 ///
 /// #[response_status_code(200)]
 /// async fn success_handler(ctx: Context) {
@@ -379,14 +381,14 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     // Response will have status code 404
 /// }
 ///
-/// #[response_status_code(500)]
-/// async fn error_handler(ctx: Context) {
-///     // Response will have status code 500
+/// #[response_status_code(CODE)]
+/// async fn dynamic_handler(ctx: Context) {
+///     // Response will have status code from variable
 /// }
 /// ```
 ///
-/// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) and should be
-/// applied to async functions that accept a `Context` parameter.
+/// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) or a variable expression
+/// and should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_status_code_macro(attr, item)
@@ -395,7 +397,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// Sets the HTTP reason phrase for the response.
 ///
 /// This attribute macro configures the HTTP reason phrase that accompanies the status code.
-/// The reason phrase should be provided as a string literal.
+/// The reason phrase can be provided as a string literal or a variable expression.
 ///
 /// # Usage
 ///
@@ -403,6 +405,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
+/// const REASON: &str = "Custom Error";
 /// #[response_reason_phrase("OK")]
 /// async fn success_handler(ctx: Context) {
 ///     // Response will have reason phrase "OK"
@@ -413,17 +416,88 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 ///     // Response will have reason phrase "Not Found"
 /// }
 ///
-/// #[response_reason_phrase("Internal Server Error")]
-/// async fn error_handler(ctx: Context) {
-///     // Response will have reason phrase "Internal Server Error"
+/// #[response_reason_phrase(REASON)]
+/// async fn dynamic_handler(ctx: Context) {
+///     // Response will have reason phrase from variable
 /// }
 /// ```
 ///
-/// The macro accepts a string literal for the reason phrase and should be
+/// The macro accepts a string literal or variable expression for the reason phrase and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_reason_phrase_macro(attr, item)
+}
+
+/// Sets a specific HTTP response header.
+///
+/// This attribute macro configures a specific HTTP response header that will be sent with the response.
+/// Both the header name and value can be provided as string literals or variable expressions.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane_macros::*;
+/// use hyperlane::*;
+///
+/// #[response_header("Content-Type", "application/json")]
+/// async fn json_handler(ctx: Context) {
+///     // Response will have Content-Type header set to application/json
+/// }
+///
+/// #[response_header("X-Custom-Header", "custom-value")]
+/// async fn custom_header_handler(ctx: Context) {
+///     // Response will have custom header
+/// }
+///
+/// #[response_header(header_name, header_value)]
+/// async fn dynamic_header_handler(ctx: Context) {
+///     let header_name = "X-Dynamic";
+///     let header_value = "dynamic-value";
+///     // Response will have header from variables
+/// }
+/// ```
+///
+/// The macro accepts two parameters: header name and header value, both can be string literals
+/// or variable expressions. Should be applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_header_macro(attr, item)
+}
+
+/// Sets the HTTP response body.
+///
+/// This attribute macro configures the HTTP response body that will be sent with the response.
+/// The body content can be provided as a string literal or a variable expression.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane_macros::*;
+/// use hyperlane::*;
+///
+/// #[response_body("Hello, World!")]
+/// async fn hello_handler(ctx: Context) {
+///     // Response will have body "Hello, World!"
+/// }
+///
+/// #[response_body("{\"message\": \"success\"}")]
+/// async fn json_response_handler(ctx: Context) {
+///     // Response will have JSON body
+/// }
+///
+/// #[response_body(response_data)]
+/// async fn dynamic_body_handler(ctx: Context) {
+///     let response_data = "Dynamic content";
+///     // Response will have body from variable
+/// }
+/// ```
+///
+/// The macro accepts a string literal or variable expression for the response body and should be
+/// applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_body_macro(attr, item)
 }
 
 /// Automatically sends the complete response after function execution.

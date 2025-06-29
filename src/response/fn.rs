@@ -1,49 +1,42 @@
 use crate::*;
 
-fn parse_literal_str(input: TokenStream) -> syn::Result<String> {
-    let lit: LitStr = syn::parse::<LitStr>(input)?;
-    Ok(lit.value())
+fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
+    syn::parse::<Expr>(input)
 }
 
-fn parse_literal_int(input: TokenStream) -> syn::Result<usize> {
-    let lit: LitInt = syn::parse::<LitInt>(input)?;
-    lit.base10_parse()
-}
-
-macro_rules! impl_response_setting_macro {
-    ($name:ident, $parse_fn:ident, $setter_fn:ident) => {
-        pub(crate) fn $name(attr: TokenStream, item: TokenStream) -> TokenStream {
-            expand_macro_with_attr_and_before_insertion(attr, item, $parse_fn, |context, value| {
-                let setter = Ident::new(stringify!($setter_fn), proc_macro2::Span::call_site());
-                quote! {
-                    #context.#setter(#value).await;
-                }
-            })
+pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+        quote! {
+            #context.set_response_status_code(hyperlane::ResponseStatusCode::from(#value as usize)).await;
         }
-    };
-    ($name:ident, $parse_fn:ident, $setter_fn:ident, $value_type:ident) => {
-        pub(crate) fn $name(attr: TokenStream, item: TokenStream) -> TokenStream {
-            expand_macro_with_attr_and_before_insertion(attr, item, $parse_fn, |context, value| {
-                let setter = Ident::new(stringify!($setter_fn), proc_macro2::Span::call_site());
-                let value_type =
-                    Ident::new(stringify!($value_type), proc_macro2::Span::call_site());
-                quote! {
-                    #context.#setter(hyperlane::#value_type::from(#value)).await;
-                }
-            })
-        }
-    };
+    })
 }
 
-impl_response_setting_macro!(
-    response_status_code_macro,
-    parse_literal_int,
-    set_response_status_code,
-    ResponseStatusCode
-);
+pub(crate) fn response_reason_phrase_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+        quote! {
+            #context.set_response_reason_phrase(#value).await;
+        }
+    })
+}
 
-impl_response_setting_macro!(
-    response_reason_phrase_macro,
-    parse_literal_str,
-    set_response_reason_phrase
-);
+pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let header_data: ResponseHeaderData = parse_macro_input!(attr as ResponseHeaderData);
+    let key: Expr = header_data.key;
+    let value: Expr = header_data.value;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            #context.set_response_header(#key, #value).await;
+        }
+    })
+}
+
+pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let body_data: ResponseBodyData = parse_macro_input!(attr as ResponseBodyData);
+    let body: Expr = body_data.body;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            #context.set_response_body(#body).await;
+        }
+    })
+}
