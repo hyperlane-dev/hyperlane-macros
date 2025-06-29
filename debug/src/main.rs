@@ -3,6 +3,11 @@ use hyperlane_macros::*;
 use serde::{Deserialize, Serialize};
 
 const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
+const CUSTOM_STATUS_CODE: i32 = 200;
+const CUSTOM_REASON: &str = "Accepted";
+const CUSTOM_HEADER_NAME: &str = "X-Custom-Header";
+const CUSTOM_HEADER_VALUE: &str = "custom-value";
+const RESPONSE_DATA: &str = "{\"status\": \"processing\"}";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct TestData {
@@ -52,27 +57,9 @@ async fn post(ctx: Context) {
 #[send]
 #[response_status_code(201)]
 #[response_reason_phrase("Created")]
-#[response_header("Content-Type", "application/json")]
+#[response_header("Content-Type" => "application/json")]
 #[response_body("{\"message\": \"Resource created\"}")]
 async fn test_new_macros_literals(ctx: Context) {}
-
-#[send]
-async fn test_new_macros_variables(ctx: Context) {
-    let status_code = 202;
-    let reason_phrase = "Accepted";
-    let header_name = "X-Custom-Header";
-    let header_value = "custom-value";
-    let response_data = "{\"status\": \"processing\"}";
-
-    // These would be used in the macro attributes if we could pass variables
-    // For now, we'll set them manually to show the functionality works
-    let _ = ctx
-        .set_response_status_code(hyperlane::ResponseStatusCode::from(status_code))
-        .await;
-    let _ = ctx.set_response_reason_phrase(reason_phrase).await;
-    let _ = ctx.set_response_header(header_name, header_value).await;
-    let _ = ctx.set_response_body(response_data).await;
-}
 
 #[connect]
 async fn connect(ctx: Context) {
@@ -263,6 +250,13 @@ async fn request_headers(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
+#[send]
+#[response_status_code(CUSTOM_STATUS_CODE)]
+#[response_reason_phrase(CUSTOM_REASON)]
+#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
+#[response_body(RESPONSE_DATA)]
+async fn response(ctx: Context) {}
+
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
@@ -302,6 +296,7 @@ async fn main() {
     server.route("/request_querys", request_querys).await;
     server.route("/request_header", request_header).await;
     server.route("/request_headers", request_headers).await;
+    server.route("/response", response).await;
     let test = || async move {
         server.run().await.unwrap();
     };

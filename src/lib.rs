@@ -361,7 +361,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Sets the HTTP status code for the response.
 ///
 /// This attribute macro configures the HTTP status code that will be sent with the response.
-/// The status code can be provided as a numeric literal or a variable expression.
+/// The status code can be provided as a numeric literal or a global constant.
 ///
 /// # Usage
 ///
@@ -369,7 +369,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// const CODE: i32 = 200;
+/// const CUSTOM_STATUS: i32 = 418;
 ///
 /// #[response_status_code(200)]
 /// async fn success_handler(ctx: Context) {
@@ -381,13 +381,13 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     // Response will have status code 404
 /// }
 ///
-/// #[response_status_code(CODE)]
-/// async fn dynamic_handler(ctx: Context) {
-///     // Response will have status code from variable
+/// #[response_status_code(CUSTOM_STATUS)]
+/// async fn custom_handler(ctx: Context) {
+///     // Response will have status code from global constant
 /// }
 /// ```
 ///
-/// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) or a variable expression
+/// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) or a global constant
 /// and should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -397,7 +397,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// Sets the HTTP reason phrase for the response.
 ///
 /// This attribute macro configures the HTTP reason phrase that accompanies the status code.
-/// The reason phrase can be provided as a string literal or a variable expression.
+/// The reason phrase can be provided as a string literal or a global constant.
 ///
 /// # Usage
 ///
@@ -405,7 +405,8 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// const REASON: &str = "Custom Error";
+/// const CUSTOM_REASON: &str = "I'm a teapot";
+///
 /// #[response_reason_phrase("OK")]
 /// async fn success_handler(ctx: Context) {
 ///     // Response will have reason phrase "OK"
@@ -416,13 +417,13 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 ///     // Response will have reason phrase "Not Found"
 /// }
 ///
-/// #[response_reason_phrase(REASON)]
-/// async fn dynamic_handler(ctx: Context) {
-///     // Response will have reason phrase from variable
+/// #[response_reason_phrase(CUSTOM_REASON)]
+/// async fn custom_handler(ctx: Context) {
+///     // Response will have reason phrase from global constant
 /// }
 /// ```
 ///
-/// The macro accepts a string literal or variable expression for the reason phrase and should be
+/// The macro accepts a string literal or global constant for the reason phrase and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -432,7 +433,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// Sets a specific HTTP response header.
 ///
 /// This attribute macro configures a specific HTTP response header that will be sent with the response.
-/// Both the header name and value can be provided as string literals or variable expressions.
+/// Both the header name and value can be provided as string literals or global constants.
 ///
 /// # Usage
 ///
@@ -440,26 +441,27 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
 ///
-/// #[response_header("Content-Type", "application/json")]
+/// const HEADER_NAME: &str = "X-Custom-Header";
+/// const HEADER_VALUE: &str = "custom-value";
+///
+/// #[response_header("Content-Type" => "application/json")]
 /// async fn json_handler(ctx: Context) {
 ///     // Response will have Content-Type header set to application/json
 /// }
 ///
-/// #[response_header("X-Custom-Header", "custom-value")]
-/// async fn custom_header_handler(ctx: Context) {
-///     // Response will have custom header
+/// #[response_header("X-Static-Header" => "static-value")]
+/// async fn static_header_handler(ctx: Context) {
+///     // Response will have static header
 /// }
 ///
-/// #[response_header(header_name, header_value)]
+/// #[response_header(HEADER_NAME => HEADER_VALUE)]
 /// async fn dynamic_header_handler(ctx: Context) {
-///     let header_name = "X-Dynamic";
-///     let header_value = "dynamic-value";
-///     // Response will have header from variables
+///     // Response will have header from global constants
 /// }
 /// ```
 ///
 /// The macro accepts two parameters: header name and header value, both can be string literals
-/// or variable expressions. Should be applied to async functions that accept a `Context` parameter.
+/// or global constants. Should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_header_macro(attr, item)
@@ -468,13 +470,15 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Sets the HTTP response body.
 ///
 /// This attribute macro configures the HTTP response body that will be sent with the response.
-/// The body content can be provided as a string literal or a variable expression.
+/// The body content can be provided as a string literal or a global constant.
 ///
 /// # Usage
 ///
 /// ```rust
 /// use hyperlane_macros::*;
 /// use hyperlane::*;
+///
+/// const RESPONSE_DATA: &str = "Dynamic content from constant";
 ///
 /// #[response_body("Hello, World!")]
 /// async fn hello_handler(ctx: Context) {
@@ -486,14 +490,13 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     // Response will have JSON body
 /// }
 ///
-/// #[response_body(response_data)]
+/// #[response_body(RESPONSE_DATA)]
 /// async fn dynamic_body_handler(ctx: Context) {
-///     let response_data = "Dynamic content";
-///     // Response will have body from variable
+///     // Response will have body from global constant
 /// }
 /// ```
 ///
-/// The macro accepts a string literal or variable expression for the response body and should be
+/// The macro accepts a string literal or global constant for the response body and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {

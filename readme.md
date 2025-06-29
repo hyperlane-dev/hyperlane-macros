@@ -54,8 +54,10 @@ cargo add hyperlane-macros
 
 ### Response Setting Macros
 
-- `#[response_status_code(code)]` - Set response status code
-- `#[response_reason_phrase("phrase")]` - Set response reason phrase
+- `#[response_status_code(code)]` - Set response status code (supports literals and global constants)
+- `#[response_reason_phrase("phrase")]` - Set response reason phrase (supports literals and global constants)
+- `#[response_header("key", "value")]` - Set response header (supports literals and global constants)
+- `#[response_body("data")]` - Set response body (supports literals and global constants)
 
 ### Send Operation Macros
 
@@ -95,27 +97,27 @@ cargo add hyperlane-macros
 
 - `#[attributes(variable_name)]` - Get all attributes as a HashMap
 
-### Route param Macros
+### Route Param Macros
 
 - `#[route_param(key => variable_name)]` - Put the route param of the specified key into the specified variable
 
-### Route params Macros
+### Route Params Macros
 
 - `#[route_params(variable_name)]` - Get all route parameters
 
-### Query Macros
+### Request Query Macros
 
 - `#[request_query(key => variable_name)]` - Get specific request_query parameter
 
-### Querys Macros
+### Request Querys Macros
 
 - `#[request_querys(variable_name)]` - Get all request_query parameters
 
-### Header Macros
+### Request Header Macros
 
 - `#[request_header(key => variable_name)]` - Get specific HTTP request_header
 
-### Headers Macros
+### Request Headers Macros
 
 - `#[request_headers(variable_name)]` - Get all HTTP request_headers
 
@@ -124,8 +126,17 @@ cargo add hyperlane-macros
 - `#[pre_hook(function_name)]` - Execute function before the marked code
 - `#[post_hook(function_name)]` - Execute function after the marked code
 
+### Response Header Macros
+
+- `#[response_header(key => value)]`
+
+### Response Body Macros
+
+- `#[response_body(value)]`
+
 ### Best Practice Warning
 
+- Request related macros are mostly query functions, while response related macros are mostly assignment functions.
 - When using `pre_hook` or `post_hook` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
 
 ## Example Usage
@@ -136,6 +147,11 @@ use hyperlane_macros::*;
 use serde::{Deserialize, Serialize};
 
 const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
+const CUSTOM_STATUS_CODE: i32 = 200;
+const CUSTOM_REASON: &str = "Accepted";
+const CUSTOM_HEADER_NAME: &str = "X-Custom-Header";
+const CUSTOM_HEADER_VALUE: &str = "custom-value";
+const RESPONSE_DATA: &str = "{\"status\": \"processing\"}";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct TestData {
@@ -181,6 +197,13 @@ async fn get(ctx: Context) {
 async fn post(ctx: Context) {
     let _ = ctx.set_response_body("post").await;
 }
+
+#[send]
+#[response_status_code(201)]
+#[response_reason_phrase("Created")]
+#[response_header("Content-Type" => "application/json")]
+#[response_body("{\"message\": \"Resource created\"}")]
+async fn test_new_macros_literals(ctx: Context) {}
 
 #[connect]
 async fn connect(ctx: Context) {
@@ -371,6 +394,13 @@ async fn request_headers(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
+#[send]
+#[response_status_code(CUSTOM_STATUS_CODE)]
+#[response_reason_phrase(CUSTOM_REASON)]
+#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
+#[response_body(RESPONSE_DATA)]
+async fn response(ctx: Context) {}
+
 #[tokio::main]
 async fn main() {
     let server: Server = Server::new();
@@ -410,10 +440,8 @@ async fn main() {
     server.route("/request_querys", request_querys).await;
     server.route("/request_header", request_header).await;
     server.route("/request_headers", request_headers).await;
-    let test = || async move {
-        server.run().await.unwrap();
-    };
-    let _ = tokio::time::timeout(std::time::Duration::from_secs(60), test()).await;
+    server.route("/response", response).await;
+    server.run().await.unwrap();
 }
 ```
 
