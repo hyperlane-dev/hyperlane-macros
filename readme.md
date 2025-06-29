@@ -41,16 +41,16 @@ cargo add hyperlane-macros
 
 ### Protocol Check Macros
 
-- `#[ws]` - WebSocket check
-- `#[http]` - HTTP check
-- `#[h2c]` - HTTP/2 Cleartext check
-- `#[http0_9]` - HTTP/0.9 check
-- `#[http1_0]` - HTTP/1.0 check
-- `#[http1_1]` - HTTP/1.1 check
-- `#[http1_1_or_higher]` - HTTP/1.1 or higher version check
-- `#[http2]` - HTTP/2 check
-- `#[http3]` - HTTP/3 check
-- `#[tls]` - TLS check
+- `#[ws]` - WebSocket check, ensures function only executes for WebSocket upgrade requests
+- `#[http]` - HTTP check, ensures function only executes for standard HTTP requests
+- `#[h2c]` - HTTP/2 Cleartext check, ensures function only executes for HTTP/2 cleartext requests
+- `#[http0_9]` - HTTP/0.9 check, ensures function only executes for HTTP/0.9 protocol requests
+- `#[http1_0]` - HTTP/1.0 check, ensures function only executes for HTTP/1.0 protocol requests
+- `#[http1_1]` - HTTP/1.1 check, ensures function only executes for HTTP/1.1 protocol requests
+- `#[http1_1_or_higher]` - HTTP/1.1 or higher version check, ensures function only executes for HTTP/1.1 or newer protocol versions
+- `#[http2]` - HTTP/2 check, ensures function only executes for HTTP/2 protocol requests
+- `#[http3]` - HTTP/3 check, ensures function only executes for HTTP/3 protocol requests
+- `#[tls]` - TLS check, ensures function only executes for TLS-secured connections
 
 ### Response Setting Macros
 
@@ -61,28 +61,28 @@ cargo add hyperlane-macros
 
 ### Send Operation Macros
 
-- `#[send]` - Send response
-- `#[send_body]` - Send response body
-- `#[send_once]` - Send response once
-- `#[send_once_body]` - Send response body once
+- `#[send]` - Send complete response (headers and body) after function execution
+- `#[send_body]` - Send only response body after function execution
+- `#[send_once]` - Send complete response exactly once after function execution
+- `#[send_once_body]` - Send response body exactly once after function execution
 
 ### Flush Macros
 
-- `#[flush]` - Flush response
+- `#[flush]` - Flush response stream after function execution to ensure immediate data transmission
 
 ### Aborted Macros
 
-- `#[aborted]` - Aborted request
+- `#[aborted]` - Handle aborted requests, providing cleanup logic for prematurely terminated connections
 
 ### Closed Operation Macros
 
-- `#[closed]` - Closed stream
+- `#[closed]` - Handle closed streams, providing cleanup logic for completed connections
 
 ### Filter Macros
 
-- `#[filter_unknown_method]` - Filter unknown HTTP methods
-- `#[filter_unknown_upgrade]` - Filter unknown upgrade requests
-- `#[filter_unknown_version]` - Filter unknown HTTP versions
+- `#[filter_unknown_method]` - Filter unknown HTTP methods, handling requests with non-standard methods
+- `#[filter_unknown_upgrade]` - Filter unknown upgrade requests, handling requests with non-standard upgrade protocols
+- `#[filter_unknown_version]` - Filter unknown HTTP versions, handling requests with non-standard HTTP protocol versions
 - `#[filter_unknown]` - Combined filter for unknown method, upgrade, and version
 
 ### Request Body Macros
@@ -91,48 +91,48 @@ cargo add hyperlane-macros
 
 ### Attribute Macros
 
-- `#[attribute(key => variable_name: type)]` - Put the attribute of the specified key into the specified variable and type
+- `#[attribute(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
 
 ### Attributes Macros
 
-- `#[attributes(variable_name)]` - Get all attributes as a HashMap
+- `#[attributes(variable_name)]` - Get all attributes as a HashMap for comprehensive attribute access
 
 ### Route Param Macros
 
-- `#[route_param(key => variable_name)]` - Put the route param of the specified key into the specified variable
+- `#[route_param(key => variable_name)]` - Extract a specific route parameter by key into a variable
 
 ### Route Params Macros
 
-- `#[route_params(variable_name)]` - Get all route parameters
+- `#[route_params(variable_name)]` - Get all route parameters as a collection
 
 ### Request Query Macros
 
-- `#[request_query(key => variable_name)]` - Get specific request_query parameter
+- `#[request_query(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
 
 ### Request Querys Macros
 
-- `#[request_querys(variable_name)]` - Get all request_query parameters
+- `#[request_querys(variable_name)]` - Get all query parameters as a collection
 
 ### Request Header Macros
 
-- `#[request_header(key => variable_name)]` - Get specific HTTP request_header
+- `#[request_header(key => variable_name)]` - Extract a specific HTTP header by name from the request
 
 ### Request Headers Macros
 
-- `#[request_headers(variable_name)]` - Get all HTTP request_headers
+- `#[request_headers(variable_name)]` - Get all HTTP headers as a collection
 
 ### Hook Macros
 
-- `#[pre_hook(function_name)]` - Execute function before the marked code
-- `#[post_hook(function_name)]` - Execute function after the marked code
+- `#[pre_hook(function_name)]` - Execute specified function before the main handler function
+- `#[post_hook(function_name)]` - Execute specified function after the main handler function
 
 ### Response Header Macros
 
-- `#[response_header(key => value)]`
+- `#[response_header(key => value)]` - Set a specific HTTP response header with the given key and value
 
 ### Response Body Macros
 
-- `#[response_body(value)]`
+- `#[response_body(value)]` - Set the HTTP response body with the given value
 
 ### Best Practice Warning
 
