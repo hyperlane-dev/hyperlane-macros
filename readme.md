@@ -26,6 +26,10 @@ cargo add hyperlane-macros
 
 ## Available Macros
 
+### Server Instance Macros
+
+- `#[hyperlane(variable_name)]` - Create a new Server instance with the specified variable name at the beginning of the function
+
 ### HTTP Method Macros
 
 - `#[methods(method1, method2, ...)]` - Accepts multiple HTTP methods
@@ -402,8 +406,8 @@ async fn request_headers(ctx: Context) {
 async fn response(ctx: Context) {}
 
 #[tokio::main]
+#[hyperlane(server)]
 async fn main() {
-    let server: Server = Server::new();
     server.host("0.0.0.0").await;
     server.port(60000).await;
     server.route("/get_post", get_post).await;

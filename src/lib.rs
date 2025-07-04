@@ -13,6 +13,7 @@
 //! - **Filter Mechanisms**: Unknown method, upgrade, and version filtering
 //! - **Hook System**: Pre and post execution hooks for request processing
 //! - **Stream Management**: Connection state handling for aborted and closed streams
+//! - **Server Instance Creation**: Automatic Server instance initialization with custom variable names
 //!
 //! ## Dependencies
 //!
@@ -27,7 +28,8 @@
 //!
 //! ## Usage Guidelines
 //!
-//! All macros are designed to be used as attribute macros on async functions that accept a `Context` parameter.
+//! Most macros are designed to be used as attribute macros on async functions that accept a `Context` parameter.
+//! The `hyperlane` macro can be used on any async function to create a Server instance.
 //! Multiple macros can be combined on a single function to create complex request handling logic.
 //! When using hook macros (`pre_hook`, `post_hook`), avoid combining them with other macros on the same function
 //! to prevent unexpected behavior during macro expansion.
@@ -43,6 +45,7 @@ mod protocol;
 mod request;
 mod response;
 mod send;
+mod server;
 
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
@@ -55,6 +58,7 @@ pub(crate) use protocol::*;
 pub(crate) use request::*;
 pub(crate) use response::*;
 pub(crate) use send::*;
+pub(crate) use server::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
@@ -1283,4 +1287,29 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_headers_macro(attr, item)
+}
+
+/// Creates a new Server instance with the specified variable name.
+///
+/// This attribute macro generates a Server instance initialization at the beginning
+/// of the function with the specified variable name.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane_macros::*;
+/// use hyperlane::*;
+///
+/// #[hyperlane(server)]
+/// async fn handle_request(ctx: Context) {
+///     // server is now available as: let server: Server = Server::new();
+///     // Function body can use server
+/// }
+/// ```
+///
+/// The macro accepts a variable name as parameter. The variable will be available
+/// as a Server instance in the function scope.
+#[proc_macro_attribute]
+pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
+    hyperlane_macro(attr, item)
 }
