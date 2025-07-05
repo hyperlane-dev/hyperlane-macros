@@ -1,8 +1,8 @@
 [package]
 name = "hyperlane-macros"
-version = "1.5.0"
+version = "1.5.1"
 edition = "2024"
-authors = ["root@ltpp.vip"] 
+authors = ["root@ltpp.vip"]
 license = "MIT"
 description = """hyperlane macro"""
 keywords = ["http", "request", "response", "tcp", "cross-platform"]
@@ -23,12 +23,12 @@ exclude = [
 proc-macro = true
 
 [dependencies]
-syn = { version = "2", features = ["full"] }
-quote = "1.0"
-proc-macro2 = "1.0"
+syn = { version = "2.0.104", features = ["full"] }
+quote = "1.0.40"
+proc-macro2 = "1.0.95"
 
 [dev-dependencies]
-hyperlane = "5.39.0"
+hyperlane = "5.40.1"
 serde = { version = "1.0.219", features = ["derive"] }
 
 [profile.dev]
