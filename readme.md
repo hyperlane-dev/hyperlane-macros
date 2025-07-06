@@ -147,7 +147,6 @@ cargo add hyperlane-macros
 ## Example Usage
 
 ```rust
-#![allow(dead_code)]
 use hyperlane::*;
 use hyperlane_macros::*;
 use serde::{Deserialize, Serialize};
@@ -414,7 +413,50 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
-fn main() {}
+#[tokio::main]
+#[hyperlane(server)]
+async fn main() {
+    server.route("/get", get).await;
+    server.route("/post", post).await;
+    server.route("/connect", connect).await;
+    server.route("/delete", delete).await;
+    server.route("/head", head).await;
+    server.route("/options", options).await;
+    server.route("/patch", patch).await;
+    server.route("/put", put).await;
+    server.route("/trace", trace).await;
+    server.route("/h2c", h2c).await;
+    server.route("/http", http_only).await;
+    server.route("/http0_9", http0_9).await;
+    server.route("/http1_0", http1_0).await;
+    server.route("/http1_1", http1_1).await;
+    server.route("/http2", http2).await;
+    server.route("/http3", http3).await;
+    server.route("/tls", tls).await;
+    server.route("/http1_1_or_higher", http1_1_or_higher).await;
+    server.route("/unknown_method", unknown_method).await;
+    server.route("/unknown_upgrade", unknown_upgrade).await;
+    server.route("/unknown_version", unknown_version).await;
+    server.route("/unknown_all", unknown_all).await;
+    server.route("/websocket", websocket).await;
+    server.route("/ctx_hook", ctx_hook).await;
+    server.route("/get_post", get_post).await;
+    server.route("/attributes", attributes).await;
+    server.route("/route_params/:test", route_params).await;
+    server.route("/request_querys", request_querys).await;
+    server.route("/request_headers", request_headers).await;
+    server.route("/route_param/:test", route_param).await;
+    server.route("/request_query", request_query).await;
+    server.route("/request_header", request_header).await;
+    server.route("/request_body", request_body).await;
+    server.route("/attribute", attribute).await;
+    server.route("/request_body_json", request_body_json).await;
+    server
+        .route("/test_new_macros_literals", test_new_macros_literals)
+        .await;
+    server.route("/response", response).await;
+    let _ = server.run().await;
+}
 ```
 
 ## License

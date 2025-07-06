@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-macros"
-version = "1.6.0"
+version = "1.6.1"
 edition = "2024"
 authors = ["root@ltpp.vip"]
 license = "MIT"
