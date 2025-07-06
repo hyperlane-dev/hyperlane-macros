@@ -1028,10 +1028,35 @@ pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     post_hook_macro(attr, item)
 }
 
-/// Parses the request body into a specified variable and type.
+/// Extracts the raw request body into a specified variable.
 ///
-/// This attribute macro extracts and deserializes the request body content into a variable
-/// with the specified type. The body content is typically parsed as JSON.
+/// This attribute macro extracts the raw request body content into a variable
+/// with the fixed type `RequestBody`. The body content is not parsed or deserialized.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane_macros::*;
+/// use hyperlane::*;
+///
+/// #[request_body(raw_body)]
+/// async fn handle_raw_body(ctx: Context) {
+///     // Use the raw request body
+///     let body_content = raw_body;
+/// }
+/// ```
+///
+/// The macro accepts only a variable name. The variable will be available
+/// in the function scope as a `RequestBody` type.
+#[proc_macro_attribute]
+pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_body_macro(attr, item)
+}
+
+/// Parses the request body as JSON into a specified variable and type.
+///
+/// This attribute macro extracts and deserializes the request body content as JSON into a variable
+/// with the specified type. The body content is parsed as JSON using serde.
 ///
 /// # Usage
 ///
@@ -1046,7 +1071,7 @@ pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     age: u32,
 /// }
 ///
-/// #[body(user_data: UserData)]
+/// #[request_body_json(user_data: UserData)]
 /// async fn handle_user(ctx: Context) {
 ///     if let Ok(data) = user_data {
 ///         // Use the parsed user data
@@ -1055,10 +1080,10 @@ pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a variable name and type in the format `variable_name: Type`.
-/// The variable will be available in the function scope as a `Result<Type, Error>`.
+/// The variable will be available in the function scope as a `Result<Type, JsonError>`.
 #[proc_macro_attribute]
-pub fn body(attr: TokenStream, item: TokenStream) -> TokenStream {
-    body_macro(attr, item)
+pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_body_json_macro(attr, item)
 }
 
 /// Extracts a specific attribute value into a variable.

@@ -4,7 +4,11 @@ pub(crate) struct RequestMethods {
     pub(crate) methods: Punctuated<Ident, Token![,]>,
 }
 
-pub(crate) struct BodyData {
+pub(crate) struct RequestBodyData {
+    pub(crate) variable: Ident,
+}
+
+pub(crate) struct RequestBodyJsonData {
     pub(crate) variable: Ident,
     pub(crate) type_name: Type,
 }

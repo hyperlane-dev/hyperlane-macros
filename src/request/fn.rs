@@ -1,12 +1,22 @@
 use crate::*;
 
-pub(crate) fn body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let body_param: BodyData = parse_macro_input!(attr as BodyData);
+pub(crate) fn request_body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let body_param: RequestBodyData = parse_macro_input!(attr as RequestBodyData);
+    let variable: Ident = body_param.variable;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            let #variable: RequestBody = #context.get_request_body().await;
+        }
+    })
+}
+
+pub(crate) fn request_body_json_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let body_param: RequestBodyJsonData = parse_macro_input!(attr as RequestBodyJsonData);
     let variable: Ident = body_param.variable;
     let type_name: Type = body_param.type_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: Result<#type_name, JsonError> = #context.get_request_body_json::<#type_name>().await;
+            let #variable: ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
         }
     })
 }

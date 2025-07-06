@@ -8,12 +8,19 @@ impl Parse for RequestMethods {
     }
 }
 
-impl Parse for BodyData {
+impl Parse for RequestBodyData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variable: Ident = input.parse()?;
+        Ok(RequestBodyData { variable })
+    }
+}
+
+impl Parse for RequestBodyJsonData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variable: Ident = input.parse()?;
         input.parse::<Token![:]>()?;
         let type_name: Type = input.parse()?;
-        Ok(BodyData {
+        Ok(RequestBodyJsonData {
             variable,
             type_name,
         })
