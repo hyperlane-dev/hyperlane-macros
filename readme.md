@@ -157,19 +157,10 @@ cargo add hyperlane-macros
 
 - `#[response_body(value)]` - Set the HTTP response body with the given value
 
-### Memory Method
-
-To help remember the macro naming conventions:
+### Helper Tips
 
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
-
-Examples:
-
-- `#[request_body(var)]` → generates `ctx.get_request_body()`
-- `#[request_header(key => var)]` → generates `ctx.get_request_header_back(key)`
-- `#[response_body("data")]` → generates `ctx.set_response_body("data")`
-- `#[response_header("key" => "value")]` → generates `ctx.set_response_header("key", "value")`
 
 ### Best Practice Warning
 
