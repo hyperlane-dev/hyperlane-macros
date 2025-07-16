@@ -49,3 +49,12 @@ pub(crate) struct HeaderData {
 pub(crate) struct HeadersData {
     pub(crate) variable: Ident,
 }
+
+pub(crate) struct CookieData {
+    pub(crate) variable: Ident,
+    pub(crate) key_name: Expr,
+}
+
+pub(crate) struct CookiesData {
+    pub(crate) variable: Ident,
+}

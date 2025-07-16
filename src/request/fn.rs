@@ -91,7 +91,7 @@ pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> Toke
     let key_name: Expr = request_header.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestHeadersValue = #context.get_request_header(#key_name).await;
+            let #variable: OptionRequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
         }
     })
 }
@@ -102,6 +102,27 @@ pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> Tok
     expand_macro_with_before_insertion(item, |context| {
         quote! {
             let #variable: RequestHeaders = #context.get_request_headers().await;
+        }
+    })
+}
+
+pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let cookie_data: CookieData = parse_macro_input!(attr as CookieData);
+    let variable: Ident = cookie_data.variable;
+    let key: Expr = cookie_data.key_name;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            let #variable: OptionCookiesValue = #context.get_request_cookie(#key).await;
+        }
+    })
+}
+
+pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let cookies_data: CookiesData = parse_macro_input!(attr as CookiesData);
+    let variable: Ident = cookies_data.variable;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            let #variable: Cookies = #context.get_request_cookies().await;
         }
     })
 }

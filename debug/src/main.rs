@@ -25,13 +25,6 @@ async fn ctx_pre_hook(ctx: Context) {}
 async fn ctx_post_hook(ctx: Context) {}
 
 #[send]
-#[response_status_code(201)]
-#[response_reason_phrase("Created")]
-#[response_header("Content-Type" => "application/json")]
-#[response_body("{\"message\": \"Resource created\"}")]
-async fn test_new_macros_literals(ctx: Context) {}
-
-#[send]
 #[response_status_code(CUSTOM_STATUS_CODE)]
 #[response_reason_phrase(CUSTOM_REASON)]
 #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
@@ -247,6 +240,20 @@ async fn request_body(ctx: Context) {
 }
 
 #[send]
+#[host("example.com")]
+async fn host(ctx: Context) {
+    let _ = ctx
+        .set_response_body("host string literal: example.com")
+        .await;
+}
+
+#[send]
+#[host_filter("filter.example.com")]
+async fn host_filter(ctx: Context) {
+    let _ = ctx.set_response_body("host filter string literal").await;
+}
+
+#[send]
 #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {
     if let Some(data) = request_attribute_option {
@@ -264,11 +271,47 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
+#[send]
+#[referer("https://example.com")]
+async fn referer(ctx: Context) {
+    let _ = ctx
+        .set_response_body("referer string literal: https://example.com")
+        .await;
+}
+
+#[send]
+#[referer_filter("https://spam.com")]
+async fn referer_filter(ctx: Context) {
+    let _ = ctx.set_response_body("referer filter string literal").await;
+}
+
+#[send]
+#[request_cookies(cookie_value)]
+async fn cookies(ctx: Context) {
+    let response: String = format!("All cookies: {:?}", cookie_value);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[request_cookie("test" => session_cookie_opt)]
+async fn cookie(ctx: Context) {
+    if let Some(session) = session_cookie_opt {
+        let response: String = format!("Session cookie: {}", session);
+        let _ = ctx.set_response_body(response).await;
+    }
+}
+
+#[send]
+#[response_status_code(201)]
+#[response_reason_phrase(HttpStatus::Created.to_string())]
+#[response_header(CONTENT_TYPE => APPLICATION_JSON)]
+#[response_body("{\"message\": \"Resource created\"}")]
+async fn literals(ctx: Context) {}
+
 #[tokio::main]
 #[hyperlane(server)]
 async fn main() {
-    server.route("/get", get).await;
-    server.route("/post", post).await;
+    server.route("/response", response).await;
     server.route("/connect", connect).await;
     server.route("/delete", delete).await;
     server.route("/head", head).await;
@@ -289,6 +332,8 @@ async fn main() {
     server.route("/unknown_upgrade", unknown_upgrade).await;
     server.route("/unknown_version", unknown_version).await;
     server.route("/unknown_all", unknown_all).await;
+    server.route("/get", get).await;
+    server.route("/post", post).await;
     server.route("/websocket", websocket).await;
     server.route("/ctx_hook", ctx_hook).await;
     server.route("/get_post", get_post).await;
@@ -300,12 +345,15 @@ async fn main() {
     server.route("/request_query", request_query).await;
     server.route("/request_header", request_header).await;
     server.route("/request_body", request_body).await;
+    server.route("/host", host).await;
+    server.route("/host_filter", host_filter).await;
     server.route("/attribute", attribute).await;
     server.route("/request_body_json", request_body_json).await;
-    server
-        .route("/test_new_macros_literals", test_new_macros_literals)
-        .await;
-    server.route("/response", response).await;
+    server.route("/referer", referer).await;
+    server.route("/referer_filter", referer_filter).await;
+    server.route("/cookies", cookies).await;
+    server.route("/cookie", cookie).await;
+    server.route("/literals", literals).await;
     let _ = tokio::time::timeout(std::time::Duration::from_secs(60), async move {
         let _ = server.run().await;
     })

@@ -96,3 +96,19 @@ impl Parse for HeadersData {
         Ok(HeadersData { variable })
     }
 }
+
+impl Parse for CookieData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let key_name: Expr = input.parse()?;
+        input.parse::<Token![=>]>()?;
+        let variable: Ident = input.parse()?;
+        Ok(CookieData { variable, key_name })
+    }
+}
+
+impl Parse for CookiesData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variable: Ident = input.parse()?;
+        Ok(CookiesData { variable })
+    }
+}

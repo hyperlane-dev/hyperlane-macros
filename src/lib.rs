@@ -40,8 +40,10 @@ mod common;
 mod filter;
 mod flush;
 mod hook;
+mod host;
 mod http;
 mod protocol;
+mod referer;
 mod request;
 mod response;
 mod send;
@@ -53,8 +55,10 @@ pub(crate) use common::*;
 pub(crate) use filter::*;
 pub(crate) use flush::*;
 pub(crate) use hook::*;
+pub(crate) use host::*;
 pub(crate) use http::*;
 pub(crate) use protocol::*;
+pub(crate) use referer::*;
 pub(crate) use request::*;
 pub(crate) use response::*;
 pub(crate) use send::*;
@@ -77,8 +81,8 @@ pub(crate) use syn::{
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[get]
 /// async fn handle_get(ctx: Context) {
@@ -101,8 +105,8 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[post]
 /// async fn handle_post(ctx: Context) {
@@ -125,8 +129,8 @@ pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[put]
 /// async fn handle_put(ctx: Context) {
@@ -149,8 +153,8 @@ pub fn put(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[delete]
 /// async fn handle_delete(ctx: Context) {
@@ -173,8 +177,8 @@ pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[patch]
 /// async fn handle_patch(ctx: Context) {
@@ -197,8 +201,8 @@ pub fn patch(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[head]
 /// async fn handle_head(ctx: Context) {
@@ -221,8 +225,8 @@ pub fn head(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[options]
 /// async fn handle_options(ctx: Context) {
@@ -245,8 +249,8 @@ pub fn options(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[connect]
 /// async fn handle_connect(ctx: Context) {
@@ -269,8 +273,8 @@ pub fn connect(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[trace]
 /// async fn handle_trace(ctx: Context) {
@@ -293,8 +297,8 @@ pub fn trace(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[methods(get, post)]
 /// async fn handle_get_post(ctx: Context) {
@@ -322,8 +326,8 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[ws]
 /// async fn handle_websocket(ctx: Context) {
@@ -346,8 +350,8 @@ pub fn ws(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http]
 /// async fn handle_http(ctx: Context) {
@@ -370,8 +374,8 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// const CUSTOM_STATUS: i32 = 418;
 ///
@@ -406,8 +410,8 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// const CUSTOM_REASON: &str = "I'm a teapot";
 ///
@@ -442,8 +446,8 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// const HEADER_NAME: &str = "X-Custom-Header";
 /// const HEADER_VALUE: &str = "custom-value";
@@ -479,8 +483,8 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// const RESPONSE_DATA: &str = "Dynamic content from constant";
 ///
@@ -515,8 +519,8 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[send]
 /// async fn auto_send_handler(ctx: Context) {
@@ -540,8 +544,8 @@ pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[send_body]
 /// async fn auto_send_body_handler(ctx: Context) {
@@ -565,8 +569,8 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[send_once]
 /// async fn send_once_handler(ctx: Context) {
@@ -590,8 +594,8 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[send_once_body]
 /// async fn send_once_body_handler(ctx: Context) {
@@ -615,8 +619,8 @@ pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[flush]
 /// async fn flush_handler(ctx: Context) {
@@ -640,8 +644,8 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[aborted]
 /// async fn handle_aborted(ctx: Context) {
@@ -664,8 +668,8 @@ pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[closed]
 /// async fn handle_closed(ctx: Context) {
@@ -688,8 +692,8 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[h2c]
 /// async fn handle_h2c(ctx: Context) {
@@ -712,8 +716,8 @@ pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http0_9]
 /// async fn handle_http09(ctx: Context) {
@@ -736,8 +740,8 @@ pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http1_0]
 /// async fn handle_http10(ctx: Context) {
@@ -760,8 +764,8 @@ pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http1_1]
 /// async fn handle_http11(ctx: Context) {
@@ -784,8 +788,8 @@ pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http1_1_or_higher]
 /// async fn handle_modern_http(ctx: Context) {
@@ -808,8 +812,8 @@ pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http2]
 /// async fn handle_http2(ctx: Context) {
@@ -832,8 +836,8 @@ pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[http3]
 /// async fn handle_http3(ctx: Context) {
@@ -856,8 +860,8 @@ pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[tls]
 /// async fn handle_secure(ctx: Context) {
@@ -880,8 +884,8 @@ pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[filter_unknown_method]
 /// async fn handle_unknown_method(ctx: Context) {
@@ -904,8 +908,8 @@ pub fn filter_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStre
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[filter_unknown_upgrade]
 /// async fn handle_unknown_upgrade(ctx: Context) {
@@ -928,8 +932,8 @@ pub fn filter_unknown_upgrade(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[filter_unknown_version]
 /// async fn handle_unknown_version(ctx: Context) {
@@ -952,8 +956,8 @@ pub fn filter_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[filter_unknown]
 /// async fn handle_all_unknown(ctx: Context) {
@@ -968,6 +972,112 @@ pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
     filter_unknown_macro(item)
 }
 
+/// Restricts function execution to requests with a specific host.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// has a host header that matches the specified value. Requests with different or missing host headers will be filtered out.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[host("example.com")]
+/// async fn handle_example_com(ctx: Context) {
+///     // Function body for example.com requests
+/// }
+///
+/// #[host("api.example.com")]
+/// async fn handle_api_subdomain(ctx: Context) {
+///     // Function body for api.example.com requests
+/// }
+/// ```
+///
+/// The macro accepts a string literal specifying the expected host value and should be
+/// applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
+    host_macro(attr, item)
+}
+
+/// Filters requests that have no host header.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// has a host header present. Requests without a host header will be filtered out.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[host_filter("example.com")]
+/// async fn handle_with_host(ctx: Context) {
+///     // Function body for requests with host header
+/// }
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn host_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
+    host_filter_macro(attr, item)
+}
+
+/// Restricts function execution to requests with a specific referer.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// has a referer header that matches the specified value. Requests with different or missing referer headers will be filtered out.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[referer("https://example.com")]
+/// async fn handle_example_referer(ctx: Context) {
+///     // Function body for requests from example.com
+/// }
+///
+/// #[referer("https://api.example.com")]
+/// async fn handle_api_referer(ctx: Context) {
+///     // Function body for requests from api.example.com
+/// }
+/// ```
+///
+/// The macro accepts a string literal specifying the expected referer value and should be
+/// applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
+    referer_macro(attr, item)
+}
+
+/// Filters requests that have a specific referer header.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// does not have a referer header that matches the specified value. Requests with the matching referer header will be filtered out.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[referer_filter("https://spam.com")]
+/// async fn handle_without_spam_referer(ctx: Context) {
+///     // Function body for requests not from spam.com
+/// }
+/// ```
+///
+/// The macro accepts a string literal specifying the referer value to filter out and should be
+/// applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn referer_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
+    referer_filter_macro(attr, item)
+}
+
 /// Executes a specified function before the main handler function.
 ///
 /// This attribute macro configures a pre-execution hook that runs before the main function logic.
@@ -976,8 +1086,8 @@ pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[get]
 /// async fn pre_handler(ctx: Context) {
@@ -1006,8 +1116,8 @@ pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[send]
 /// async fn post_handler(ctx: Context) {
@@ -1036,8 +1146,8 @@ pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[request_body(raw_body)]
 /// async fn handle_raw_body(ctx: Context) {
@@ -1061,8 +1171,8 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 /// use serde::Deserialize;
 ///
 /// #[derive(Deserialize, Clone)]
@@ -1094,8 +1204,8 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 /// use serde::Deserialize;
 ///
 /// const USER_KEY: &str = "user_data";
@@ -1129,8 +1239,8 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[attributes(all_attrs)]
 /// async fn handle_with_all_attributes(ctx: Context) {
@@ -1155,8 +1265,8 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// // For route like "/users/{id}"
 /// #[route_param("id" => user_id)]
@@ -1182,8 +1292,8 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// // For route like "/users/{id}/posts/{post_id}"
 /// #[route_params(params)]
@@ -1209,8 +1319,8 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// // For URL like "/search?q=rust&limit=10"
 /// #[request_query("q" => search_term)]
@@ -1236,8 +1346,8 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// // For URL like "/search?q=rust&limit=10&sort=date"
 /// #[request_querys(all_params)]
@@ -1263,8 +1373,8 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[request_header(HOST => host_request_header)]
 /// async fn handle_with_host(ctx: Context) {
@@ -1296,8 +1406,8 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[request_headers(all_request_headers)]
 /// async fn handle_with_all_request_headers(ctx: Context) {
@@ -1314,6 +1424,60 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_headers_macro(attr, item)
 }
 
+/// Extracts a specific cookie value or all cookies into a variable.
+///
+/// This attribute macro supports two syntaxes:
+/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key
+/// 2. `cookie(variable_name)` - Extract all cookies as a raw string
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_cookie("session_id" => session_cookie_opt)]
+/// async fn handle_with_session(ctx: Context) {
+///     if let Some(session) = session_cookie_opt {
+///         // Use the session cookie value
+///     }
+/// }
+/// ```
+///
+/// For specific cookie extraction, the variable will be available as `Option<String>`.
+/// For all cookies extraction, the variable will be available as `String`.
+#[proc_macro_attribute]
+pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_cookie_macro(attr, item)
+}
+
+/// Extracts all cookies as a raw string into a variable.
+///
+/// This attribute macro retrieves the entire Cookie header from the request and makes it
+/// available as a String variable. If no Cookie header is present, an empty string is used.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_cookies(cookie_value)]
+/// async fn handle_with_cookies(ctx: Context) {
+///     // Use the cookie value
+///     if !cookie_value.is_empty() {
+///         // Process cookie data
+///     }
+/// }
+/// ```
+///
+/// The macro accepts a variable name that will contain the Cookie header value.
+/// The variable will be available as a String in the function scope.
+#[proc_macro_attribute]
+pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_cookies_macro(attr, item)
+}
+
 /// Creates a new Server instance with the specified variable name.
 ///
 /// This attribute macro generates a Server instance initialization at the beginning
@@ -1322,8 +1486,8 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Usage
 ///
 /// ```rust
-/// use hyperlane_macros::*;
 /// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
 /// #[hyperlane(server)]
 /// async fn handle_request(ctx: Context) {

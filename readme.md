@@ -126,6 +126,24 @@ cargo add hyperlane-macros
 
 - `#[request_headers(variable_name)]` - Get all HTTP headers as a collection
 
+### Request Cookie Macros
+
+- `#[request_cookie(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
+
+### Request Cookies Macros
+
+- `#[request_cookies(variable_name)]` - Get all cookies as a raw string from the cookie header
+
+### Host Macros
+
+- `#[host("hostname")]` - Restrict function execution to requests with a specific host header value
+- `#[host_filter("hostname")]` - Filter requests that match a specific host header value
+
+### Referer Macros
+
+- `#[referer("url")]` - Restrict function execution to requests with a specific referer header value
+- `#[referer_filter("url")]` - Filter requests that match a specific referer header value
+
 ### Hook Macros
 
 - `#[pre_hook(function_name)]` - Execute specified function before the main handler function
@@ -138,6 +156,20 @@ cargo add hyperlane-macros
 ### Response Body Macros
 
 - `#[response_body(value)]` - Set the HTTP response body with the given value
+
+### Memory Method
+
+To help remember the macro naming conventions:
+
+- **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
+- **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
+
+Examples:
+
+- `#[request_body(var)]` → generates `ctx.get_request_body()`
+- `#[request_header(key => var)]` → generates `ctx.get_request_header_back(key)`
+- `#[response_body("data")]` → generates `ctx.set_response_body("data")`
+- `#[response_header("key" => "value")]` → generates `ctx.set_response_header("key", "value")`
 
 ### Best Practice Warning
 
@@ -172,13 +204,6 @@ async fn ctx_pre_hook(ctx: Context) {}
 #[send]
 #[response_status_code(200)]
 async fn ctx_post_hook(ctx: Context) {}
-
-#[send]
-#[response_status_code(201)]
-#[response_reason_phrase("Created")]
-#[response_header("Content-Type" => "application/json")]
-#[response_body("{\"message\": \"Resource created\"}")]
-async fn test_new_macros_literals(ctx: Context) {}
 
 #[send]
 #[response_status_code(CUSTOM_STATUS_CODE)]
@@ -396,6 +421,20 @@ async fn request_body(ctx: Context) {
 }
 
 #[send]
+#[host("example.com")]
+async fn host(ctx: Context) {
+    let _ = ctx
+        .set_response_body("host string literal: example.com")
+        .await;
+}
+
+#[send]
+#[host_filter("filter.example.com")]
+async fn host_filter(ctx: Context) {
+    let _ = ctx.set_response_body("host filter string literal").await;
+}
+
+#[send]
 #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {
     if let Some(data) = request_attribute_option {
@@ -413,11 +452,47 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
+#[send]
+#[referer("https://example.com")]
+async fn referer(ctx: Context) {
+    let _ = ctx
+        .set_response_body("referer string literal: https://example.com")
+        .await;
+}
+
+#[send]
+#[referer_filter("https://spam.com")]
+async fn referer_filter(ctx: Context) {
+    let _ = ctx.set_response_body("referer filter string literal").await;
+}
+
+#[send]
+#[request_cookies(cookie_value)]
+async fn cookies(ctx: Context) {
+    let response: String = format!("All cookies: {:?}", cookie_value);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[request_cookie("test" => session_cookie_opt)]
+async fn cookie(ctx: Context) {
+    if let Some(session) = session_cookie_opt {
+        let response: String = format!("Session cookie: {}", session);
+        let _ = ctx.set_response_body(response).await;
+    }
+}
+
+#[send]
+#[response_status_code(201)]
+#[response_reason_phrase(HttpStatus::Created.to_string())]
+#[response_header(CONTENT_TYPE => APPLICATION_JSON)]
+#[response_body("{\"message\": \"Resource created\"}")]
+async fn literals(ctx: Context) {}
+
 #[tokio::main]
 #[hyperlane(server)]
 async fn main() {
-    server.route("/get", get).await;
-    server.route("/post", post).await;
+    server.route("/response", response).await;
     server.route("/connect", connect).await;
     server.route("/delete", delete).await;
     server.route("/head", head).await;
@@ -438,6 +513,8 @@ async fn main() {
     server.route("/unknown_upgrade", unknown_upgrade).await;
     server.route("/unknown_version", unknown_version).await;
     server.route("/unknown_all", unknown_all).await;
+    server.route("/get", get).await;
+    server.route("/post", post).await;
     server.route("/websocket", websocket).await;
     server.route("/ctx_hook", ctx_hook).await;
     server.route("/get_post", get_post).await;
@@ -449,12 +526,15 @@ async fn main() {
     server.route("/request_query", request_query).await;
     server.route("/request_header", request_header).await;
     server.route("/request_body", request_body).await;
+    server.route("/host", host).await;
+    server.route("/host_filter", host_filter).await;
     server.route("/attribute", attribute).await;
     server.route("/request_body_json", request_body_json).await;
-    server
-        .route("/test_new_macros_literals", test_new_macros_literals)
-        .await;
-    server.route("/response", response).await;
+    server.route("/referer", referer).await;
+    server.route("/referer_filter", referer_filter).await;
+    server.route("/cookies", cookies).await;
+    server.route("/cookie", cookie).await;
+    server.route("/literals", literals).await;
     let _ = server.run().await;
 }
 ```
