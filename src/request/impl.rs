@@ -112,3 +112,17 @@ impl Parse for CookiesData {
         Ok(CookiesData { variable })
     }
 }
+
+impl Parse for RequestVersionData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variable: Ident = input.parse()?;
+        Ok(RequestVersionData { variable })
+    }
+}
+
+impl Parse for RequestPathData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variable: Ident = input.parse()?;
+        Ok(RequestPathData { variable })
+    }
+}

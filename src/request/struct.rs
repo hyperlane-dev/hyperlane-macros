@@ -58,3 +58,11 @@ pub(crate) struct CookieData {
 pub(crate) struct CookiesData {
     pub(crate) variable: Ident,
 }
+
+pub(crate) struct RequestVersionData {
+    pub(crate) variable: Ident,
+}
+
+pub(crate) struct RequestPathData {
+    pub(crate) variable: Ident,
+}

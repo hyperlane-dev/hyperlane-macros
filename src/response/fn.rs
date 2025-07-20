@@ -24,9 +24,17 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
     let header_data: ResponseHeaderData = parse_macro_input!(attr as ResponseHeaderData);
     let key: Expr = header_data.key;
     let value: Expr = header_data.value;
-    expand_macro_with_before_insertion(item, |context| {
-        quote! {
-            #context.set_response_header(#key, #value).await;
+    let operation: HeaderOperation = header_data.operation;
+    expand_macro_with_before_insertion(item, |context| match operation {
+        HeaderOperation::Set => {
+            quote! {
+                #context.set_response_header(#key, #value).await;
+            }
+        }
+        HeaderOperation::Replace => {
+            quote! {
+                #context.replace_response_header(#key, #value).await;
+            }
         }
     })
 }
@@ -37,6 +45,14 @@ pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> Token
     expand_macro_with_before_insertion(item, |context| {
         quote! {
             #context.set_response_body(#body).await;
+        }
+    })
+}
+
+pub(crate) fn response_version_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+        quote! {
+            #context.set_response_version(#value).await;
         }
     })
 }

@@ -126,3 +126,23 @@ pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> Tok
         }
     })
 }
+
+pub(crate) fn request_version_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let version_data: RequestVersionData = parse_macro_input!(attr as RequestVersionData);
+    let variable: Ident = version_data.variable;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            let #variable: RequestVersion = #context.get_request_version().await;
+        }
+    })
+}
+
+pub(crate) fn request_path_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let path_data: RequestPathData = parse_macro_input!(attr as RequestPathData);
+    let variable: Ident = path_data.variable;
+    expand_macro_with_before_insertion(item, |context| {
+        quote! {
+            let #variable: RequestPath = #context.get_request_path().await;
+        }
+    })
+}

@@ -438,10 +438,11 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
     response_reason_phrase_macro(attr, item)
 }
 
-/// Sets a specific HTTP response header.
+/// Sets or replaces a specific HTTP response header.
 ///
 /// This attribute macro configures a specific HTTP response header that will be sent with the response.
 /// Both the header name and value can be provided as string literals or global constants.
+/// Use `"key", "value"` to set a header (add to existing headers) or `"key" => "value"` to replace a header (overwrite existing).
 ///
 /// # Usage
 ///
@@ -452,24 +453,36 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// const HEADER_NAME: &str = "X-Custom-Header";
 /// const HEADER_VALUE: &str = "custom-value";
 ///
-/// #[response_header("Content-Type" => "application/json")]
+/// #[response_header("Content-Type", "application/json")]
 /// async fn json_handler(ctx: Context) {
 ///     // Response will have Content-Type header set to application/json
 /// }
 ///
 /// #[response_header("X-Static-Header" => "static-value")]
-/// async fn static_header_handler(ctx: Context) {
-///     // Response will have static header
+/// async fn replace_header_handler(ctx: Context) {
+///     // Response will have static header replaced (overwrite existing)
 /// }
 ///
-/// #[response_header(HEADER_NAME => HEADER_VALUE)]
+/// #[response_header(HEADER_NAME, HEADER_VALUE)]
 /// async fn dynamic_header_handler(ctx: Context) {
 ///     // Response will have header from global constants
 /// }
+///
+/// #[response_header("Cache-Control" => "no-cache")]
+/// async fn replace_cache_handler(ctx: Context) {
+///     // Response will have Cache-Control header replaced
+/// }
+///
+/// #[response_header("X-Test-Header", "set-value")]
+/// #[response_header("X-Replace-Header" => "replace-value")]
+/// async fn header_operations_handler(ctx: Context) {
+///     // Response will have X-Test-Header set and X-Replace-Header replaced
+/// }
 /// ```
 ///
-/// The macro accepts two parameters: header name and header value, both can be string literals
-/// or global constants. Should be applied to async functions that accept a `Context` parameter.
+/// The macro accepts header name and header value, both can be string literals or global constants.
+/// Use `"key", "value"` for setting headers and `"key" => "value"` for replacing headers.
+/// Should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_header_macro(attr, item)
@@ -509,6 +522,30 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_body_macro(attr, item)
+}
+
+/// Sets the HTTP response version.
+///
+/// This attribute macro configures the HTTP response version that will be sent with the response.
+/// The version can be provided as a variable or code block.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[response_version(HttpVersion::HTTP1_1)]
+/// async fn version_from_constant(ctx: Context) {
+///     // Response will have version from global constant
+/// }
+/// ```
+///
+/// The macro accepts a variable or code block for the response version and should be
+/// applied to async functions that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_version_macro(attr, item)
 }
 
 /// Automatically sends the complete response after function execution.
@@ -1476,6 +1513,57 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_cookies_macro(attr, item)
+}
+
+/// Extracts the HTTP request version into a variable.
+///
+/// This attribute macro retrieves the HTTP version from the request and makes it
+/// available as a variable. The version represents the HTTP protocol version used.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_version(http_version)]
+/// async fn handle_with_version(ctx: Context) {
+///     // Use the HTTP version
+/// }
+/// ```
+///
+/// The macro accepts a variable name that will contain the HTTP request version.
+/// The variable will be available as a RequestVersion type in the function scope.
+#[proc_macro_attribute]
+pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_version_macro(attr, item)
+}
+
+/// Extracts the HTTP request path into a variable.
+///
+/// This attribute macro retrieves the request path from the HTTP request and makes it
+/// available as a variable. The path represents the URL path portion of the request.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_path(request_path)]
+/// async fn handle_with_path(ctx: Context) {
+///     // Use the request path
+///     if request_path.starts_with("/api/") {
+///         // Handle API requests
+///     }
+/// }
+/// ```
+///
+/// The macro accepts a variable name that will contain the HTTP request path.
+/// The variable will be available as a RequestPath type in the function scope.
+#[proc_macro_attribute]
+pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_path_macro(attr, item)
 }
 
 /// Creates a new Server instance with the specified variable name.

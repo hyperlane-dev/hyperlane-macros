@@ -61,7 +61,9 @@ cargo add hyperlane-macros
 - `#[response_status_code(code)]` - Set response status code (supports literals and global constants)
 - `#[response_reason_phrase("phrase")]` - Set response reason phrase (supports literals and global constants)
 - `#[response_header("key", "value")]` - Set response header (supports literals and global constants)
+- `#[response_header("key" => "value")]` - Replace response header (supports literals and global constants)
 - `#[response_body("data")]` - Set response body (supports literals and global constants)
+- `#[response_version(version)]` - Set response HTTP version (supports literals and global constants)
 
 ### Send Operation Macros
 
@@ -134,6 +136,14 @@ cargo add hyperlane-macros
 
 - `#[request_cookies(variable_name)]` - Get all cookies as a raw string from the cookie header
 
+### Request Version Macros
+
+- `#[request_version(variable_name)]` - Extract the HTTP request version into a variable
+
+### Request Path Macros
+
+- `#[request_path(variable_name)]` - Extract the HTTP request path into a variable
+
 ### Host Macros
 
 - `#[host("hostname")]` - Restrict function execution to requests with a specific host header value
@@ -151,7 +161,8 @@ cargo add hyperlane-macros
 
 ### Response Header Macros
 
-- `#[response_header(key => value)]` - Set a specific HTTP response header with the given key and value
+- `#[response_header("key", "value")]` - Set a specific HTTP response header with the given key and value (add to existing headers)
+- `#[response_header("key" => "value")]` - Replace a specific HTTP response header with the given key and value (overwrite existing)
 
 ### Response Body Macros
 
@@ -474,10 +485,34 @@ async fn cookie(ctx: Context) {
 }
 
 #[send]
+#[request_version(http_version)]
+async fn request_version_test(ctx: Context) {
+    let response: String = format!("HTTP Version: {:?}", http_version);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[request_path(request_path)]
+async fn request_path_test(ctx: Context) {
+    let response: String = format!("Request Path: {:?}", request_path);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[response_header("X-Test-Header", "set-value")]
+#[response_header("X-Replace-Header" => "replace-value")]
+async fn header_operations_test(ctx: Context) {
+    let _ = ctx
+        .set_response_body("Testing header set and replace operations")
+        .await;
+}
+
+#[send]
 #[response_status_code(201)]
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
+#[response_version(HttpVersion::HTTP1_1)]
 async fn literals(ctx: Context) {}
 
 #[tokio::main]
@@ -525,6 +560,11 @@ async fn main() {
     server.route("/referer_filter", referer_filter).await;
     server.route("/cookies", cookies).await;
     server.route("/cookie", cookie).await;
+    server.route("/request_version", request_version_test).await;
+    server.route("/request_path", request_path_test).await;
+    server
+        .route("/header_operations", header_operations_test)
+        .await;
     server.route("/literals", literals).await;
     let _ = tokio::time::timeout(std::time::Duration::from_secs(60), async move {
         let result: ServerResult<()> = server.run().await;

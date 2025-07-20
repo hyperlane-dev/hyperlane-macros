@@ -302,10 +302,34 @@ async fn cookie(ctx: Context) {
 }
 
 #[send]
+#[request_version(http_version)]
+async fn request_version_test(ctx: Context) {
+    let response: String = format!("HTTP Version: {:?}", http_version);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[request_path(request_path)]
+async fn request_path_test(ctx: Context) {
+    let response: String = format!("Request Path: {:?}", request_path);
+    let _ = ctx.set_response_body(response).await;
+}
+
+#[send]
+#[response_header("X-Test-Header", "set-value")]
+#[response_header("X-Replace-Header" => "replace-value")]
+async fn header_operations_test(ctx: Context) {
+    let _ = ctx
+        .set_response_body("Testing header set and replace operations")
+        .await;
+}
+
+#[send]
 #[response_status_code(201)]
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
+#[response_version(HttpVersion::HTTP1_1)]
 async fn literals(ctx: Context) {}
 
 #[tokio::main]
@@ -353,6 +377,11 @@ async fn main() {
     server.route("/referer_filter", referer_filter).await;
     server.route("/cookies", cookies).await;
     server.route("/cookie", cookie).await;
+    server.route("/request_version", request_version_test).await;
+    server.route("/request_path", request_path_test).await;
+    server
+        .route("/header_operations", header_operations_test)
+        .await;
     server.route("/literals", literals).await;
     let _ = tokio::time::timeout(std::time::Duration::from_secs(60), async move {
         let result: ServerResult<()> = server.run().await;
