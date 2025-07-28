@@ -1,5 +1,15 @@
 use crate::*;
 
+/// Filters requests matching the specified Referer header.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The Referer value token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with Referer filter.
 pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
@@ -17,6 +27,16 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
     })
 }
 
+/// Filters requests not matching the specified Referer header.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The Referer value token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with inverse Referer filter.
 pub(crate) fn referer_filter_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;

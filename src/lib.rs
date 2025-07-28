@@ -1,38 +1,9 @@
-//! # Hyperlane Macros
+//! hyperlane-macros
 //!
-//! A comprehensive collection of procedural macros for building HTTP servers with enhanced functionality.
-//! This crate provides attribute macros that simplify HTTP request handling, protocol validation,
-//! response management, and request data extraction.
-//!
-//! ## Features
-//!
-//! - **HTTP Method Handlers**: Macros for all standard HTTP methods (GET, POST, PUT, DELETE, etc.)
-//! - **Protocol Validation**: Support for HTTP versions, WebSocket, TLS, and HTTP/2 cleartext
-//! - **Response Management**: Status code setting, reason phrase customization, and response sending
-//! - **Request Data Extraction**: Body parsing, request header extraction, request query parameters, and route parameters
-//! - **Filter Mechanisms**: Unknown method, upgrade, and version filtering
-//! - **Hook System**: Pre and post execution hooks for request processing
-//! - **Stream Management**: Connection state handling for aborted and closed streams
-//! - **Server Instance Creation**: Automatic Server instance initialization with custom variable names
-//!
-//! ## Dependencies
-//!
-//! To use this crate, add the following dependencies to your `Cargo.toml`:
-//!
-//! ```toml
-//! [dependencies]
-//! hyperlane-macros = "*"
-//! hyperlane = "*"
-//! serde = { version = "*", features = ["derive"] }
-//! ```
-//!
-//! ## Usage Guidelines
-//!
-//! Most macros are designed to be used as attribute macros on async functions that accept a `Context` parameter.
-//! The `hyperlane` macro can be used on any async function to create a Server instance.
-//! Multiple macros can be combined on a single function to create complex request handling logic.
-//! When using hook macros (`pre_hook`, `post_hook`), avoid combining them with other macros on the same function
-//! to prevent unexpected behavior during macro expansion.
+//! A comprehensive collection of procedural macros for building
+//! HTTP servers with enhanced functionality. This crate provides
+//! attribute macros that simplify HTTP request handling, protocol
+//! validation, response management, and request data extraction.
 
 mod aborted;
 mod closed;

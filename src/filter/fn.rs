@@ -1,5 +1,14 @@
 use crate::*;
 
+/// Filters requests with unknown method, upgrade and version.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with filter checks.
 pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_before_insertion(item, |context| {
         quote! {

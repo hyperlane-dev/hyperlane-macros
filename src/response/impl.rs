@@ -1,5 +1,8 @@
 use crate::*;
 
+/// Implementation of Parse trait for ResponseHeaderData.
+///
+/// Parses header key, operation and value from input stream.
 impl Parse for ResponseHeaderData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let key: Expr = input.parse()?;
@@ -24,6 +27,9 @@ impl Parse for ResponseHeaderData {
     }
 }
 
+/// Implementation of Parse trait for ResponseBodyData.
+///
+/// Parses response body expression from input stream.
 impl Parse for ResponseBodyData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let body: Expr = input.parse()?;

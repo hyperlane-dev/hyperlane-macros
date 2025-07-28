@@ -1,5 +1,14 @@
 use crate::*;
 
+/// Checks if request is WebSocket protocol.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with protocol check.
 pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
     expand_check_macro(item, |context| {
         quote! {
@@ -10,6 +19,15 @@ pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+/// Checks if request is HTTP protocol.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with protocol check.
 pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
     expand_check_macro(item, |context| {
         quote! {

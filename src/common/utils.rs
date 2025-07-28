@@ -1,5 +1,15 @@
 use crate::*;
 
+/// Expands macro with code inserted before function body.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - Function to generate code inserted before.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with inserted code.
 pub(crate) fn expand_macro_with_before_insertion(
     input: TokenStream,
     before_fn: impl FnOnce(&Ident) -> TokenStream2,
@@ -26,6 +36,16 @@ pub(crate) fn expand_macro_with_before_insertion(
     }
 }
 
+/// Expands macro with code inserted after function body.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - Function to generate code inserted after.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with inserted code.
 pub(crate) fn expand_macro_with_after_insertion(
     input: TokenStream,
     after_fn: impl FnOnce(&Ident) -> TokenStream2,
@@ -52,6 +72,18 @@ pub(crate) fn expand_macro_with_after_insertion(
     }
 }
 
+/// Expands macro with attribute parsing and code insertion before function body.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream to parse.
+/// - `TokenStream` - The input token stream to process.
+/// - `impl FnOnce(TokenStream) -> syn::Result<T>` - Function to parse attributes.
+/// - `impl FnOnce(&Ident, T) -> TokenStream2` - Function to generate code inserted before.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with inserted code.
 pub(crate) fn expand_macro_with_attr_and_before_insertion<T>(
     attr: TokenStream,
     item: TokenStream,
@@ -64,6 +96,16 @@ pub(crate) fn expand_macro_with_attr_and_before_insertion<T>(
     }
 }
 
+/// Expands macro with check code inserted before function body.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to process.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - Function to generate check code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with check code.
 pub(crate) fn expand_check_macro(
     input: TokenStream,
     check_fn: impl FnOnce(&Ident) -> TokenStream2,
@@ -71,6 +113,15 @@ pub(crate) fn expand_check_macro(
     expand_macro_with_before_insertion(input, check_fn)
 }
 
+/// Parses context identifier from function signature.
+///
+/// # Arguments
+///
+/// - `&Signature` - The function signature to parse.
+///
+/// # Returns
+///
+/// - `syn::Result<&Ident>` - The parsed context identifier or error.
 pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
     match sig.inputs.first() {
         Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {

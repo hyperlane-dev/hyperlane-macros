@@ -1,5 +1,15 @@
 use crate::*;
 
+/// Gets raw request body and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and type token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with body extraction.
 pub(crate) fn request_body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let body_param: RequestBodyData = parse_macro_input!(attr as RequestBodyData);
     let variable: Ident = body_param.variable;
@@ -10,6 +20,16 @@ pub(crate) fn request_body_macro(attr: TokenStream, item: TokenStream) -> TokenS
     })
 }
 
+/// Parses request body as JSON and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and type token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with JSON parsing.
 pub(crate) fn request_body_json_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let body_param: RequestBodyJsonData = parse_macro_input!(attr as RequestBodyJsonData);
     let variable: Ident = body_param.variable;
@@ -21,6 +41,16 @@ pub(crate) fn request_body_json_macro(attr: TokenStream, item: TokenStream) -> T
     })
 }
 
+/// Gets request attribute by key and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name, type and key name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with attribute extraction.
 pub(crate) fn attribute_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attribute: AttributeData = parse_macro_input!(attr as AttributeData);
     let variable: Ident = attribute.variable;
@@ -33,6 +63,16 @@ pub(crate) fn attribute_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     })
 }
 
+/// Gets all request attributes and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with attributes extraction.
 pub(crate) fn attributes_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attributes: AttributesData = parse_macro_input!(attr as AttributesData);
     let variable: Ident = attributes.variable;
@@ -43,6 +83,16 @@ pub(crate) fn attributes_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     })
 }
 
+/// Gets route parameter by key and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and key name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with route param extraction.
 pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_param: RouteParamData = parse_macro_input!(attr as RouteParamData);
     let variable: Ident = route_param.variable;
@@ -54,6 +104,16 @@ pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenSt
     })
 }
 
+/// Gets all route parameters and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with route params extraction.
 pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_params: RouteParamsData = parse_macro_input!(attr as RouteParamsData);
     let variable: Ident = route_params.variable;
@@ -64,6 +124,16 @@ pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenS
     })
 }
 
+/// Gets request query parameter by key and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and key name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with query param extraction.
 pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let request_query: QueryData = parse_macro_input!(attr as QueryData);
     let variable: Ident = request_query.variable;
@@ -75,6 +145,16 @@ pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> Token
     })
 }
 
+/// Gets all request query parameters and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with query params extraction.
 pub(crate) fn request_querys_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let request_query: QuerysData = parse_macro_input!(attr as QuerysData);
     let variable: Ident = request_query.variable;
@@ -85,6 +165,16 @@ pub(crate) fn request_querys_macro(attr: TokenStream, item: TokenStream) -> Toke
     })
 }
 
+/// Gets request header by key and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and key name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with header extraction.
 pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let request_header: HeaderData = parse_macro_input!(attr as HeaderData);
     let variable: Ident = request_header.variable;
@@ -96,6 +186,16 @@ pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> Toke
     })
 }
 
+/// Gets all request headers and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with headers extraction.
 pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let request_headers: HeadersData = parse_macro_input!(attr as HeadersData);
     let variable: Ident = request_headers.variable;
@@ -106,6 +206,16 @@ pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> Tok
     })
 }
 
+/// Gets request cookie by key and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name and key name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with cookie extraction.
 pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let cookie_data: CookieData = parse_macro_input!(attr as CookieData);
     let variable: Ident = cookie_data.variable;
@@ -117,6 +227,16 @@ pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> Toke
     })
 }
 
+/// Gets all request cookies and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with cookies extraction.
 pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let cookies_data: CookiesData = parse_macro_input!(attr as CookiesData);
     let variable: Ident = cookies_data.variable;
@@ -127,6 +247,16 @@ pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> Tok
     })
 }
 
+/// Gets request version and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with version extraction.
 pub(crate) fn request_version_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let version_data: RequestVersionData = parse_macro_input!(attr as RequestVersionData);
     let variable: Ident = version_data.variable;
@@ -137,6 +267,16 @@ pub(crate) fn request_version_macro(attr: TokenStream, item: TokenStream) -> Tok
     })
 }
 
+/// Gets request path and assigns to specified variable.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The variable name token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with path extraction.
 pub(crate) fn request_path_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let path_data: RequestPathData = parse_macro_input!(attr as RequestPathData);
     let variable: Ident = path_data.variable;

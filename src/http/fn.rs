@@ -21,6 +21,16 @@ impl_http_method_macro!(options_handler, "options");
 impl_http_method_macro!(connect_handler, "connect");
 impl_http_method_macro!(trace_handler, "trace");
 
+/// Creates method check function for HTTP request validation.
+///
+/// # Arguments
+///
+/// - `&str` - The HTTP method name to check.
+/// - `proc_macro2::Span` - The span for error reporting.
+///
+/// # Returns
+///
+/// - `impl FnOnce(&Ident) -> TokenStream2` - The generated check function.
 pub(crate) fn create_method_check(
     method_name: &str,
     span: proc_macro2::Span,
@@ -35,6 +45,16 @@ pub(crate) fn create_method_check(
     }
 }
 
+/// Handles HTTP requests for multiple method types.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The allowed methods token stream.
+/// - `TokenStream` - The input token stream to process.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with methods check.
 pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
