@@ -4,11 +4,11 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with send operation
+/// - `TokenStream` - The expanded token stream with send operation.
 pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_after_insertion(item, |context| {
         quote! {
@@ -21,11 +21,11 @@ pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with body send operation
+/// - `TokenStream` - The expanded token stream with body send operation.
 pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_after_insertion(item, |context| {
         quote! {
@@ -38,11 +38,11 @@ pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with single send operation
+/// - `TokenStream` - The expanded token stream with single send operation.
 pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_after_insertion(item, |context| {
         quote! {
@@ -55,11 +55,11 @@ pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with single body send operation
+/// - `TokenStream` - The expanded token stream with single body send operation.
 pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_after_insertion(item, |context| {
         quote! {

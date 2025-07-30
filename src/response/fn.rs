@@ -4,11 +4,11 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to parse
+/// - `TokenStream` - The input token stream to parse.
 ///
 /// # Returns
 ///
-/// - `syn::Result<Expr>` - Parsed expression or error
+/// - `syn::Result<Expr>` - The parsed expression or error.
 fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
     syn::parse::<Expr>(input)
 }
@@ -17,12 +17,12 @@ fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The status code expression
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with status code setting
+/// - `TokenStream` - The expanded token stream with status code setting.
 pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
         quote! {
@@ -35,12 +35,12 @@ pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The reason phrase expression
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with reason phrase setting
+/// - `TokenStream` - The expanded token stream with reason phrase setting.
 pub(crate) fn response_reason_phrase_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
         quote! {
@@ -53,12 +53,12 @@ pub(crate) fn response_reason_phrase_macro(attr: TokenStream, item: TokenStream)
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The header key, value and operation
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with header operation
+/// - `TokenStream` - The expanded token stream with header operation.
 pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let header_data: ResponseHeaderData = parse_macro_input!(attr as ResponseHeaderData);
     let key: Expr = header_data.key;
@@ -82,12 +82,12 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The body expression
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with body setting
+/// - `TokenStream` - The expanded token stream with body setting.
 pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let body_data: ResponseBodyData = parse_macro_input!(attr as ResponseBodyData);
     let body: Expr = body_data.body;
@@ -102,12 +102,12 @@ pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> Token
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The version expression
-/// - `TokenStream` - The input token stream to process
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with version setting
+/// - `TokenStream` - The expanded token stream with version setting.
 pub(crate) fn response_version_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
         quote! {

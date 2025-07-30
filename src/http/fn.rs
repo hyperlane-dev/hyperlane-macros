@@ -25,7 +25,7 @@ impl_http_method_macro!(trace_handler, "trace");
 ///
 /// # Arguments
 ///
-/// - `&str` - The HTTP method name to check.
+/// - `&str` - The method name string.
 /// - `proc_macro2::Span` - The span for error reporting.
 ///
 /// # Returns
@@ -49,7 +49,7 @@ pub(crate) fn create_method_check(
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The allowed methods token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns

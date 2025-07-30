@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The host value token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
@@ -27,7 +27,7 @@ pub(crate) fn host_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The host value token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns

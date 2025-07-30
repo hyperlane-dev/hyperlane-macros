@@ -4,12 +4,12 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The server variable name
-/// - `TokenStream` - The input function to wrap
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - Expanded token stream with server initialization
+/// - `TokenStream` - The expanded token stream with server initialization.
 pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let variable_name: Ident = match parse_variable_name(attr) {
         Ok(name) => name,
@@ -35,11 +35,11 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream to parse
+/// - `TokenStream` - The input token stream to parse.
 ///
 /// # Returns
 ///
-/// - `syn::Result<Ident>` - Parsed identifier or error
+/// - `syn::Result<Ident>` - The parsed identifier or error.
 fn parse_variable_name(attr: TokenStream) -> syn::Result<Ident> {
     let attr_tokens: TokenStream2 = attr.into();
     if attr_tokens.is_empty() {

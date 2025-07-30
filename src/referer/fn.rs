@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The Referer value token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
@@ -31,7 +31,7 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The Referer value token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns

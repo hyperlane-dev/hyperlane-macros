@@ -4,7 +4,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The hook function name token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
@@ -23,7 +23,7 @@ pub(crate) fn pre_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStrea
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The hook function name token stream.
+/// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
