@@ -991,14 +991,14 @@ pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[host("example.com")]
+/// #[host("localhost")]
 /// async fn handle_example_com(ctx: Context) {
-///     // Function body for example.com requests
+///     // Function body for localhost requests
 /// }
 ///
-/// #[host("api.example.com")]
+/// #[host("api.localhost")]
 /// async fn handle_api_subdomain(ctx: Context) {
-///     // Function body for api.example.com requests
+///     // Function body for api.localhost requests
 /// }
 /// ```
 ///
@@ -1020,7 +1020,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[host_filter("example.com")]
+/// #[host_filter("localhost")]
 /// async fn handle_with_host(ctx: Context) {
 ///     // Function body for requests with host header
 /// }
@@ -1044,14 +1044,14 @@ pub fn host_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[referer("https://example.com")]
+/// #[referer("http://localhost")]
 /// async fn handle_example_referer(ctx: Context) {
-///     // Function body for requests from example.com
+///     // Function body for requests from localhost
 /// }
 ///
-/// #[referer("https://api.example.com")]
+/// #[referer("https://api.localhost")]
 /// async fn handle_api_referer(ctx: Context) {
-///     // Function body for requests from api.example.com
+///     // Function body for requests from api.localhost
 /// }
 /// ```
 ///
@@ -1073,9 +1073,9 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[referer_filter("https://spam.com")]
+/// #[referer_filter("http://localhost")]
 /// async fn handle_without_spam_referer(ctx: Context) {
-///     // Function body for requests not from spam.com
+///     // Function body for requests not from localhost
 /// }
 /// ```
 ///

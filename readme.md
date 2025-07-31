@@ -423,15 +423,15 @@ async fn request_body(ctx: Context) {
 }
 
 #[send]
-#[host("example.com")]
+#[host("localhost")]
 async fn host(ctx: Context) {
     let _ = ctx
-        .set_response_body("host string literal: example.com")
+        .set_response_body("host string literal: localhost")
         .await;
 }
 
 #[send]
-#[host_filter("filter.example.com")]
+#[host_filter("filter.localhost")]
 async fn host_filter(ctx: Context) {
     let _ = ctx.set_response_body("host filter string literal").await;
 }
@@ -455,15 +455,15 @@ async fn request_body_json(ctx: Context) {
 }
 
 #[send]
-#[referer("https://example.com")]
+#[referer("http://localhost")]
 async fn referer(ctx: Context) {
     let _ = ctx
-        .set_response_body("referer string literal: https://example.com")
+        .set_response_body("referer string literal: http://localhost")
         .await;
 }
 
 #[send]
-#[referer_filter("https://spam.com")]
+#[referer_filter("http://localhost")]
 async fn referer_filter(ctx: Context) {
     let _ = ctx.set_response_body("referer filter string literal").await;
 }
