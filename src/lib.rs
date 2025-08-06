@@ -366,7 +366,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
-/// The macro accepts a numeric HTTP status code (e.g., 200, 404, 500) or a global constant
+/// The macro accepts a numeric HTTP status code or a global constant
 /// and should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
