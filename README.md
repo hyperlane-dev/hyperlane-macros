@@ -566,14 +566,8 @@ async fn main() {
         .route("/header_operations", header_operations_test)
         .await;
     server.route("/literals", literals).await;
-    let server_run_hook: ServerRunHook = server.run().await.unwrap_or_default();
-    let shutdown_hook: ArcPinBoxFutureSend = server_run_hook.get_shutdown_hook().clone();
-    let get_wait_hook: &ArcPinBoxFutureSend = server_run_hook.get_wait_hook();
-    tokio::spawn(async move {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        shutdown_hook().await;
-    });
-    get_wait_hook().await;
+    let server_hook: ServerHook = server.run().await.unwrap_or_default();
+    server_hook.wait().await;
 }
 ```
 
