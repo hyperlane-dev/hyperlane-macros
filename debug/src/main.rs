@@ -318,7 +318,7 @@ async fn request_path_test(ctx: Context) {
 #[send]
 #[response_header("X-Test-Header", "set-value")]
 #[response_header("X-Replace-Header" => "replace-value")]
-async fn header_operations_test(ctx: Context) {
+async fn response_header_test(ctx: Context) {
     let _ = ctx
         .set_response_body("Testing header set and replace operations")
         .await;
@@ -379,9 +379,7 @@ async fn main() {
     server.route("/cookie", cookie).await;
     server.route("/request_version", request_version_test).await;
     server.route("/request_path", request_path_test).await;
-    server
-        .route("/header_operations", header_operations_test)
-        .await;
+    server.route("/response_header", response_header_test).await;
     server.route("/literals", literals).await;
     let server_hook: ServerHook = server.run().await.unwrap_or_default();
     let server_hook_clone: ServerHook = server_hook.clone();
