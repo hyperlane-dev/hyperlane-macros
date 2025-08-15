@@ -24,7 +24,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
         #vis #sig {
-            let #variable_name: Server = Server::new();
+            let #variable_name: Server = Server::new().await;
             #(#stmts)*
         }
     };

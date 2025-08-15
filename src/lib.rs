@@ -1550,7 +1550,7 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// #[hyperlane(server)]
 /// async fn handle_request(ctx: Context) {
-///     // server is now available as: let server: Server = Server::new();
+///     // server is now available as: let server: Server = Server::new().await;
 ///     // Function body can use server
 /// }
 /// ```
