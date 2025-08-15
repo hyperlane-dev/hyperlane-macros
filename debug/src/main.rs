@@ -316,8 +316,8 @@ async fn request_path_test(ctx: Context) {
 }
 
 #[send]
-#[response_header("X-Test-Header", "set-value")]
-#[response_header("X-Replace-Header" => "replace-value")]
+#[response_header("X-Add-Header", "add-value")]
+#[response_header("X-Set-Header" => "set-value")]
 async fn response_header_test(ctx: Context) {
     let _ = ctx
         .set_response_body("Testing header set and replace operations")

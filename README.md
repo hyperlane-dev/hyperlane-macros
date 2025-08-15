@@ -60,8 +60,8 @@ cargo add hyperlane-macros
 
 - `#[response_status_code(code)]` - Set response status code (supports literals and global constants)
 - `#[response_reason_phrase("phrase")]` - Set response reason phrase (supports literals and global constants)
-- `#[response_header("key", "value")]` - Set response header (supports literals and global constants)
-- `#[response_header("key" => "value")]` - Replace response header (supports literals and global constants)
+- `#[response_header("key", "value")]` - Add response header (supports literals and global constants)
+- `#[response_header("key" => "value")]` - Set response header (supports literals and global constants)
 - `#[response_body("data")]` - Set response body (supports literals and global constants)
 - `#[response_version(version)]` - Set response HTTP version (supports literals and global constants)
 
@@ -161,8 +161,8 @@ cargo add hyperlane-macros
 
 ### Response Header Macros
 
-- `#[response_header("key", "value")]` - Set a specific HTTP response header with the given key and value (add to existing headers)
-- `#[response_header("key" => "value")]` - Replace a specific HTTP response header with the given key and value (overwrite existing)
+- `#[response_header("key", "value")]` - Add a specific HTTP response header with the given key and value (add to existing headers)
+- `#[response_header("key" => "value")]` - Set a specific HTTP response header with the given key and value (overwrite existing)
 
 ### Response Body Macros
 
@@ -499,8 +499,8 @@ async fn request_path_test(ctx: Context) {
 }
 
 #[send]
-#[response_header("X-Test-Header", "set-value")]
-#[response_header("X-Replace-Header" => "replace-value")]
+#[response_header("X-Add-Header", "add-value")]
+#[response_header("X-Set-Header" => "set-value")]
 async fn response_header_test(ctx: Context) {
     let _ = ctx
         .set_response_body("Testing header set and replace operations")

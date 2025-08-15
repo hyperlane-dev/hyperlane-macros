@@ -65,14 +65,14 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
     let value: Expr = header_data.value;
     let operation: HeaderOperation = header_data.operation;
     expand_macro_with_before_insertion(item, |context| match operation {
+        HeaderOperation::Add => {
+            quote! {
+                #context.add_response_header(#key, #value).await;
+            }
+        }
         HeaderOperation::Set => {
             quote! {
                 #context.set_response_header(#key, #value).await;
-            }
-        }
-        HeaderOperation::Replace => {
-            quote! {
-                #context.replace_response_header(#key, #value).await;
             }
         }
     })

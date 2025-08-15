@@ -8,14 +8,14 @@ impl Parse for ResponseHeaderData {
         let key: Expr = input.parse()?;
         let operation: HeaderOperation = if input.peek(Token![=>]) {
             input.parse::<Token![=>]>()?;
-            HeaderOperation::Replace
+            HeaderOperation::Set
         } else if input.peek(Token![,]) {
             input.parse::<Token![,]>()?;
-            HeaderOperation::Set
+            HeaderOperation::Add
         } else {
             return Err(syn::Error::new(
                 input.span(),
-                "Expected either ',' for set operation or '=>' for replace operation",
+                "Expected either ',' for add operation or '=>' for set operation",
             ));
         };
         let value: Expr = input.parse()?;

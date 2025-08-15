@@ -430,7 +430,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// }
 ///
 /// #[response_header("X-Static-Header" => "static-value")]
-/// async fn replace_header_handler(ctx: Context) {
+/// async fn set_header_handler(ctx: Context) {
 ///     // Response will have static header replaced (overwrite existing)
 /// }
 ///
@@ -440,14 +440,14 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// }
 ///
 /// #[response_header("Cache-Control" => "no-cache")]
-/// async fn replace_cache_handler(ctx: Context) {
+/// async fn set_cache_handler(ctx: Context) {
 ///     // Response will have Cache-Control header replaced
 /// }
 ///
-/// #[response_header("X-Test-Header", "set-value")]
-/// #[response_header("X-Replace-Header" => "replace-value")]
+/// #[response_header("X-Add-Header", "add-value")]
+/// #[response_header("X-Set-Header" => "set-value")]
 /// async fn header_operations_handler(ctx: Context) {
-///     // Response will have X-Test-Header set and X-Replace-Header replaced
+///     // Response will have X-Add-Header set and X-Set-Header replaced
 /// }
 /// ```
 ///
