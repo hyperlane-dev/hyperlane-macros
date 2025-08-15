@@ -1548,7 +1548,7 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[hyperlane(server)]
+/// #[server(server)]
 /// async fn handle_request(ctx: Context) {
 ///     // server is now available as: let server: Server = Server::new().await;
 ///     // Function body can use server
@@ -1558,6 +1558,30 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a variable name as parameter. The variable will be available
 /// as a Server instance in the function scope.
 #[proc_macro_attribute]
-pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
-    hyperlane_macro(attr, item)
+pub fn server(attr: TokenStream, item: TokenStream) -> TokenStream {
+    server_macro(attr, item)
+}
+
+/// Creates a new ServerConfig instance with the specified variable name.
+///
+/// This attribute macro generates a ServerConfig instance initialization at the beginning
+/// of the function with the specified variable name.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[server_config(server_config)]
+/// async fn handle_request(ctx: Context) {
+///     // server_config is now available as: let server_config: ServerConfig = ServerConfig::new().await;
+///     // Function body can use server_config
+/// }
+/// ```
+/// The macro accepts a variable name as parameter. The variable will be available
+/// as a ServerConfig instance in the function scope.
+#[proc_macro_attribute]
+pub fn server_config(attr: TokenStream, item: TokenStream) -> TokenStream {
+    server_config_macro(attr, item)
 }

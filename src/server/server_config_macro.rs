@@ -10,7 +10,7 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with server initialization.
-pub(crate) fn server_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn server_config_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let variable_name: Ident = match parse_variable_name(attr) {
         Ok(name) => name,
         Err(err) => return err.to_compile_error().into(),
@@ -27,7 +27,7 @@ pub(crate) fn server_macro(attr: TokenStream, item: TokenStream) -> TokenStream 
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
         #vis async fn #ident(#inputs) #output {
-            let #variable_name: Server = Server::new().await;
+            let #variable_name: ServerConfig = ServerConfig::new().await;
             #(#stmts)*
         }
     };

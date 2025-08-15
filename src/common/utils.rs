@@ -141,3 +141,24 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
         )),
     }
 }
+
+/// Parses the server variable name from attribute tokens.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream to parse.
+///
+/// # Returns
+///
+/// - `syn::Result<Ident>` - The parsed identifier or error.
+pub(crate) fn parse_variable_name(attr: TokenStream) -> syn::Result<Ident> {
+    let attr_tokens: TokenStream2 = attr.into();
+    if attr_tokens.is_empty() {
+        return Err(syn::Error::new(
+            proc_macro2::Span::call_site(),
+            "Expected variable name as argument",
+        ));
+    }
+    let parsed: Ident = syn::parse2(attr_tokens)?;
+    Ok(parsed)
+}

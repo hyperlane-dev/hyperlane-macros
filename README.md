@@ -28,7 +28,8 @@ cargo add hyperlane-macros
 
 ### Server Instance Macros
 
-- `#[hyperlane(variable_name)]` - Create a new Server instance with the specified variable name at the beginning of the function
+- `#[server(variable_name)]` - Create a new Server instance with the specified variable name at the beginning of the function
+- `#[server_config(variable_name)]` - Create a new ServerConfig instance with the specified variable name at the beginning of the function, allowing for server configuration
 
 ### HTTP Method Macros
 
@@ -197,6 +198,9 @@ struct TestData {
     name: String,
     age: u32,
 }
+
+#[response_version(HttpVersion::HTTP1_1)]
+async fn request_middleware(ctx: Context) {}
 
 #[get]
 #[http]
@@ -512,12 +516,15 @@ async fn response_header_test(ctx: Context) {
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
-#[response_version(HttpVersion::HTTP1_1)]
 async fn literals(ctx: Context) {}
 
+#[server(server)]
+#[server_config(config)]
 #[tokio::main]
-#[hyperlane(server)]
 async fn main() {
+    config.disable_nodelay().await;
+    server.config(config).await;
+    server.request_middleware(request_middleware).await;
     server.route("/response", response).await;
     server.route("/connect", connect).await;
     server.route("/delete", delete).await;

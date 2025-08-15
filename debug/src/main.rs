@@ -15,6 +15,9 @@ struct TestData {
     age: u32,
 }
 
+#[response_version(HttpVersion::HTTP1_1)]
+async fn request_middleware(ctx: Context) {}
+
 #[get]
 #[http]
 async fn ctx_pre_hook(ctx: Context) {}
@@ -329,12 +332,15 @@ async fn response_header_test(ctx: Context) {
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
-#[response_version(HttpVersion::HTTP1_1)]
 async fn literals(ctx: Context) {}
 
+#[server(server)]
+#[server_config(config)]
 #[tokio::main]
-#[hyperlane(server)]
 async fn main() {
+    config.disable_nodelay().await;
+    server.config(config).await;
+    server.request_middleware(request_middleware).await;
     server.route("/response", response).await;
     server.route("/connect", connect).await;
     server.route("/delete", delete).await;
