@@ -161,8 +161,8 @@ cargo add hyperlane-macros
 
 ### Response Header Macros
 
-- `#[response_header("key", "value")]` - Add a specific HTTP response header with the given key and value (add to existing headers)
-- `#[response_header("key" => "value")]` - Set a specific HTTP response header with the given key and value (overwrite existing)
+- `#[response_header("key", "value")]` - Add a specific HTTP response header with the given key (add to existing headers)
+- `#[response_header("key" => "value")]` - Set a specific HTTP response header with the given key (overwrite existing)
 
 ### Response Body Macros
 
