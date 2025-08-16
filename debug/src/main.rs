@@ -334,8 +334,8 @@ async fn response_header_test(ctx: Context) {
 #[response_body("{\"message\": \"Resource created\"}")]
 async fn literals(ctx: Context) {}
 
-#[server(server)]
-#[server_config(config)]
+#[hyperlane(Server => server)]
+#[hyperlane(ServerConfig => config)]
 #[tokio::main]
 async fn main() {
     config.disable_nodelay().await;

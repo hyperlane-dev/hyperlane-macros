@@ -13,12 +13,12 @@ mod flush;
 mod hook;
 mod host;
 mod http;
+mod hyperlane;
 mod protocol;
 mod referer;
 mod request;
 mod response;
 mod send;
-mod server;
 
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
@@ -28,18 +28,19 @@ pub(crate) use flush::*;
 pub(crate) use hook::*;
 pub(crate) use host::*;
 pub(crate) use http::*;
+pub(crate) use hyperlane::*;
 pub(crate) use protocol::*;
 pub(crate) use referer::*;
 pub(crate) use request::*;
 pub(crate) use response::*;
 pub(crate) use send::*;
-pub(crate) use server::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
 pub(crate) use quote::quote;
 pub(crate) use syn::{
-    parse::{Parse, ParseStream},
+    Ident, Token,
+    parse::{Parse, ParseStream, Result},
     punctuated::Punctuated,
     *,
 };
@@ -1537,35 +1538,9 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_path_macro(attr, item)
 }
 
-/// Creates a new Server instance with the specified variable name.
+/// Creates a new instance of a specified type with a given variable name.
 ///
-/// This attribute macro generates a Server instance initialization at the beginning
-/// of the function with the specified variable name.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[server(server)]
-/// async fn handle_request(ctx: Context) {
-///     // server is now available as: let server: Server = Server::new().await;
-///     // Function body can use server
-/// }
-/// ```
-///
-/// The macro accepts a variable name as parameter. The variable will be available
-/// as a Server instance in the function scope.
-#[proc_macro_attribute]
-pub fn server(attr: TokenStream, item: TokenStream) -> TokenStream {
-    server_macro(attr, item)
-}
-
-/// Creates a new ServerConfig instance with the specified variable name.
-///
-/// This attribute macro generates a ServerConfig instance initialization at the beginning
-/// of the function with the specified variable name.
+/// This attribute macro generates an instance initialization at the beginning of the function.
 ///
 /// # Usage
 ///
@@ -1573,15 +1548,17 @@ pub fn server(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[server_config(server_config)]
-/// async fn handle_request(ctx: Context) {
-///     // server_config is now available as: let server_config: ServerConfig = ServerConfig::new().await;
-///     // Function body can use server_config
+/// #[hyperlane(Server => server)]
+/// #[tokio::main]
+/// async fn main() {
+///     // `server` is now available as: `let server: Server = Server::new().await;`
+///     // The function body can now use `server`.
 /// }
 /// ```
-/// The macro accepts a variable name as parameter. The variable will be available
-/// as a ServerConfig instance in the function scope.
+///
+/// The macro accepts a `Type => variable_name` pair.
+/// The variable will be available as an instance of the specified type in the function scope.
 #[proc_macro_attribute]
-pub fn server_config(attr: TokenStream, item: TokenStream) -> TokenStream {
-    server_config_macro(attr, item)
+pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
+    hyperlane_macro(attr, item)
 }

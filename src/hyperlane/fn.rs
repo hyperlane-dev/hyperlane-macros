@@ -4,17 +4,14 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
-/// - `TokenStream` - The input token stream to process.
+/// - `TokenStream`: The attribute token stream.
+/// - `TokenStream`: The input token stream to process.
 ///
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with server initialization.
-pub(crate) fn server_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let variable_name: Ident = match parse_variable_name(attr) {
-        Ok(name) => name,
-        Err(err) => return err.to_compile_error().into(),
-    };
+pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let hyperlane_attr: HyperlaneAttr = parse_macro_input!(attr as HyperlaneAttr);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
@@ -24,10 +21,16 @@ pub(crate) fn server_macro(attr: TokenStream, item: TokenStream) -> TokenStream 
     let stmts: &Vec<Stmt> = &block.stmts;
     let inputs: &Punctuated<FnArg, token::Comma> = &sig.inputs;
     let output: &ReturnType = &sig.output;
+    let mut init_statements: Vec<TokenStream2> = Vec::new();
+    let type_name: &Ident = &hyperlane_attr.type_name;
+    let var_name: &Ident = &hyperlane_attr.var_name;
+    init_statements.push(quote! {
+        let #var_name: #type_name = #type_name::new().await;
+    });
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
         #vis async fn #ident(#inputs) #output {
-            let #variable_name: Server = Server::new().await;
+            #(#init_statements)*
             #(#stmts)*
         }
     };
