@@ -2,10 +2,12 @@ use crate::*;
 
 /// Main macro for creating and configuring a Hyperlane server instance.
 ///
+/// This macro expects an attribute in the format `#[hyperlane(variable_name: TypeName)]`.
+///
 /// # Arguments
 ///
-/// - `TokenStream`: The attribute token stream.
-/// - `TokenStream`: The input token stream to process.
+/// - `TokenStream`: The attribute token stream, containing the variable and type name.
+/// - `TokenStream`: The input token stream to process, typically an `async fn`.
 ///
 /// # Returns
 ///
@@ -22,8 +24,8 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let inputs: &Punctuated<FnArg, token::Comma> = &sig.inputs;
     let output: &ReturnType = &sig.output;
     let mut init_statements: Vec<TokenStream2> = Vec::new();
-    let type_name: &Ident = &hyperlane_attr.type_name;
     let var_name: &Ident = &hyperlane_attr.var_name;
+    let type_name: &Ident = &hyperlane_attr.type_name;
     init_statements.push(quote! {
         let #var_name: #type_name = #type_name::new().await;
     });

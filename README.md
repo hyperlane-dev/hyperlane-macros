@@ -28,8 +28,8 @@ cargo add hyperlane-macros
 
 ### Hyperlane Macro
 
-- `#[hyperlane(Server => server)]` - Creates a new `Server` or `ServerConfig` instance with the specified variable name.
-- `#[hyperlane(ServerConfig => config)]` - Creates a new `ServerConfig` instance with the specified variable name.
+- `#[hyperlane(server: Server)]` - Creates a new `Server` or `ServerConfig` instance with the specified variable name and type.
+- `#[hyperlane(config: ServerConfig)]` - Creates a new `ServerConfig` instance with the specified variable name and type.
 
 ### HTTP Method Macros
 
@@ -518,8 +518,8 @@ async fn response_header_test(ctx: Context) {
 #[response_body("{\"message\": \"Resource created\"}")]
 async fn literals(ctx: Context) {}
 
-#[hyperlane(Server => server)]
-#[hyperlane(ServerConfig => config)]
+#[hyperlane(server: Server)]
+#[hyperlane(config: ServerConfig)]
 #[tokio::main]
 async fn main() {
     config.disable_nodelay().await;

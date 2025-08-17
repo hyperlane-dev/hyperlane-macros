@@ -1548,7 +1548,7 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[hyperlane(Server => server)]
+/// #[hyperlane(server: Server)]
 /// #[tokio::main]
 /// async fn main() {
 ///     // `server` is now available as: `let server: Server = Server::new().await;`
@@ -1556,7 +1556,7 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
-/// The macro accepts a `Type => variable_name` pair.
+/// The macro accepts a `variable_name: Type` pair.
 /// The variable will be available as an instance of the specified type in the function scope.
 #[proc_macro_attribute]
 pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {

@@ -2,7 +2,8 @@ use crate::*;
 
 /// Implementation of the `Parse` trait for `HyperlaneAttr`.
 ///
-/// This implementation allows parsing a `HyperlaneAttr` from a token stream.
+/// This implementation allows parsing a `HyperlaneAttr` from a token stream,
+/// expecting the format `variable_name: TypeName`.
 ///
 /// # Arguments
 ///
@@ -14,9 +15,9 @@ use crate::*;
 impl Parse for HyperlaneAttr {
     fn parse(input: ParseStream) -> Result<Self> {
         Ok(HyperlaneAttr {
-            type_name: input.parse()?,
-            _arrow: input.parse()?,
             var_name: input.parse()?,
+            _colon: input.parse()?,
+            type_name: input.parse()?,
         })
     }
 }
