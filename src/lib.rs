@@ -18,6 +18,7 @@ mod protocol;
 mod referer;
 mod request;
 mod response;
+mod route;
 mod send;
 
 pub(crate) use aborted::*;
@@ -33,6 +34,7 @@ pub(crate) use protocol::*;
 pub(crate) use referer::*;
 pub(crate) use request::*;
 pub(crate) use response::*;
+pub(crate) use route::*;
 pub(crate) use send::*;
 
 pub(crate) use proc_macro::TokenStream;
@@ -1561,4 +1563,26 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
     hyperlane_macro(attr, item)
+}
+
+/// Registers a function as a route handler.
+///
+/// This attribute macro registers the decorated function as a route handler for a given path.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route(server => "/path")]
+/// async fn handler(ctx: Context) {
+///     // function body
+/// }
+/// ```
+///
+/// The macro accepts a server instance and a path.
+#[proc_macro_attribute]
+pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
+    route_macro(attr, item)
 }

@@ -29,6 +29,26 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     init_statements.push(quote! {
         let #var_name: #type_name = #type_name::new().await;
     });
+    if type_name == "Server" {
+        init_statements.push(quote! {
+            for route in inventory::iter::<Route> {
+                #var_name.route(route.path, route.handler).await;
+            }
+        });
+        let gen_code: TokenStream2 = quote! {
+            pub struct Route {
+                pub path: &'static str,
+                pub handler: fn(Context) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send>>,
+            }
+            inventory::collect!(Route);
+            #(#attrs)*
+            #vis async fn #ident(#inputs) #output {
+                #(#init_statements)*
+                #(#stmts)*
+            }
+        };
+        return gen_code.into();
+    }
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
         #vis async fn #ident(#inputs) #output {

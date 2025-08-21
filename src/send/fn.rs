@@ -10,7 +10,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with send operation.
 pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_after_insertion(item, |context| {
+    expand_macro_with_before_return_insertion(item, |context| {
         quote! {
             let _ = #context.send().await;
         }
@@ -27,7 +27,7 @@ pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
 ///
 /// - `TokenStream` - The expanded token stream with body send operation.
 pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_after_insertion(item, |context| {
+    expand_macro_with_before_return_insertion(item, |context| {
         quote! {
             let _ = #context.send_body().await;
         }
@@ -44,7 +44,7 @@ pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
 ///
 /// - `TokenStream` - The expanded token stream with single send operation.
 pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_after_insertion(item, |context| {
+    expand_macro_with_before_return_insertion(item, |context| {
         quote! {
             let _ = #context.send_once().await;
         }
@@ -61,7 +61,7 @@ pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
 ///
 /// - `TokenStream` - The expanded token stream with single body send operation.
 pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_after_insertion(item, |context| {
+    expand_macro_with_before_return_insertion(item, |context| {
         quote! {
             let _ = #context.send_once_body().await;
         }
