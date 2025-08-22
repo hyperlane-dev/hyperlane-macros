@@ -1568,6 +1568,7 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Registers a function as a route handler.
 ///
 /// This attribute macro registers the decorated function as a route handler for a given path.
+/// This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
 ///
 /// # Usage
 ///
@@ -1575,13 +1576,20 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route(server => "/path")]
-/// async fn handler(ctx: Context) {
+/// #[route("/health")]
+/// async fn health_check(ctx: Context) {
 ///     // function body
 /// }
 /// ```
 ///
-/// The macro accepts a server instance and a path.
+/// # Parameters
+///
+/// - `server` (optional): Expression that returns a server instance
+/// - `path`: String literal defining the route path
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_macro(attr, item)

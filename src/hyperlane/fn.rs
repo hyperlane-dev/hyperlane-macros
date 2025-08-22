@@ -32,11 +32,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     if type_name == "Server" {
         init_statements.push(quote! {
             for route in inventory::iter::<hyperlane::RouteMacro> {
-                if let Some(server) = route.server.as_ref() {
-                    server.route(&route.path, route.handler).await;
-                } else {
-                    #var_name.route(&route.path, route.handler).await;
-                }
+                #var_name.route(&route.path, route.handler).await;
             }
         });
     }
