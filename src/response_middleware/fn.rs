@@ -1,5 +1,18 @@
 use crate::*;
 
+/// Registers a response middleware.
+///
+/// This macro takes a function as input and registers it as a response middleware.
+/// The registered function will be called after the main request handler but before the response is sent.
+///
+/// # Arguments
+///
+/// - `_attr` - The attribute token stream (unused).
+/// - `item` - The input token stream representing the function to be registered as a middleware.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with the middleware registration.
 pub(crate) fn response_middleware_macro(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let fn_name: &Ident = &input_fn.sig.ident;

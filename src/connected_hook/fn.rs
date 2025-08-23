@@ -1,5 +1,18 @@
 use crate::*;
 
+/// Registers a connected hook.
+///
+/// This macro takes a function as input and registers it as a connected hook.
+/// The registered function will be called when a connection is established.
+///
+/// # Arguments
+///
+/// - `_attr` - The attribute token stream (unused).
+/// - `item` - The input token stream representing the function to be registered as a hook.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with the hook registration.
 pub(crate) fn connected_hook_macro(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let fn_name: &Ident = &input_fn.sig.ident;

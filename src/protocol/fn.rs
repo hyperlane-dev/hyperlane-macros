@@ -39,6 +39,15 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+/// Implements a protocol check macro.
+///
+/// This macro generates a function that checks if the request matches a specific protocol.
+/// If the protocol does not match, the request is aborted.
+///
+/// # Arguments
+///
+/// - `$name`: The name of the generated macro function.
+/// - `$check`: The name of the method to call on the request to perform the protocol check (e.g., `is_h2c`).
 macro_rules! impl_protocol_check_macro {
     ($name:ident, $check:ident) => {
         pub(crate) fn $name(item: TokenStream) -> TokenStream {
@@ -55,11 +64,26 @@ macro_rules! impl_protocol_check_macro {
     };
 }
 
+// Checks if the request is H2C protocol.
 impl_protocol_check_macro!(h2c_macro, is_h2c);
+
+// Checks if the request is HTTP/0.9 protocol.
 impl_protocol_check_macro!(http0_9_macro, is_http0_9);
+
+// Checks if the request is HTTP/1.0 protocol.
 impl_protocol_check_macro!(http1_0_macro, is_http1_0);
+
+// Checks if the request is HTTP/1.1 protocol.
 impl_protocol_check_macro!(http1_1_macro, is_http1_1);
+
+// Checks if the request is HTTP/1.1 or higher protocol.
 impl_protocol_check_macro!(http1_1_or_higher_macro, is_http1_1_or_higher);
+
+// Checks if the request is HTTP/2 protocol.
 impl_protocol_check_macro!(http2_macro, is_http2);
+
+// Checks if the request is HTTP/3 protocol.
 impl_protocol_check_macro!(http3_macro, is_http3);
+
+// Checks if the request is TLS protocol.
 impl_protocol_check_macro!(tls_macro, is_tls);
