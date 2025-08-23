@@ -1591,8 +1591,8 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/health")]
-/// async fn health_check(ctx: Context) {
+/// #[route("/")]
+/// async fn route(ctx: Context) {
 ///     // function body
 /// }
 /// ```
@@ -1609,36 +1609,176 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_macro(attr, item)
 }
 
+/// Registers a function as a request middleware.
+///
+/// This attribute macro registers the decorated function to be executed as a middleware
+/// for incoming requests. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_middleware]
+/// async fn log_request(ctx: Context) {
+///     // Middleware logic
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_middleware_macro(attr, item)
 }
 
+/// Registers a function as a response middleware.
+///
+/// This attribute macro registers the decorated function to be executed as a middleware
+/// for outgoing responses. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[response_middleware]
+/// async fn add_custom_header(ctx: Context) {
+///     // Middleware logic
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_middleware_macro(attr, item)
 }
 
+/// Registers a function as a pre-upgrade hook.
+///
+/// This attribute macro registers the decorated function to be executed before a connection
+/// is upgraded (e.g., to WebSocket). This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[pre_upgrade_hook]
+/// async fn handle_pre_upgrade(ctx: Context) {
+///     // Pre-upgrade logic
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn pre_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     pre_upgrade_hook_macro(attr, item)
 }
 
+/// Registers a function as a connected hook.
+///
+/// This attribute macro registers the decorated function to be executed when a new client
+/// connection is established. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[connected_hook]
+/// async fn handle_new_connection(ctx: Context) {
+///     // Connection handling logic
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     connected_hook_macro(attr, item)
 }
 
+/// Registers a function as a panic hook.
+///
+/// This attribute macro registers the decorated function to handle panics that occur
+/// during request processing. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[panic_hook]
+/// async fn handle_panic(ctx: Context) {
+///     // Panic handling logic
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     panic_hook_macro(attr, item)
 }
 
+/// Disables the default HTTP hook.
+///
+/// This attribute macro disables the default HTTP handling logic, allowing for a fully
+/// custom implementation. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[disable_http_hook("/")]
+/// async fn custom_http_logic(ctx: Context) {
+///     // Custom logic to replace default HTTP hook
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn disable_http_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     disable_http_hook_macro(attr, item)
 }
 
+/// Disables the default WebSocket hook.
+///
+/// This attribute macro disables the default WebSocket handling logic, allowing for a fully
+/// custom implementation. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[disable_ws_hook("/")]
+/// async fn custom_ws_logic(ctx: Context) {
+///     // Custom logic to replace default WebSocket hook
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn disable_ws_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     disable_ws_hook_macro(attr, item)
