@@ -191,3 +191,38 @@ pub(crate) fn expand_macro_with_before_return_insertion(
         Err(err) => err.to_compile_error().into(),
     }
 }
+
+/// Convert an arbitrary expression into an `isize` token stream.
+///
+/// This function handles integer literals, string literals, and arbitrary expressions.
+/// - Integer literals are converted directly to `isize`.
+/// - String literals are parsed as `isize`.
+/// - Other expressions are converted at runtime using `.to_string().parse::<isize>()`.
+///
+/// # Parameters
+/// - `&Expr` - The expression to convert to `isize`.
+///
+/// # Returns
+/// - A `TokenStream2` representing the expression converted to `isize`.
+pub(crate) fn expr_to_isize(expr: &Expr) -> TokenStream2 {
+    match expr {
+        Expr::Lit(ExprLit {
+            lit: Lit::Int(lit_int),
+            ..
+        }) => {
+            let value = lit_int.base10_parse::<isize>().unwrap();
+            quote! { #value }
+        }
+        Expr::Lit(ExprLit {
+            lit: Lit::Str(lit_str),
+            ..
+        }) => {
+            let value: isize = lit_str
+                .value()
+                .parse()
+                .expect("Cannot parse string to isize");
+            quote! { #value }
+        }
+        _ => quote! { (#expr).to_string().parse::<isize>().unwrap() },
+    }
+}

@@ -31,7 +31,15 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     });
     if type_name == "Server" {
         init_statements.push(quote! {
-            for hook in inventory::iter::<hyperlane::HookMacro> {
+            let mut hooks: Vec<_> = inventory::iter::<hyperlane::HookMacro>.into_iter().collect();
+            hooks.sort_by_key(|hook| {
+                match hook.hook_type {
+                    hyperlane::HookType::RequestMiddleware(priority) => priority,
+                    hyperlane::HookType::ResponseMiddleware(priority) => priority,
+                    _ => 0,
+                }
+            });
+            for hook in hooks {
                 match hook.hook_type {
                     hyperlane::HookType::PanicHook => {
                         #var_name.panic_hook(hook.handler).await;
@@ -48,13 +56,13 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
                     hyperlane::HookType::PreUpgradeHook => {
                         #var_name.pre_upgrade_hook(hook.handler).await;
                     },
-                    hyperlane::HookType::RequestMiddleware => {
+                    hyperlane::HookType::RequestMiddleware(_) => {
                         #var_name.request_middleware(hook.handler).await;
                     },
                     hyperlane::HookType::Route(path) => {
                         #var_name.route(path, hook.handler).await;
                     },
-                    hyperlane::HookType::ResponseMiddleware => {
+                    hyperlane::HookType::ResponseMiddleware(_) => {
                         #var_name.response_middleware(hook.handler).await;
                     },
                 }

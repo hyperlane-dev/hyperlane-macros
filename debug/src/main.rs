@@ -15,23 +15,26 @@ struct TestData {
     age: u32,
 }
 
-#[request_middleware]
-#[response_body("2")]
-#[response_version(HttpVersion::HTTP1_1)]
-async fn request_middleware_2(ctx: Context) {}
-
-#[request_middleware]
 #[response_body("1")]
+#[request_middleware]
 #[response_version(HttpVersion::HTTP1_1)]
 async fn request_middleware_1(ctx: Context) {}
 
+#[response_body("2")]
+#[request_middleware(1)]
+#[response_version(HttpVersion::HTTP1_1)]
+async fn request_middleware_2(ctx: Context) {}
+
 #[response_middleware]
-#[send]
-async fn response_middleware(ctx: Context) {
+async fn response_middleware_1(ctx: Context) {
     if ctx.get_request().await.get_upgrade_type().is_ws() {
         return;
     }
 }
+
+#[send]
+#[response_middleware(1)]
+async fn response_middleware_2(ctx: Context) {}
 
 #[panic_hook]
 #[send]
