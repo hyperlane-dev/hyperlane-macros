@@ -32,6 +32,7 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
     expand_check_macro(item, |context| {
         quote! {
             if !#context.get_request().await.is_http() {
+                let _ = #context.aborted().await;
                 return;
             }
         }
@@ -45,6 +46,7 @@ macro_rules! impl_protocol_check_macro {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());
                 quote! {
                     if !#context.get_request().await.#check_fn() {
+                        let _ = #context.aborted().await;
                         return;
                     }
                 }

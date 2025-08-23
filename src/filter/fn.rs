@@ -12,13 +12,10 @@ use crate::*;
 pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            if !#context.get_request().await.is_unknown_method() {
-                return;
-            }
-            if !#context.get_request().await.is_unknown_upgrade() {
-                return;
-            }
-            if !#context.get_request().await.is_unknown_version() {
+            if !#context.get_request().await.is_unknown_method()
+            || !#context.get_request().await.is_unknown_upgrade()
+            || !#context.get_request().await.is_unknown_version() {
+                let _ = #context.aborted().await;
                 return;
             }
         }
