@@ -31,17 +31,9 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     });
     if type_name == "Server" {
         init_statements.push(quote! {
-            let mut hooks: Vec<_> = inventory::iter::<hyperlane::HookMacro>.into_iter().collect();
-            hooks.sort_by_key(|hook| {
-                match hook.hook_type {
-                    hyperlane::HookType::RequestMiddleware(order) => order,
-                    hyperlane::HookType::ResponseMiddleware(order) => order,
-                    hyperlane::HookType::PanicHook(order) => order,
-                    hyperlane::HookType::ConnectedHook(order) => order,
-                    hyperlane::HookType::PreUpgradeHook(order) => order,
-                    _ => 0,
-                }
-            });
+            let mut hooks: Vec<_> = inventory::iter::<HookMacro>.into_iter().collect();
+            assert_hooks_unique_order(&hooks);
+            hooks.sort_by_key(|hook| hook.hook_type.get());
             for hook in hooks {
                 match hook.hook_type {
                     hyperlane::HookType::PanicHook(_) => {

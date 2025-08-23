@@ -8,12 +8,12 @@ pub(crate) struct PathAttr {
     pub(crate) path: Expr,
 }
 
-/// Represents a parsed attribute containing an optional `order`.
+/// Represents a parsed macro attribute containing an optional order.
 ///
-/// This struct is used by macro parsing implementations to hold the extracted order expression.
-/// If the `order` is not specified in the macro, it defaults to `0`.
+/// This struct is used during macro parsing to hold the extracted order expression.
+/// Hooks or attributes that do not specify an order will have `None`.
+#[derive(Clone)]
 pub(crate) struct OrderAttr {
-    /// The order expression provided in the macro attribute.
-    /// Defaults to `0` if not specified.
-    pub(crate) order: Expr,
+    /// The optional order expression provided in the macro attribute.
+    pub(crate) order: Option<Expr>,
 }

@@ -192,37 +192,38 @@ pub(crate) fn expand_macro_with_before_return_insertion(
     }
 }
 
-/// Convert an arbitrary expression into an `isize` token stream.
+/// Convert an optional expression into an `Option<isize>` token stream.
 ///
-/// This function handles integer literals, string literals, and arbitrary expressions.
-/// - Integer literals are converted directly to `isize`.
-/// - String literals are parsed as `isize`.
-/// - Other expressions are converted at runtime using `.to_string().parse::<isize>()`.
+/// This function supports integer and string literals only:
+/// - Integer literals are parsed and converted into `Some(isize)`.
+/// - String literals are parsed into `isize` and wrapped in `Some(...)`.
+/// - Any other expression types will result in `None`.
+/// - If `opt_expr` is `None`, the result is also `None`.
 ///
 /// # Parameters
-/// - `&Expr` - The expression to convert to `isize`.
+/// - `opt_expr` - An optional reference to the expression to convert.
 ///
 /// # Returns
-/// - A `TokenStream2` representing the expression converted to `isize`.
-pub(crate) fn expr_to_isize(expr: &Expr) -> TokenStream2 {
-    match expr {
-        Expr::Lit(ExprLit {
-            lit: Lit::Int(lit_int),
-            ..
-        }) => {
-            let value = lit_int.base10_parse::<isize>().unwrap();
-            quote! { #value }
-        }
-        Expr::Lit(ExprLit {
-            lit: Lit::Str(lit_str),
-            ..
-        }) => {
-            let value: isize = lit_str
-                .value()
-                .parse()
-                .expect("Cannot parse string to isize");
-            quote! { #value }
-        }
-        _ => quote! { (#expr).to_string().parse::<isize>().unwrap() },
+/// - A `TokenStream2` representing `Some(isize)` for supported literals, or `None` otherwise.
+pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
+    match opt_expr {
+        Some(expr) => match expr {
+            Expr::Lit(ExprLit {
+                lit: Lit::Int(lit_int),
+                ..
+            }) => {
+                let value: isize = lit_int.base10_parse::<isize>().unwrap();
+                quote! { Some(#value) }
+            }
+            Expr::Lit(ExprLit {
+                lit: Lit::Str(lit_str),
+                ..
+            }) => {
+                let value: isize = lit_str.value().parse().expect("Cannot parse to isize");
+                quote! { Some(#value) }
+            }
+            _ => quote! { None },
+        },
+        None => quote! { None },
     }
 }

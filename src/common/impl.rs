@@ -26,21 +26,20 @@ impl Parse for PathAttr {
 /// an optional `order` from the macro's attribute tokens.
 /// If no order is provided, it defaults to `0`.
 impl Parse for OrderAttr {
-    /// Parses the input stream into a `OrderAttr` struct.
+    /// Parses the input stream into an `OrderAttr` struct.
     ///
     /// # Arguments
     ///
-    /// - `ParseStream` - The token stream to parse.
+    /// - `input` - The token stream to parse.
     ///
     /// # Returns
     ///
     /// A `Result` containing the parsed `OrderAttr` or an error.
     fn parse(input: ParseStream) -> Result<Self> {
-        let order: Expr = if input.is_empty() {
-            syn::parse_str("0")?
-        } else {
-            input.parse()?
-        };
-        Ok(OrderAttr { order })
+        if input.is_empty() {
+            return Ok(OrderAttr { order: None });
+        }
+        let expr: Expr = input.parse()?;
+        Ok(OrderAttr { order: Some(expr) })
     }
 }
