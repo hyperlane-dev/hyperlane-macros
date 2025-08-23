@@ -27,11 +27,26 @@ async fn request_middleware_1(ctx: Context) {}
 
 #[response_middleware]
 #[send]
-async fn response_middleware(ctx: Context) {}
+async fn response_middleware(ctx: Context) {
+    if ctx.get_request().await.get_upgrade_type().is_ws() {
+        return;
+    }
+}
 
 #[panic_hook]
 #[send]
 async fn panic_hook(ctx: Context) {}
+
+#[route("/disable_http_hook")]
+#[response_body("disable_http_hook")]
+#[disable_http_hook("/disable_http_hook")]
+async fn disable_http_hook(ctx: Context) {}
+
+#[route("/disable_ws_hook")]
+#[response_body("disable_http_hook")]
+#[disable_ws_hook("/disable_http_hook")]
+#[send_body]
+async fn disable_ws_hook(ctx: Context) {}
 
 #[get]
 #[http]
@@ -41,11 +56,11 @@ async fn ctx_pre_hook(ctx: Context) {}
 #[response_status_code(200)]
 async fn ctx_post_hook(ctx: Context) {}
 
-#[response_status_code(CUSTOM_STATUS_CODE)]
-#[response_reason_phrase(CUSTOM_REASON)]
-#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
-#[response_body(RESPONSE_DATA)]
 #[route("/response")]
+#[response_body(RESPONSE_DATA)]
+#[response_reason_phrase(CUSTOM_REASON)]
+#[response_status_code(CUSTOM_STATUS_CODE)]
+#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
 async fn response(ctx: Context) {}
 
 #[connect]
@@ -168,91 +183,91 @@ async fn unknown_all(ctx: Context) {
     let _ = ctx.set_response_body("unknown all").await;
 }
 
-#[send_body]
 #[ws]
 #[get]
+#[send_body]
 #[route("/get")]
 async fn get(ctx: Context) {
     let _ = ctx.set_response_body("get").await;
 }
 
-#[send_once]
 #[post]
+#[send_once]
 #[route("/post")]
 async fn post(ctx: Context) {
     let _ = ctx.set_response_body("post").await;
 }
 
-#[send_once_body]
 #[ws]
+#[send_once_body]
 #[route("/websocket")]
 async fn websocket(ctx: Context) {
     let _ = ctx.set_response_body("websocket").await;
 }
 
+#[route("/ctx_hook")]
 #[pre_hook(ctx_pre_hook)]
 #[post_hook(ctx_post_hook)]
-#[route("/ctx_hook")]
 async fn ctx_hook(ctx: Context) {
     let _ = ctx.set_response_body("Testing hook macro").await;
 }
 
+#[http]
 #[closed]
+#[route("/get_post")]
+#[methods(get, post)]
 #[response_reason_phrase("OK")]
 #[response_status_code(200)]
-#[methods(get, post)]
-#[http]
-#[route("/get_post")]
 async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await;
 }
 
-#[attributes(request_attributes)]
 #[route("/attributes")]
+#[attributes(request_attributes)]
 async fn attributes(ctx: Context) {
     let response: String = format!("{:?}", request_attributes);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[route_params(request_route_params)]
 #[route("/route_params/:test")]
+#[route_params(request_route_params)]
 async fn route_params(ctx: Context) {
     let response: String = format!("{:?}", request_route_params);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[request_querys(request_querys)]
 #[route("/request_querys")]
+#[request_querys(request_querys)]
 async fn request_querys(ctx: Context) {
     let response: String = format!("{:?}", request_querys);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[request_headers(request_headers)]
 #[route("/request_headers")]
+#[request_headers(request_headers)]
 async fn request_headers(ctx: Context) {
     let response: String = format!("{:?}", request_headers);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[route_param("test" => request_route_param)]
 #[route("/route_param/:test")]
+#[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {
     if let Some(data) = request_route_param {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
-#[request_query("test" => request_query_option)]
 #[route("/request_query")]
+#[request_query("test" => request_query_option)]
 async fn request_query(ctx: Context) {
     if let Some(data) = request_query_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
-#[request_header(HOST => request_header_option)]
 #[route("/request_header")]
+#[request_header(HOST => request_header_option)]
 async fn request_header(ctx: Context) {
     if let Some(data) = request_header_option {
         let _ = ctx.set_response_body(data).await;
@@ -266,22 +281,22 @@ async fn request_body(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[host("localhost")]
 #[route("/host")]
+#[host("localhost")]
 async fn host(ctx: Context) {
     let _ = ctx
         .set_response_body("host string literal: localhost")
         .await;
 }
 
-#[host_filter("filter.localhost")]
 #[route("/host_filter")]
+#[host_filter("filter.localhost")]
 async fn host_filter(ctx: Context) {
     let _ = ctx.set_response_body("host filter string literal").await;
 }
 
-#[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 #[route("/attribute")]
+#[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {
     if let Some(data) = request_attribute_option {
         let response: String = format!("name={}, age={}", data.name, data.age);
@@ -289,8 +304,8 @@ async fn attribute(ctx: Context) {
     }
 }
 
-#[request_body_json(request_data_result: TestData)]
 #[route("/request_body_json")]
+#[request_body_json(request_data_result: TestData)]
 async fn request_body_json(ctx: Context) {
     if let Ok(data) = request_data_result {
         let response: String = format!("name={}, age={}", data.name, data.age);
@@ -298,29 +313,29 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
-#[referer("http://localhost")]
 #[route("/referer")]
+#[referer("http://localhost")]
 async fn referer(ctx: Context) {
     let _ = ctx
         .set_response_body("referer string literal: http://localhost")
         .await;
 }
 
-#[referer_filter("http://localhost")]
 #[route("/referer_filter")]
+#[referer_filter("http://localhost")]
 async fn referer_filter(ctx: Context) {
     let _ = ctx.set_response_body("referer filter string literal").await;
 }
 
-#[request_cookies(cookie_value)]
 #[route("/cookies")]
+#[request_cookies(cookie_value)]
 async fn cookies(ctx: Context) {
     let response: String = format!("All cookies: {:?}", cookie_value);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[request_cookie("test" => session_cookie_opt)]
 #[route("/cookie")]
+#[request_cookie("test" => session_cookie_opt)]
 async fn cookie(ctx: Context) {
     if let Some(session) = session_cookie_opt {
         let response: String = format!("Session cookie: {}", session);
@@ -328,34 +343,34 @@ async fn cookie(ctx: Context) {
     }
 }
 
-#[request_version(http_version)]
 #[route("/request_version")]
+#[request_version(http_version)]
 async fn request_version_test(ctx: Context) {
     let response: String = format!("HTTP Version: {:?}", http_version);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[request_path(request_path)]
 #[route("/request_path")]
+#[request_path(request_path)]
 async fn request_path_test(ctx: Context) {
     let response: String = format!("Request Path: {:?}", request_path);
     let _ = ctx.set_response_body(response).await;
 }
 
+#[route("/response_header")]
 #[response_header("X-Add-Header", "add-value")]
 #[response_header("X-Set-Header" => "set-value")]
-#[route("/response_header")]
 async fn response_header_test(ctx: Context) {
     let _ = ctx
         .set_response_body("Testing header set and replace operations")
         .await;
 }
 
+#[route("/literals")]
 #[response_status_code(201)]
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
-#[route("/literals")]
 async fn literals(ctx: Context) {}
 
 #[hyperlane(server: Server)]
