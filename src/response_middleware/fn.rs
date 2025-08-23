@@ -14,7 +14,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with the middleware registration.
 pub(crate) fn response_middleware_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_args: PathAndOrderAttr = parse_macro_input!(attr as PathAndOrderAttr);
+    let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let fn_name: &Ident = &input_fn.sig.ident;

@@ -14,16 +14,15 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with the hook disabling registration.
 pub(crate) fn disable_ws_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_args: PathAndOrderAttr = parse_macro_input!(attr as PathAndOrderAttr);
+    let attr_args: PathAttr = parse_macro_input!(attr as PathAttr);
     let path: &Expr = &attr_args.path;
-    let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let fn_name: &Ident = &input_fn.sig.ident;
     let gen_code: TokenStream2 = quote! {
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::DisableWsHook(#path, #order),
+                hook_type: hyperlane::HookType::DisableWsHook(#path),
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }

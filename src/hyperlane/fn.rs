@@ -37,8 +37,6 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
                     hyperlane::HookType::RequestMiddleware(order) => order,
                     hyperlane::HookType::ResponseMiddleware(order) => order,
                     hyperlane::HookType::PanicHook(order) => order,
-                    hyperlane::HookType::DisableHttpHook(_, order) => order,
-                    hyperlane::HookType::DisableWsHook(_, order) => order,
                     hyperlane::HookType::ConnectedHook(order) => order,
                     hyperlane::HookType::PreUpgradeHook(order) => order,
                     _ => 0,
@@ -49,10 +47,10 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
                     hyperlane::HookType::PanicHook(_) => {
                         #var_name.panic_hook(hook.handler).await;
                     },
-                    hyperlane::HookType::DisableHttpHook(path, _) => {
+                    hyperlane::HookType::DisableHttpHook(path) => {
                         #var_name.disable_http_hook(path).await;
                     },
-                    hyperlane::HookType::DisableWsHook(path, _) => {
+                    hyperlane::HookType::DisableWsHook(path) => {
                         #var_name.disable_ws_hook(path).await;
                     },
                     hyperlane::HookType::ConnectedHook(_) => {
