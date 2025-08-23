@@ -31,7 +31,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     });
     if type_name == "Server" {
         init_statements.push(quote! {
-            for hook in inventory::iter::<hyperlane::RouteMacro> {
+            for hook in inventory::iter::<hyperlane::HookMacro> {
                 match hook.hook_type {
                     hyperlane::HookType::PanicHook => {
                         #var_name.panic_hook(route.handler).await;
