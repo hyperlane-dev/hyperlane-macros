@@ -19,16 +19,22 @@ struct TestData {
 #[response_version(HttpVersion::HTTP1_1)]
 async fn request_middleware(ctx: Context) {}
 
+#[response_middleware]
+#[send]
+async fn response_middleware(ctx: Context) {}
+
+#[panic_hook]
+#[send]
+async fn panic_hook(ctx: Context) {}
+
 #[get]
 #[http]
 async fn ctx_pre_hook(ctx: Context) {}
 
 #[flush]
-#[send]
 #[response_status_code(200)]
 async fn ctx_post_hook(ctx: Context) {}
 
-#[send]
 #[response_status_code(CUSTOM_STATUS_CODE)]
 #[response_reason_phrase(CUSTOM_REASON)]
 #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
@@ -78,91 +84,78 @@ async fn trace(ctx: Context) {
     let _ = ctx.set_response_body("trace").await.send().await;
 }
 
-#[send]
 #[h2c]
 #[route("/h2c")]
 async fn h2c(ctx: Context) {
     let _ = ctx.set_response_body("h2c").await;
 }
 
-#[send]
 #[http]
 #[route("/http")]
 async fn http_only(ctx: Context) {
     let _ = ctx.set_response_body("http").await;
 }
 
-#[send]
 #[http0_9]
 #[route("/http0_9")]
 async fn http0_9(ctx: Context) {
     let _ = ctx.set_response_body("http0.9").await;
 }
 
-#[send]
 #[http1_0]
 #[route("/http1_0")]
 async fn http1_0(ctx: Context) {
     let _ = ctx.set_response_body("http1.0").await;
 }
 
-#[send]
 #[http1_1]
 #[route("/http1_1")]
 async fn http1_1(ctx: Context) {
     let _ = ctx.set_response_body("http1.1").await;
 }
 
-#[send]
 #[http2]
 #[route("/http2")]
 async fn http2(ctx: Context) {
     let _ = ctx.set_response_body("http2").await;
 }
 
-#[send]
 #[http3]
 #[route("/http3")]
 async fn http3(ctx: Context) {
     let _ = ctx.set_response_body("http3").await;
 }
 
-#[send]
 #[tls]
 #[route("/tls")]
 async fn tls(ctx: Context) {
     let _ = ctx.set_response_body("tls").await;
 }
 
-#[send]
 #[http1_1_or_higher]
 #[route("/http1_1_or_higher")]
 async fn http1_1_or_higher(ctx: Context) {
     let _ = ctx.set_response_body("http1.1+").await;
 }
 
-#[send]
 #[filter_unknown_method]
 #[route("/unknown_method")]
 async fn unknown_method(ctx: Context) {
     let _ = ctx.set_response_body("unknown method").await;
 }
 
-#[send]
 #[filter_unknown_upgrade]
 #[route("/unknown_upgrade")]
 async fn unknown_upgrade(ctx: Context) {
     let _ = ctx.set_response_body("unknown upgrade").await;
 }
 
-#[send]
 #[filter_unknown_version]
 #[route("/unknown_version")]
 async fn unknown_version(ctx: Context) {
     let _ = ctx.set_response_body("unknown version").await;
 }
 
-#[send]
 #[filter_unknown]
 #[route("/unknown_all")]
 async fn unknown_all(ctx: Context) {
@@ -191,7 +184,6 @@ async fn websocket(ctx: Context) {
     let _ = ctx.set_response_body("websocket").await;
 }
 
-#[send]
 #[pre_hook(ctx_pre_hook)]
 #[post_hook(ctx_post_hook)]
 #[route("/ctx_hook")]
@@ -200,7 +192,6 @@ async fn ctx_hook(ctx: Context) {
 }
 
 #[closed]
-#[send]
 #[response_reason_phrase("OK")]
 #[response_status_code(200)]
 #[methods(get, post)]
@@ -210,7 +201,6 @@ async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await;
 }
 
-#[send]
 #[attributes(request_attributes)]
 #[route("/attributes")]
 async fn attributes(ctx: Context) {
@@ -218,7 +208,6 @@ async fn attributes(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[route_params(request_route_params)]
 #[route("/route_params/:test")]
 async fn route_params(ctx: Context) {
@@ -226,7 +215,6 @@ async fn route_params(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[request_querys(request_querys)]
 #[route("/request_querys")]
 async fn request_querys(ctx: Context) {
@@ -234,7 +222,6 @@ async fn request_querys(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[request_headers(request_headers)]
 #[route("/request_headers")]
 async fn request_headers(ctx: Context) {
@@ -242,7 +229,6 @@ async fn request_headers(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[route_param("test" => request_route_param)]
 #[route("/route_param/:test")]
 async fn route_param(ctx: Context) {
@@ -251,7 +237,6 @@ async fn route_param(ctx: Context) {
     }
 }
 
-#[send]
 #[request_query("test" => request_query_option)]
 #[route("/request_query")]
 async fn request_query(ctx: Context) {
@@ -260,7 +245,6 @@ async fn request_query(ctx: Context) {
     }
 }
 
-#[send]
 #[request_header(HOST => request_header_option)]
 #[route("/request_header")]
 async fn request_header(ctx: Context) {
@@ -269,7 +253,6 @@ async fn request_header(ctx: Context) {
     }
 }
 
-#[send]
 #[request_body(raw_body)]
 #[route("/request_body")]
 async fn request_body(ctx: Context) {
@@ -277,7 +260,6 @@ async fn request_body(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[host("localhost")]
 #[route("/host")]
 async fn host(ctx: Context) {
@@ -286,14 +268,12 @@ async fn host(ctx: Context) {
         .await;
 }
 
-#[send]
 #[host_filter("filter.localhost")]
 #[route("/host_filter")]
 async fn host_filter(ctx: Context) {
     let _ = ctx.set_response_body("host filter string literal").await;
 }
 
-#[send]
 #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 #[route("/attribute")]
 async fn attribute(ctx: Context) {
@@ -303,7 +283,6 @@ async fn attribute(ctx: Context) {
     }
 }
 
-#[send]
 #[request_body_json(request_data_result: TestData)]
 #[route("/request_body_json")]
 async fn request_body_json(ctx: Context) {
@@ -313,7 +292,6 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
-#[send]
 #[referer("http://localhost")]
 #[route("/referer")]
 async fn referer(ctx: Context) {
@@ -322,14 +300,12 @@ async fn referer(ctx: Context) {
         .await;
 }
 
-#[send]
 #[referer_filter("http://localhost")]
 #[route("/referer_filter")]
 async fn referer_filter(ctx: Context) {
     let _ = ctx.set_response_body("referer filter string literal").await;
 }
 
-#[send]
 #[request_cookies(cookie_value)]
 #[route("/cookies")]
 async fn cookies(ctx: Context) {
@@ -337,7 +313,6 @@ async fn cookies(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[request_cookie("test" => session_cookie_opt)]
 #[route("/cookie")]
 async fn cookie(ctx: Context) {
@@ -347,7 +322,6 @@ async fn cookie(ctx: Context) {
     }
 }
 
-#[send]
 #[request_version(http_version)]
 #[route("/request_version")]
 async fn request_version_test(ctx: Context) {
@@ -355,7 +329,6 @@ async fn request_version_test(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[request_path(request_path)]
 #[route("/request_path")]
 async fn request_path_test(ctx: Context) {
@@ -363,7 +336,6 @@ async fn request_path_test(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
 #[response_header("X-Add-Header", "add-value")]
 #[response_header("X-Set-Header" => "set-value")]
 #[route("/response_header")]
@@ -373,7 +345,6 @@ async fn response_header_test(ctx: Context) {
         .await;
 }
 
-#[send]
 #[response_status_code(201)]
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]

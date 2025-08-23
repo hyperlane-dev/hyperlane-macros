@@ -56,7 +56,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
                     },
                     hyperlane::HookType::ResponseMiddleware => {
                         #var_name.response_middleware(hook.handler).await;
-                    }
+                    },
                 }
             }
         });
