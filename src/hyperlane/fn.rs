@@ -34,28 +34,28 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
             for hook in inventory::iter::<hyperlane::HookMacro> {
                 match hook.hook_type {
                     hyperlane::HookType::PanicHook => {
-                        #var_name.panic_hook(route.handler).await;
+                        #var_name.panic_hook(hook.handler).await;
                     },
-                    hyperlane::HookType::DisableHttpHook => {
-                        #var_name.disable_http_hook(&route.path).await;
+                    hyperlane::HookType::DisableHttpHook(path) => {
+                        #var_name.disable_http_hook(path).await;
                     },
-                    hyperlane::HookType::DisableWsHook => {
-                        #var_name.disable_ws_hook(&route.path).await;
+                    hyperlane::HookType::DisableWsHook(path) => {
+                        #var_name.disable_ws_hook(path).await;
                     },
                     hyperlane::HookType::ConnectedHook => {
-                        #var_name.connected_hook(route.handler).await;
+                        #var_name.connected_hook(hook.handler).await;
                     },
                     hyperlane::HookType::PreUpgradeHook => {
-                        #var_name.pre_upgrade_hook(route.handler).await;
+                        #var_name.pre_upgrade_hook(hook.handler).await;
                     },
                     hyperlane::HookType::RequestMiddleware => {
-                        #var_name.request_middleware(route.handler).await;
+                        #var_name.request_middleware(hook.handler).await;
                     },
-                    hyperlane::HookType::Route => {
-                        #var_name.route(&route.path, route.handler).await;
+                    hyperlane::HookType::Route(path) => {
+                        #var_name.route(path, hook.handler).await;
                     },
                     hyperlane::HookType::ResponseMiddleware => {
-                        #var_name.response_middleware(route.handler).await;
+                        #var_name.response_middleware(hook.handler).await;
                     }
                 }
             }

@@ -29,8 +29,7 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::Route,
-                path: #path,
+                hook_type: hyperlane::HookType::Route(#path),
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }

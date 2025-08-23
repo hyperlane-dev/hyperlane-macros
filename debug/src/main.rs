@@ -15,6 +15,7 @@ struct TestData {
     age: u32,
 }
 
+#[request_middleware]
 #[response_version(HttpVersion::HTTP1_1)]
 async fn request_middleware(ctx: Context) {}
 
@@ -386,7 +387,6 @@ async fn literals(ctx: Context) {}
 async fn main() {
     config.disable_nodelay().await;
     server.config(config).await;
-    server.request_middleware(request_middleware).await;
     let server_hook: ServerHook = server.run().await.unwrap_or_default();
     let server_hook_clone: ServerHook = server_hook.clone();
     tokio::spawn(async move {
