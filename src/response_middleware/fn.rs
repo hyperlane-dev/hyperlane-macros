@@ -7,7 +7,7 @@ pub(crate) fn response_middleware_macro(_attr: TokenStream, item: TokenStream) -
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::ResponseMiddleware
+                hook_type: hyperlane::HookType::ResponseMiddleware,
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }

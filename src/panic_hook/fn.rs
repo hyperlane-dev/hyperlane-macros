@@ -7,7 +7,7 @@ pub(crate) fn panic_hook_macro(_attr: TokenStream, item: TokenStream) -> TokenSt
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::PanicHook
+                hook_type: hyperlane::HookType::PanicHook,
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }

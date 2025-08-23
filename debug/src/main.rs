@@ -16,8 +16,14 @@ struct TestData {
 }
 
 #[request_middleware]
+#[response_body("2")]
 #[response_version(HttpVersion::HTTP1_1)]
-async fn request_middleware(ctx: Context) {}
+async fn request_middleware_2(ctx: Context) {}
+
+#[request_middleware]
+#[response_body("1")]
+#[response_version(HttpVersion::HTTP1_1)]
+async fn request_middleware_1(ctx: Context) {}
 
 #[response_middleware]
 #[send]

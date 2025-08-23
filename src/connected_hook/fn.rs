@@ -7,7 +7,7 @@ pub(crate) fn connected_hook_macro(_attr: TokenStream, item: TokenStream) -> Tok
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::ConnectedHook
+                hook_type: hyperlane::HookType::ConnectedHook,
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }

@@ -7,7 +7,7 @@ pub(crate) fn pre_upgrade_hook_macro(_attr: TokenStream, item: TokenStream) -> T
         #input_fn
         inventory::submit! {
             hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::PreUpgradeHook
+                hook_type: hyperlane::HookType::PreUpgradeHook,
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }
