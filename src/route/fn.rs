@@ -18,7 +18,7 @@ use crate::*;
 ///
 /// The macro generates:
 /// - The original function unchanged
-/// - An `inventory::submit!` block that registers a `RouteMacro` instance
+/// - An `inventory::submit!` block that registers a `HookMacro` instance
 /// - A handler closure that wraps the function in `Box::pin` for async execution
 pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_attr: RouteAttr = parse_macro_input!(attr as RouteAttr);
@@ -28,7 +28,8 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let gen_code: TokenStream2 = quote! {
         #input_fn
         inventory::submit! {
-            hyperlane::RouteMacro {
+            hyperlane::HookMacro {
+                hook_type: hyperlane::HookType::Route,
                 path: #path,
                 handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
             }

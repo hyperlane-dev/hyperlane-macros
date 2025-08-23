@@ -20,6 +20,13 @@ mod request;
 mod response;
 mod route;
 mod send;
+mod connected_hook;
+mod disable_http_hook;
+mod disable_ws_hook;
+mod panic_hook;
+mod pre_upgrade_hook;
+mod request_middleware;
+mod response_middleware;
 
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
@@ -36,6 +43,14 @@ pub(crate) use request::*;
 pub(crate) use response::*;
 pub(crate) use route::*;
 pub(crate) use send::*;
+
+pub(crate) use connected_hook::*;
+pub(crate) use disable_http_hook::*;
+pub(crate) use disable_ws_hook::*;
+pub(crate) use panic_hook::*;
+pub(crate) use pre_upgrade_hook::*;
+pub(crate) use request_middleware::*;
+pub(crate) use response_middleware::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
@@ -1593,4 +1608,39 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_middleware_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
+    response_middleware_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn pre_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    pre_upgrade_hook_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    connected_hook_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    panic_hook_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn disable_http_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    disable_http_hook_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn disable_ws_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    disable_ws_hook_macro(attr, item)
 }
