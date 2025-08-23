@@ -17,6 +17,7 @@ pub(crate) fn host_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
         quote! {
             let request_host: RequestHost = #context.get_request_host().await;
             if request_host != #host_value.to_string() {
+                let _ = #context.aborted().await;
                 return;
             }
         }
@@ -40,6 +41,7 @@ pub(crate) fn host_filter_macro(attr: TokenStream, item: TokenStream) -> TokenSt
         quote! {
             let request_host: RequestHost = #context.get_request_host().await;
             if request_host == #host_value.to_string() {
+                let _ = #context.aborted().await;
                 return;
             }
         }

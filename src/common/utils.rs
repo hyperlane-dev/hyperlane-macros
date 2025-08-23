@@ -141,3 +141,53 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
         )),
     }
 }
+
+/// Expands macro with code inserted before the return statement of the function body.
+///
+/// This function modifies the input `TokenStream` representing a function by inserting
+/// generated code right before the final return statement (or at the end if no explicit return).
+///
+/// # Arguments
+///
+/// - `input` - The input `TokenStream` to process, typically an `async fn`.
+/// - `before_return_fn` - A closure that generates the `TokenStream2` to be inserted.
+///   It takes an `&Ident` (the context identifier) as input.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded `TokenStream` with the generated code inserted.
+pub(crate) fn expand_macro_with_before_return_insertion(
+    input: TokenStream,
+    before_return_fn: impl FnOnce(&Ident) -> TokenStream2,
+) -> TokenStream {
+    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let vis: &Visibility = &input_fn.vis;
+    let sig: &Signature = &input_fn.sig;
+    let attrs: &Vec<Attribute> = &input_fn.attrs;
+    match parse_context_from_fn(sig) {
+        Ok(context) => {
+            let before_return_code: TokenStream2 = before_return_fn(context);
+            let stmts: &mut Vec<Stmt> = &mut input_fn.block.stmts;
+            if let Some(last_stmt) = stmts.pop() {
+                let gen_code: TokenStream2 = quote! {
+                    #(#attrs)*
+                    #vis #sig {
+                        #(#stmts)*
+                        #before_return_code
+                        #last_stmt
+                    }
+                };
+                gen_code.into()
+            } else {
+                let gen_code: TokenStream2 = quote! {
+                    #(#attrs)*
+                    #vis #sig {
+                        #before_return_code
+                    }
+                };
+                gen_code.into()
+            }
+        }
+        Err(err) => err.to_compile_error().into(),
+    }
+}
