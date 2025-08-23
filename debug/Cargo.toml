@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 hyperlane-macros = { path = "../" }
-hyperlane = "*"
+hyperlane = { path = "../../hyperlane" }
 serde = { version = "*", features = ["derive"] }
 inventory = "*"
 tokio = { version = "*", features = ["full"] }

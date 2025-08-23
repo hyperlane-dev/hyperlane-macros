@@ -6,7 +6,9 @@ impl Parse for RequestMiddlewareAttr {
             Ok(RequestMiddlewareAttr { path: None })
         } else {
             let path_expr: Expr = input.parse()?;
-            Ok(RequestMiddlewareAttr { path: Some(path_expr) })
+            Ok(RequestMiddlewareAttr {
+                path: Some(path_expr),
+            })
         }
     }
 }
