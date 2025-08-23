@@ -10,6 +10,10 @@ use crate::*;
 /// - `TokenStream` - The attribute token stream (unused).
 /// - `TokenStream` - The input token stream representing the function to be registered as a middleware.
 ///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with the middleware registration.

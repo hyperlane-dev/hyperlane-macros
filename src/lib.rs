@@ -8,17 +8,12 @@
 mod aborted;
 mod closed;
 mod common;
-mod connected_hook;
-mod disable_http_hook;
-mod disable_ws_hook;
 mod filter;
 mod flush;
 mod hook;
 mod host;
 mod http;
 mod hyperlane;
-mod panic_hook;
-mod pre_upgrade_hook;
 mod protocol;
 mod referer;
 mod request;
@@ -31,17 +26,12 @@ mod send;
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
 pub(crate) use common::*;
-pub(crate) use connected_hook::*;
-pub(crate) use disable_http_hook::*;
-pub(crate) use disable_ws_hook::*;
 pub(crate) use filter::*;
 pub(crate) use flush::*;
 pub(crate) use hook::*;
 pub(crate) use host::*;
 pub(crate) use http::*;
 pub(crate) use hyperlane::*;
-pub(crate) use panic_hook::*;
-pub(crate) use pre_upgrade_hook::*;
 pub(crate) use protocol::*;
 pub(crate) use referer::*;
 pub(crate) use request::*;
@@ -1613,6 +1603,10 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// This attribute macro registers the decorated function to be executed as a middleware
 /// for incoming requests. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
 ///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
 /// # Usage
 ///
 /// ```rust
@@ -1637,6 +1631,10 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This attribute macro registers the decorated function to be executed as a middleware
 /// for outgoing responses. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
 ///
 /// # Usage
 ///
@@ -1663,6 +1661,10 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// This attribute macro registers the decorated function to be executed before a connection
 /// is upgraded (e.g., to WebSocket). This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
 ///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
 /// # Usage
 ///
 /// ```rust
@@ -1688,6 +1690,10 @@ pub fn pre_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// This attribute macro registers the decorated function to be executed when a new client
 /// connection is established. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
 ///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
 /// # Usage
 ///
 /// ```rust
@@ -1712,6 +1718,10 @@ pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This attribute macro registers the decorated function to handle panics that occur
 /// during request processing. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
 ///
 /// # Usage
 ///
