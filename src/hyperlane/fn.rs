@@ -34,26 +34,31 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
             let mut hooks: Vec<_> = inventory::iter::<hyperlane::HookMacro>.into_iter().collect();
             hooks.sort_by_key(|hook| {
                 match hook.hook_type {
-                    hyperlane::HookType::RequestMiddleware(priority) => priority,
-                    hyperlane::HookType::ResponseMiddleware(priority) => priority,
+                    hyperlane::HookType::RequestMiddleware(order) => order,
+                    hyperlane::HookType::ResponseMiddleware(order) => order,
+                    hyperlane::HookType::PanicHook(order) => order,
+                    hyperlane::HookType::DisableHttpHook(_, order) => order,
+                    hyperlane::HookType::DisableWsHook(_, order) => order,
+                    hyperlane::HookType::ConnectedHook(order) => order,
+                    hyperlane::HookType::PreUpgradeHook(order) => order,
                     _ => 0,
                 }
             });
             for hook in hooks {
                 match hook.hook_type {
-                    hyperlane::HookType::PanicHook => {
+                    hyperlane::HookType::PanicHook(_) => {
                         #var_name.panic_hook(hook.handler).await;
                     },
-                    hyperlane::HookType::DisableHttpHook(path) => {
+                    hyperlane::HookType::DisableHttpHook(path, _) => {
                         #var_name.disable_http_hook(path).await;
                     },
-                    hyperlane::HookType::DisableWsHook(path) => {
+                    hyperlane::HookType::DisableWsHook(path, _) => {
                         #var_name.disable_ws_hook(path).await;
                     },
-                    hyperlane::HookType::ConnectedHook => {
+                    hyperlane::HookType::ConnectedHook(_) => {
                         #var_name.connected_hook(hook.handler).await;
                     },
-                    hyperlane::HookType::PreUpgradeHook => {
+                    hyperlane::HookType::PreUpgradeHook(_) => {
                         #var_name.pre_upgrade_hook(hook.handler).await;
                     },
                     hyperlane::HookType::RequestMiddleware(_) => {

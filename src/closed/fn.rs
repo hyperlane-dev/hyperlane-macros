@@ -9,7 +9,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `item` - The input `TokenStream` to process.
+/// - `TokenStream` - The input `TokenStream` to process.
 ///
 /// # Returns
 ///
