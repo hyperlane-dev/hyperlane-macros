@@ -510,12 +510,7 @@ async fn main() {
     config.disable_nodelay().await;
     server.config(config).await;
     let server_hook: ServerHook = server.run().await.unwrap_or_default();
-    let server_hook_clone: ServerHook = server_hook.clone();
-    tokio::spawn(async move {
-        tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        server_hook.shutdown().await;
-    });
-    server_hook_clone.wait().await;
+    server_hook.wait().await;
 }
 ```
 
