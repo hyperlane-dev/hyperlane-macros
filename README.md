@@ -28,7 +28,7 @@ cargo add hyperlane-macros
 
 ### Hyperlane Macro
 
-- `#[hyperlane(server: Server)]` - Creates a new `Server` or `ServerConfig` instance with the specified variable name and type.
+- `#[hyperlane(server: Server)]` - Creates a new `Server` instance with the specified variable name and type, and automatically registers other hooks and routes defined within the crate.
 - `#[hyperlane(config: ServerConfig)]` - Creates a new `ServerConfig` instance with the specified variable name and type.
 
 ### HTTP Method Macros
@@ -159,6 +159,19 @@ cargo add hyperlane-macros
 
 - `#[pre_hook(function_name)]` - Execute specified function before the main handler function
 - `#[post_hook(function_name)]` - Execute specified function after the main handler function
+- `#[connected_hook]` - Execute function when a new client connection is established
+- `#[panic_hook]` - Execute function when a panic occurs within the server
+- `#[pre_upgrade_hook]` - Execute function before any protocol upgrade occurs
+
+### Disable Hook Macros
+
+- `#[disable_http_hook]` - Disable HTTP handling for a specific route
+- `#[disable_ws_hook]` - Disable WebSocket handling for a specific route
+
+### Middleware Macros
+
+- `#[request_middleware]` - Register a function as a request middleware
+- `#[response_middleware]` - Register a function as a response middleware
 
 ### Response Header Macros
 
@@ -203,24 +216,52 @@ struct TestData {
     age: u32,
 }
 
+#[request_middleware]
+#[response_body("2")]
 #[response_version(HttpVersion::HTTP1_1)]
-async fn request_middleware(ctx: Context) {}
+async fn request_middleware_2(ctx: Context) {}
+
+#[request_middleware]
+#[response_body("1")]
+#[response_version(HttpVersion::HTTP1_1)]
+async fn request_middleware_1(ctx: Context) {}
+
+#[response_middleware]
+#[send]
+async fn response_middleware(ctx: Context) {
+    if ctx.get_request().await.get_upgrade_type().is_ws() {
+        return;
+    }
+}
+
+#[panic_hook]
+#[send]
+async fn panic_hook(ctx: Context) {}
+
+#[route("/disable_http_hook")]
+#[response_body("disable_http_hook")]
+#[disable_http_hook("/disable_http_hook")]
+async fn disable_http_hook(ctx: Context) {}
+
+#[route("/disable_ws_hook")]
+#[response_body("disable_http_hook")]
+#[disable_ws_hook("/disable_http_hook")]
+#[send_body]
+async fn disable_ws_hook(ctx: Context) {}
 
 #[get]
 #[http]
 async fn ctx_pre_hook(ctx: Context) {}
 
 #[flush]
-#[send]
 #[response_status_code(200)]
 async fn ctx_post_hook(ctx: Context) {}
 
-#[send]
-#[response_status_code(CUSTOM_STATUS_CODE)]
-#[response_reason_phrase(CUSTOM_REASON)]
-#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
-#[response_body(RESPONSE_DATA)]
 #[route("/response")]
+#[response_body(RESPONSE_DATA)]
+#[response_reason_phrase(CUSTOM_REASON)]
+#[response_status_code(CUSTOM_STATUS_CODE)]
+#[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
 async fn response(ctx: Context) {}
 
 #[connect]
@@ -265,198 +306,175 @@ async fn trace(ctx: Context) {
     let _ = ctx.set_response_body("trace").await.send().await;
 }
 
-#[send]
 #[h2c]
 #[route("/h2c")]
 async fn h2c(ctx: Context) {
     let _ = ctx.set_response_body("h2c").await;
 }
 
-#[send]
 #[http]
 #[route("/http")]
 async fn http_only(ctx: Context) {
     let _ = ctx.set_response_body("http").await;
 }
 
-#[send]
 #[http0_9]
 #[route("/http0_9")]
 async fn http0_9(ctx: Context) {
     let _ = ctx.set_response_body("http0.9").await;
 }
 
-#[send]
 #[http1_0]
 #[route("/http1_0")]
 async fn http1_0(ctx: Context) {
     let _ = ctx.set_response_body("http1.0").await;
 }
 
-#[send]
 #[http1_1]
 #[route("/http1_1")]
 async fn http1_1(ctx: Context) {
     let _ = ctx.set_response_body("http1.1").await;
 }
 
-#[send]
 #[http2]
 #[route("/http2")]
 async fn http2(ctx: Context) {
     let _ = ctx.set_response_body("http2").await;
 }
 
-#[send]
 #[http3]
 #[route("/http3")]
 async fn http3(ctx: Context) {
     let _ = ctx.set_response_body("http3").await;
 }
 
-#[send]
 #[tls]
 #[route("/tls")]
 async fn tls(ctx: Context) {
     let _ = ctx.set_response_body("tls").await;
 }
 
-#[send]
 #[http1_1_or_higher]
 #[route("/http1_1_or_higher")]
 async fn http1_1_or_higher(ctx: Context) {
     let _ = ctx.set_response_body("http1.1+").await;
 }
 
-#[send]
 #[filter_unknown_method]
 #[route("/unknown_method")]
 async fn unknown_method(ctx: Context) {
     let _ = ctx.set_response_body("unknown method").await;
 }
 
-#[send]
 #[filter_unknown_upgrade]
 #[route("/unknown_upgrade")]
 async fn unknown_upgrade(ctx: Context) {
     let _ = ctx.set_response_body("unknown upgrade").await;
 }
 
-#[send]
 #[filter_unknown_version]
 #[route("/unknown_version")]
 async fn unknown_version(ctx: Context) {
     let _ = ctx.set_response_body("unknown version").await;
 }
 
-#[send]
 #[filter_unknown]
 #[route("/unknown_all")]
 async fn unknown_all(ctx: Context) {
     let _ = ctx.set_response_body("unknown all").await;
 }
 
-#[send_body]
 #[ws]
 #[get]
+#[send_body]
 #[route("/get")]
 async fn get(ctx: Context) {
     let _ = ctx.set_response_body("get").await;
 }
 
-#[send_once]
 #[post]
+#[send_once]
 #[route("/post")]
 async fn post(ctx: Context) {
     let _ = ctx.set_response_body("post").await;
 }
 
-#[send_once_body]
 #[ws]
+#[send_once_body]
 #[route("/websocket")]
 async fn websocket(ctx: Context) {
     let _ = ctx.set_response_body("websocket").await;
 }
 
-#[send]
+#[route("/ctx_hook")]
 #[pre_hook(ctx_pre_hook)]
 #[post_hook(ctx_post_hook)]
-#[route("/ctx_hook")]
 async fn ctx_hook(ctx: Context) {
     let _ = ctx.set_response_body("Testing hook macro").await;
 }
 
+#[http]
 #[closed]
-#[send]
+#[route("/get_post")]
+#[methods(get, post)]
 #[response_reason_phrase("OK")]
 #[response_status_code(200)]
-#[methods(get, post)]
-#[http]
-#[route("/get_post")]
 async fn get_post(ctx: Context) {
     let _ = ctx.set_response_body("get_post").await;
 }
 
-#[send]
-#[attributes(request_attributes)]
 #[route("/attributes")]
+#[attributes(request_attributes)]
 async fn attributes(ctx: Context) {
     let response: String = format!("{:?}", request_attributes);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[route_params(request_route_params)]
 #[route("/route_params/:test")]
+#[route_params(request_route_params)]
 async fn route_params(ctx: Context) {
     let response: String = format!("{:?}", request_route_params);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[request_querys(request_querys)]
 #[route("/request_querys")]
+#[request_querys(request_querys)]
 async fn request_querys(ctx: Context) {
     let response: String = format!("{:?}", request_querys);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[request_headers(request_headers)]
 #[route("/request_headers")]
+#[request_headers(request_headers)]
 async fn request_headers(ctx: Context) {
     let response: String = format!("{:?}", request_headers);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[route_param("test" => request_route_param)]
 #[route("/route_param/:test")]
+#[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {
     if let Some(data) = request_route_param {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
-#[send]
-#[request_query("test" => request_query_option)]
 #[route("/request_query")]
+#[request_query("test" => request_query_option)]
 async fn request_query(ctx: Context) {
     if let Some(data) = request_query_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
-#[send]
-#[request_header(HOST => request_header_option)]
 #[route("/request_header")]
+#[request_header(HOST => request_header_option)]
 async fn request_header(ctx: Context) {
     if let Some(data) = request_header_option {
         let _ = ctx.set_response_body(data).await;
     }
 }
 
-#[send]
 #[request_body(raw_body)]
 #[route("/request_body")]
 async fn request_body(ctx: Context) {
@@ -464,25 +482,22 @@ async fn request_body(ctx: Context) {
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[host("localhost")]
 #[route("/host")]
+#[host("localhost")]
 async fn host(ctx: Context) {
     let _ = ctx
         .set_response_body("host string literal: localhost")
         .await;
 }
 
-#[send]
-#[host_filter("filter.localhost")]
 #[route("/host_filter")]
+#[host_filter("filter.localhost")]
 async fn host_filter(ctx: Context) {
     let _ = ctx.set_response_body("host filter string literal").await;
 }
 
-#[send]
-#[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 #[route("/attribute")]
+#[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {
     if let Some(data) = request_attribute_option {
         let response: String = format!("name={}, age={}", data.name, data.age);
@@ -490,9 +505,8 @@ async fn attribute(ctx: Context) {
     }
 }
 
-#[send]
-#[request_body_json(request_data_result: TestData)]
 #[route("/request_body_json")]
+#[request_body_json(request_data_result: TestData)]
 async fn request_body_json(ctx: Context) {
     if let Ok(data) = request_data_result {
         let response: String = format!("name={}, age={}", data.name, data.age);
@@ -500,33 +514,29 @@ async fn request_body_json(ctx: Context) {
     }
 }
 
-#[send]
-#[referer("http://localhost")]
 #[route("/referer")]
+#[referer("http://localhost")]
 async fn referer(ctx: Context) {
     let _ = ctx
         .set_response_body("referer string literal: http://localhost")
         .await;
 }
 
-#[send]
-#[referer_filter("http://localhost")]
 #[route("/referer_filter")]
+#[referer_filter("http://localhost")]
 async fn referer_filter(ctx: Context) {
     let _ = ctx.set_response_body("referer filter string literal").await;
 }
 
-#[send]
-#[request_cookies(cookie_value)]
 #[route("/cookies")]
+#[request_cookies(cookie_value)]
 async fn cookies(ctx: Context) {
     let response: String = format!("All cookies: {:?}", cookie_value);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[request_cookie("test" => session_cookie_opt)]
 #[route("/cookie")]
+#[request_cookie("test" => session_cookie_opt)]
 async fn cookie(ctx: Context) {
     if let Some(session) = session_cookie_opt {
         let response: String = format!("Session cookie: {}", session);
@@ -534,38 +544,34 @@ async fn cookie(ctx: Context) {
     }
 }
 
-#[send]
-#[request_version(http_version)]
 #[route("/request_version")]
+#[request_version(http_version)]
 async fn request_version_test(ctx: Context) {
     let response: String = format!("HTTP Version: {:?}", http_version);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
-#[request_path(request_path)]
 #[route("/request_path")]
+#[request_path(request_path)]
 async fn request_path_test(ctx: Context) {
     let response: String = format!("Request Path: {:?}", request_path);
     let _ = ctx.set_response_body(response).await;
 }
 
-#[send]
+#[route("/response_header")]
 #[response_header("X-Add-Header", "add-value")]
 #[response_header("X-Set-Header" => "set-value")]
-#[route("/response_header")]
 async fn response_header_test(ctx: Context) {
     let _ = ctx
         .set_response_body("Testing header set and replace operations")
         .await;
 }
 
-#[send]
+#[route("/literals")]
 #[response_status_code(201)]
 #[response_reason_phrase(HttpStatus::Created.to_string())]
 #[response_header(CONTENT_TYPE => APPLICATION_JSON)]
 #[response_body("{\"message\": \"Resource created\"}")]
-#[route("/literals")]
 async fn literals(ctx: Context) {}
 
 #[hyperlane(server: Server)]
@@ -574,7 +580,6 @@ async fn literals(ctx: Context) {}
 async fn main() {
     config.disable_nodelay().await;
     server.config(config).await;
-    server.request_middleware(request_middleware).await;
     let server_hook: ServerHook = server.run().await.unwrap_or_default();
     server_hook.wait().await;
 }

@@ -1599,7 +1599,6 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Parameters
 ///
-/// - `server` (optional): Expression that returns a server instance
 /// - `path`: String literal defining the route path
 ///
 /// # Dependencies
