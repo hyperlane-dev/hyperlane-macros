@@ -18,7 +18,12 @@ pub(crate) struct OrderAttr {
     pub(crate) order: Option<Expr>,
 }
 
+/// Represents a macro that can be injected.
+///
+/// This struct is used to define a macro that can be collected and used by the `inventory` crate.
 pub(crate) struct InjectableMacro {
-    pub name: &'static str,
-    pub handler: Handler,
+    /// The name of the macro.
+    pub(crate) name: &'static str,
+    /// The handler for the macro.
+    pub(crate) handler: Handler,
 }

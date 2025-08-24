@@ -160,6 +160,8 @@ cargo add hyperlane-macros
 - `#[connected_hook]` - Execute function when a new client connection is established
 - `#[panic_hook]` - Execute function when a panic occurs within the server
 - `#[prologue_upgrade_hook]` - Execute function before any protocol upgrade occurs
+- `#[prologue_hooks(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
+- `#[epilogue_hooks(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
 ### Disable Hook Macros
 
@@ -423,8 +425,8 @@ async fn unknown_method(ctx: Context) {}
 #[route("/get")]
 #[send_once_body]
 #[prologue_hooks[
-    get,
     ws,
+    get,
     response_body("get")
 ]]
 async fn get(ctx: Context) {}

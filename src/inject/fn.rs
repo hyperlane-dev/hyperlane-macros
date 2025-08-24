@@ -1,5 +1,23 @@
 use crate::*;
 
+/// Applies a macro to a token stream.
+///
+/// This function takes a macro's metadata and a token stream, finds the corresponding
+/// registered macro, and applies it.
+///
+/// # Arguments
+///
+/// - `&Meta` - The metadata of the macro to apply.
+/// - `TokenStream` - The token stream to apply the macro to.
+///
+/// # Returns
+///
+/// The resulting token stream after applying the macro.
+///
+/// # Panics
+///
+/// This function will panic if the macro is not found, if the macro format is unsupported,
+/// or if a simple macro is given attributes.
 fn apply_macro(macro_meta: &Meta, item_stream: TokenStream) -> TokenStream {
     let (macro_name, macro_attr) = match macro_meta {
         Meta::Path(path) => (
@@ -34,6 +52,19 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream) -> TokenStream {
     panic!("Unsupported macro: {}", macro_name);
 }
 
+/// Injects a list of macros before the decorated function.
+///
+/// The macros are applied in head-insertion order, meaning the first macro in the list
+/// is the outermost macro.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The token stream representing the attributes of the macro.
+/// - `TokenStream` - The token stream representing the item to which the macro is applied.
+///
+/// # Returns
+///
+/// The resulting token stream after applying all the prologue hooks.
 pub(crate) fn prologue_hooks_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let metas: Punctuated<Meta, Comma> = Punctuated::<Meta, Token![,]>::parse_terminated
         .parse(attr.into())
@@ -45,6 +76,19 @@ pub(crate) fn prologue_hooks_macro(attr: TokenStream, item: TokenStream) -> Toke
     current_stream
 }
 
+/// Injects a list of macros after the decorated function.
+///
+/// The macros are applied in tail-insertion order, meaning the last macro in the list
+/// is the outermost macro.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The token stream representing the attributes of the macro.
+/// - `TokenStream` - The token stream representing the item to which the macro is applied.
+///
+/// # Returns
+///
+/// The resulting token stream after applying all the epilogue hooks.
 pub(crate) fn epilogue_hooks_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let metas: Punctuated<Meta, Comma> = Punctuated::<Meta, Token![,]>::parse_terminated
         .parse(attr.into())

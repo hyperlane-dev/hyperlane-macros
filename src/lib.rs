@@ -1761,10 +1761,11 @@ pub fn disable_ws_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Usage
 ///
-/// ```rust,ignore
-/// use hyperlane_macros::{self as hyperlane, post, send};
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
-/// #[hyperlane::prologue_hooks(post, send)]
+/// #[prologue_hooks(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }
@@ -1781,10 +1782,11 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Usage
 ///
-/// ```rust,ignore
-/// use hyperlane_macros::{self as hyperlane, post, send};
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
 ///
-/// #[hyperlane::epilogue_hooks(post, send)]
+/// #[epilogue_hooks(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }

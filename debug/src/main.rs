@@ -223,8 +223,8 @@ async fn unknown_method(ctx: Context) {}
 #[route("/get")]
 #[send_once_body]
 #[prologue_hooks[
-    get,
     ws,
+    get,
     response_body("get")
 ]]
 async fn get(ctx: Context) {}
@@ -232,14 +232,14 @@ async fn get(ctx: Context) {}
 #[send_once]
 #[route("/post")]
 #[prologue_hooks[
-    post,   
+    post,
     response_body("post")
 ]]
 async fn post(ctx: Context) {}
 
 #[route("/ws")]
 #[prologue_hooks[
-    ws,   
+    ws,
     response_body("ws")
 ]]
 async fn websocket(ctx: Context) {}
