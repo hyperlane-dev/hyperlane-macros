@@ -10,7 +10,7 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inserted code.
-pub(crate) fn expand_macro_with_before_insertion(
+pub(crate) fn inject_at_start(
     input: TokenStream,
     before_fn: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
@@ -46,7 +46,7 @@ pub(crate) fn expand_macro_with_before_insertion(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inserted code.
-pub(crate) fn expand_macro_with_after_insertion(
+pub(crate) fn inject_at_end(
     input: TokenStream,
     after_fn: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
@@ -70,47 +70,6 @@ pub(crate) fn expand_macro_with_after_insertion(
         }
         Err(err) => err.to_compile_error().into(),
     }
-}
-
-/// Expands macro with attribute parsing and code insertion before function body.
-///
-/// # Arguments
-///
-/// - `TokenStream` - The attribute token stream to parse.
-/// - `TokenStream` - The input token stream to process.
-/// - `impl FnOnce(TokenStream) -> syn::Result<T>` - Function to parse attributes.
-/// - `impl FnOnce(&Ident, T) -> TokenStream2` - Function to generate code inserted before.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with inserted code.
-pub(crate) fn expand_macro_with_attr_and_before_insertion<T>(
-    attr: TokenStream,
-    item: TokenStream,
-    parse_attr: impl FnOnce(TokenStream) -> syn::Result<T>,
-    before_fn: impl FnOnce(&Ident, T) -> TokenStream2,
-) -> TokenStream {
-    match parse_attr(attr) {
-        Ok(value) => expand_macro_with_before_insertion(item, |context| before_fn(context, value)),
-        Err(err) => err.to_compile_error().into(),
-    }
-}
-
-/// Expands macro with check code inserted before function body.
-///
-/// # Arguments
-///
-/// - `TokenStream` - The input token stream to process.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - Function to generate check code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with check code.
-pub(crate) fn expand_check_macro(
-    input: TokenStream,
-    check_fn: impl FnOnce(&Ident) -> TokenStream2,
-) -> TokenStream {
-    expand_macro_with_before_insertion(input, check_fn)
 }
 
 /// Parses context identifier from function signature.
@@ -139,45 +98,6 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
             &sig.inputs,
             "expected at least one argument",
         )),
-    }
-}
-
-/// Expands macro with code inserted before the return statement of the function body.
-///
-/// This function modifies the input `TokenStream` representing a function by inserting
-/// generated code right before the final return statement (or at the end if no explicit return).
-///
-/// # Arguments
-///
-/// - `input` - The input `TokenStream` to process, typically an `async fn`.
-/// - `before_return_fn` - A closure that generates the `TokenStream2` to be inserted.
-///   It takes an `&Ident` (the context identifier) as input.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded `TokenStream` with the generated code inserted.
-pub(crate) fn expand_macro_with_before_return_insertion(
-    input: TokenStream,
-    before_return_fn: impl FnOnce(&Ident) -> TokenStream2,
-) -> TokenStream {
-    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
-    let vis: &Visibility = &input_fn.vis;
-    let sig: &Signature = &input_fn.sig;
-    let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_context_from_fn(sig) {
-        Ok(context) => {
-            let before_return_code: TokenStream2 = before_return_fn(context);
-            let orig_stmts: Vec<Stmt> = input_fn.block.stmts;
-            let gen_code: TokenStream2 = quote! {
-                #(#attrs)*
-                #vis #sig {
-                    #(#orig_stmts)*
-                    #before_return_code
-                }
-            };
-            gen_code.into()
-        }
-        Err(err) => err.to_compile_error().into(),
     }
 }
 

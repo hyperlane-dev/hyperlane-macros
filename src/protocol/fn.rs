@@ -10,7 +10,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with protocol check.
 pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
-    expand_check_macro(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             if !#context.get_request().await.is_ws() {
                 return;
@@ -29,7 +29,7 @@ pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
 ///
 /// - `TokenStream` - The expanded token stream with protocol check.
 pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
-    expand_check_macro(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             if !#context.get_request().await.is_http() {
                 return;
@@ -50,7 +50,7 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
 macro_rules! impl_protocol_check_macro {
     ($name:ident, $check:ident) => {
         pub(crate) fn $name(item: TokenStream) -> TokenStream {
-            expand_check_macro(item, |context| {
+            inject_at_start(item, |context| {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());
                 quote! {
                     let request: ::hyperlane::Request = #context.get_request().await;

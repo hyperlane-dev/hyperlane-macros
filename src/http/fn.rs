@@ -12,7 +12,7 @@ use crate::*;
 macro_rules! impl_http_method_macro {
     ($name:ident, $method:expr) => {
         pub(crate) fn $name(item: TokenStream) -> TokenStream {
-            expand_check_macro(
+            inject_at_start(
                 item,
                 create_method_check($method, proc_macro2::Span::call_site()),
             )

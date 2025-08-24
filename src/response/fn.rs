@@ -1,18 +1,5 @@
 use crate::*;
 
-/// Parses a TokenStream into an Expr.
-///
-/// # Arguments
-///
-/// - `TokenStream` - The input token stream to parse.
-///
-/// # Returns
-///
-/// - `syn::Result<Expr>` - The parsed expression or error.
-fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
-    syn::parse::<Expr>(input)
-}
-
 /// Sets response status code from macro input.
 ///
 /// # Arguments
@@ -24,7 +11,11 @@ fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
 ///
 /// - `TokenStream` - The expanded token stream with status code setting.
 pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+    let value: Expr = match parse(attr) {
+        Ok(v) => v,
+        Err(err) => return err.to_compile_error().into(),
+    };
+    inject_at_start(item, |context| {
         quote! {
             #context.set_response_status_code(::hyperlane::ResponseStatusCode::from(#value as usize)).await;
         }
@@ -42,7 +33,11 @@ pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -
 ///
 /// - `TokenStream` - The expanded token stream with reason phrase setting.
 pub(crate) fn response_reason_phrase_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+    let value: Expr = match parse(attr) {
+        Ok(v) => v,
+        Err(err) => return err.to_compile_error().into(),
+    };
+    inject_at_start(item, |context| {
         quote! {
             #context.set_response_reason_phrase(#value).await;
         }
@@ -64,7 +59,7 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
     let key: Expr = header_data.key;
     let value: Expr = header_data.value;
     let operation: HeaderOperation = header_data.operation;
-    expand_macro_with_before_insertion(item, |context| match operation {
+    inject_at_start(item, |context| match operation {
         HeaderOperation::Add => {
             quote! {
                 #context.add_response_header(#key, #value).await;
@@ -91,7 +86,7 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
 pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let body_data: ResponseBodyData = parse_macro_input!(attr as ResponseBodyData);
     let body: Expr = body_data.body;
-    expand_macro_with_before_insertion(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             #context.set_response_body(#body).await;
         }
@@ -109,7 +104,11 @@ pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> Token
 ///
 /// - `TokenStream` - The expanded token stream with version setting.
 pub(crate) fn response_version_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
+    let value: Expr = match parse(attr) {
+        Ok(v) => v,
+        Err(err) => return err.to_compile_error().into(),
+    };
+    inject_at_start(item, |context| {
         quote! {
             #context.set_response_version(#value).await;
         }

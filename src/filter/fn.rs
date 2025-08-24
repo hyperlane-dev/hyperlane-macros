@@ -10,7 +10,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with filter checks.
 pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_before_insertion(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             {
                 let request: ::hyperlane::Request = #context.get_request().await;
@@ -34,7 +34,7 @@ pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
 macro_rules! impl_filter_macro {
     ($name:ident, $check:ident) => {
         pub(crate) fn $name(item: TokenStream) -> TokenStream {
-            expand_check_macro(item, |context| {
+            inject_at_start(item, |context| {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());
                 quote! {
                     if !#context.get_request().await.#check_fn() {

@@ -10,7 +10,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with flush call.
 pub(crate) fn flush_macro(item: TokenStream) -> TokenStream {
-    expand_macro_with_after_insertion(item, |context| {
+    inject_at_end(item, |context| {
         quote! {
             let _ = #context.flush().await;
         }

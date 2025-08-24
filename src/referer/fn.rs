@@ -13,7 +13,7 @@ use crate::*;
 pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
-    expand_macro_with_before_insertion(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
@@ -40,7 +40,7 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
 pub(crate) fn referer_filter_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
-    expand_macro_with_before_insertion(item, |context| {
+    inject_at_start(item, |context| {
         quote! {
             let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
