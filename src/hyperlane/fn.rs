@@ -33,7 +33,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
         init_statements.push(quote! {
             let mut hooks: Vec<::hyperlane::HookMacro> = inventory::iter().cloned().collect();
             assert_hook_unique_order(hooks.clone());
-            hooks.sort_by_key(|hook| hook.hook_type.get());
+            hooks.sort_by_key(|hook| hook.hook_type.try_get());
             for hook in hooks {
                 #var_name.handle_hook(hook.clone()).await;
             }

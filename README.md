@@ -85,12 +85,10 @@ cargo add hyperlane-macros
 
 - `#[closed]` - Handle closed streams, providing cleanup logic for completed connections
 
-### Filter Macros
+### Conditional Macros
 
-- `#[filter_unknown_method]` - Filter unknown HTTP methods, handling requests with non-standard methods
-- `#[filter_unknown_upgrade]` - Filter unknown upgrade requests, handling requests with non-standard upgrade protocols
-- `#[filter_unknown_version]` - Filter unknown HTTP versions, handling requests with non-standard HTTP protocol versions
-- `#[filter_unknown]` - Combined filter for unknown method, upgrade, and version
+- `#[filter(condition)]` - Continues execution only if the `condition` (a code block returning a boolean) is `true`.
+- `#[reject(condition)]` - Continues execution only if the `condition` (a code block returning a boolean) is `false`.
 
 ### Request Body Macros
 
@@ -265,24 +263,24 @@ async fn request_middleware_3(ctx: Context) {}
 #[response_header(STEP => "response_middleware_1")]
 async fn response_middleware_1(ctx: Context) {}
 
+#[send]
+#[flush]
 #[response_middleware(2)]
 #[response_header(STEP => "response_middleware_2")]
+#[reject(ctx.get_request().await.is_ws())]
 async fn response_middleware_2(ctx: Context) {}
 
-#[send]
+#[send_body]
+#[flush]
 #[response_middleware("3")]
 #[response_header(STEP => "response_middleware_3")]
-async fn response_middleware_3(ctx: Context) {
-    if ctx.get_request().await.get_upgrade_type().is_ws() {
-        return;
-    }
-}
+#[ws]
+async fn response_middleware_3(ctx: Context) {}
 
 #[get]
 #[http]
 async fn pre_hook(ctx: Context) {}
 
-#[flush]
 #[response_status_code(200)]
 async fn post_hook(ctx: Context) {}
 
@@ -373,25 +371,10 @@ async fn tls(ctx: Context) {}
 #[response_body("http1.1+")]
 async fn http1_1_or_higher(ctx: Context) {}
 
-#[filter_unknown_method]
 #[route("/unknown_method")]
 #[response_body("unknown method")]
+#[filter(ctx.get_request().await.is_unknown_method())]
 async fn unknown_method(ctx: Context) {}
-
-#[filter_unknown_upgrade]
-#[route("/unknown_upgrade")]
-#[response_body("unknown upgrade")]
-async fn unknown_upgrade(ctx: Context) {}
-
-#[filter_unknown_version]
-#[route("/unknown_version")]
-#[response_body("unknown version")]
-async fn unknown_version(ctx: Context) {}
-
-#[filter_unknown]
-#[route("/unknown_all")]
-#[response_body("unknown all")]
-async fn unknown_all(ctx: Context) {}
 
 #[route("/get")]
 #[send_once_body]
@@ -406,7 +389,6 @@ async fn get(ctx: Context) {}
 #[post]
 async fn post(ctx: Context) {}
 
-#[send_body]
 #[route("/websocket")]
 #[response_body("websocket")]
 #[ws]

@@ -1,8 +1,8 @@
 use crate::*;
 
-/// Filters requests based on a boolean condition.
+/// Rejects requests based on a boolean condition.
 ///
-/// The function continues execution only if the provided code block returns `true`.
+/// The function continues execution only if the provided code block returns `false`.
 ///
 /// # Arguments
 ///
@@ -11,15 +11,15 @@ use crate::*;
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The modified function wrapped with a conditional guard;
-///   the original function body is executed only if the condition is `true`,
-///   otherwise the function returns early without doing anything.
-pub(crate) fn filter_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+/// - `TokenStream` - The modified function wrapped with a conditional check;
+///   if the condition evaluates to `true`, the function returns early,
+///   otherwise the original function body is executed.
+pub(crate) fn reject_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let condition: Expr = parse_macro_input!(attr as Expr);
     let mut item_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let stmts: &Vec<Stmt> = &item_fn.block.stmts;
     let new_stmts: TokenStream2 = quote! {
-        if !(#condition) {
+        if #condition {
             return;
         }
         #(#stmts)*

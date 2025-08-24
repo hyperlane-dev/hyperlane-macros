@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-macros"
-version = "4.5.2"
+version = "5.0.0"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -30,7 +30,7 @@ proc-macro2 = "1.0.101"
 inventory = "0.3.21"
 
 [dev-dependencies]
-hyperlane = "7.14.2"
+hyperlane = "8.0.1"
 serde = { version = "1.0.219", features = ["derive"] }
 
 [profile.dev]

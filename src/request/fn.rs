@@ -58,7 +58,7 @@ pub(crate) fn attribute_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let key_name: Expr = attribute.key_name;
     inject_at_start(item, |context| {
         quote! {
-            let #variable: Option<#type_name> = #context.get_attribute::<#type_name>(#key_name).await;
+            let #variable: Option<#type_name> = #context.try_get_attribute::<#type_name>(#key_name).await;
         }
     })
 }
@@ -99,7 +99,7 @@ pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenSt
     let key_name: Expr = route_param.key_name;
     inject_at_start(item, |context| {
         quote! {
-            let #variable: ::hyperlane::OptionString = #context.get_route_param(#key_name).await;
+            let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
         }
     })
 }
@@ -140,7 +140,7 @@ pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> Token
     let key_name: Expr = request_query.key_name;
     inject_at_start(item, |context| {
         quote! {
-            let #variable: ::hyperlane::OptionRequestQuerysValue = #context.get_request_query(#key_name).await;
+            let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
         }
     })
 }
@@ -181,7 +181,7 @@ pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> Toke
     let key_name: Expr = request_header.key_name;
     inject_at_start(item, |context| {
         quote! {
-            let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
+            let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
         }
     })
 }
@@ -222,7 +222,7 @@ pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> Toke
     let key: Expr = cookie_data.key_name;
     inject_at_start(item, |context| {
         quote! {
-            let #variable: ::hyperlane::OptionCookiesValue = #context.get_request_cookie(#key).await;
+            let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key).await;
         }
     })
 }

@@ -16,6 +16,7 @@ mod http;
 mod hyperlane;
 mod protocol;
 mod referer;
+mod reject;
 mod request;
 mod request_middleware;
 mod response;
@@ -34,6 +35,7 @@ pub(crate) use http::*;
 pub(crate) use hyperlane::*;
 pub(crate) use protocol::*;
 pub(crate) use referer::*;
+pub(crate) use reject::*;
 pub(crate) use request::*;
 pub(crate) use request_middleware::*;
 pub(crate) use response::*;
@@ -891,10 +893,9 @@ pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
     tls_macro(item)
 }
 
-/// Handles requests with unknown or non-standard HTTP methods.
+/// Filters requests based on a boolean condition.
 ///
-/// This attribute macro configures the function to handle requests that use
-/// unrecognized or unsupported HTTP methods, providing a fallback for non-standard methods.
+/// The function continues execution only if the provided code block returns `true`.
 ///
 /// # Usage
 ///
@@ -902,47 +903,19 @@ pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[filter_unknown_method]
-/// async fn handle_unknown_method(ctx: Context) {
-///     // Handle requests with unknown HTTP methods
+/// #[filter(ctx.get_request().await.is_ws())]
+/// async fn handle_ws(ctx: Context) {
+///     // This code will only run for WebSocket requests.
 /// }
 /// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn filter_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    filter_unknown_method_macro(item)
+pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
+    filter_macro(attr, item)
 }
 
-/// Handles requests with unknown or non-standard upgrade protocols.
+/// Rejects requests based on a boolean condition.
 ///
-/// This attribute macro configures the function to handle requests that specify
-/// unrecognized upgrade protocols, providing a fallback for non-standard upgrade request headers.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[filter_unknown_upgrade]
-/// async fn handle_unknown_upgrade(ctx: Context) {
-///     // Handle requests with unknown upgrade protocols
-/// }
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
-#[proc_macro_attribute]
-pub fn filter_unknown_upgrade(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    filter_unknown_upgrade_macro(item)
-}
-
-/// Handles requests with unknown or non-standard HTTP versions.
-///
-/// This attribute macro configures the function to handle requests that use
-/// unrecognized HTTP protocol versions, providing a fallback for non-standard versions.
+/// The function continues execution only if the provided code block returns `false`.
 ///
 /// # Usage
 ///
@@ -950,41 +923,14 @@ pub fn filter_unknown_upgrade(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[filter_unknown_version]
-/// async fn handle_unknown_version(ctx: Context) {
-///     // Handle requests with unknown HTTP versions
+/// #[reject(ctx.get_request().await.is_http())]
+/// async fn handle_non_http(ctx: Context) {
+///     // This code will not run for HTTP requests.
 /// }
 /// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn filter_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    filter_unknown_version_macro(item)
-}
-
-/// Handles requests with any unknown characteristics.
-///
-/// This attribute macro combines filtering for unknown methods, upgrade protocols, and HTTP versions,
-/// providing comprehensive handling for requests with any unrecognized characteristics.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[filter_unknown]
-/// async fn handle_all_unknown(ctx: Context) {
-///     // Handle requests with any unknown characteristics
-/// }
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
-#[proc_macro_attribute]
-pub fn filter_unknown(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    filter_unknown_macro(item)
+pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
+    reject_macro(attr, item)
 }
 
 /// Restricts function execution to requests with a specific host.
