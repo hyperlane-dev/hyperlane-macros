@@ -65,7 +65,6 @@ pub(crate) fn create_method_check(
     move |context| {
         quote! {
             if !#context.get_request().await.#check_method() {
-                let _ = #context.aborted().await;
                 return;
             }
         }
@@ -99,7 +98,6 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
             });
             let check_expr: TokenStream2 = quote! {
                 if !(#(#method_checks)||*) {
-                    let _ = #context.aborted().await;
                     return;
                 }
             };

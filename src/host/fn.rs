@@ -15,9 +15,8 @@ pub(crate) fn host_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let host_value: Expr = host_data.host_value;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let request_host: RequestHost = #context.get_request_host().await;
+            let request_host: ::hyperlane::RequestHost = #context.get_request_host().await;
             if request_host != #host_value.to_string() {
-                let _ = #context.aborted().await;
                 return;
             }
         }
@@ -39,9 +38,8 @@ pub(crate) fn host_filter_macro(attr: TokenStream, item: TokenStream) -> TokenSt
     let host_value: Expr = host_data.host_value;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let request_host: RequestHost = #context.get_request_host().await;
+            let request_host: ::hyperlane::RequestHost = #context.get_request_host().await;
             if request_host == #host_value.to_string() {
-                let _ = #context.aborted().await;
                 return;
             }
         }

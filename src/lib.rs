@@ -1614,6 +1614,8 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[request_middleware]
+/// #[request_middleware(1)]
+/// #[request_middleware("2")]
 /// async fn log_request(ctx: Context) {
 ///     // Middleware logic
 /// }
@@ -1643,6 +1645,8 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[response_middleware]
+/// #[response_middleware(1)]
+/// #[response_middleware("2")]
 /// async fn add_custom_header(ctx: Context) {
 ///     // Middleware logic
 /// }
@@ -1672,6 +1676,8 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane_macros::*;
 ///
 /// #[pre_upgrade_hook]
+/// #[pre_upgrade_hook(1)]
+/// #[pre_upgrade_hook("2")]
 /// async fn handle_pre_upgrade(ctx: Context) {
 ///     // Pre-upgrade logic
 /// }
@@ -1701,6 +1707,8 @@ pub fn pre_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[connected_hook]
+/// #[connected_hook(1)]
+/// #[connected_hook("2")]
 /// async fn handle_new_connection(ctx: Context) {
 ///     // Connection handling logic
 /// }
@@ -1730,6 +1738,8 @@ pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[panic_hook]
+/// #[panic_hook(1)]
+/// #[panic_hook("2")]
 /// async fn handle_panic(ctx: Context) {
 ///     // Panic handling logic
 /// }

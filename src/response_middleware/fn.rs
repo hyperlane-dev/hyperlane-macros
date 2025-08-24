@@ -25,9 +25,9 @@ pub(crate) fn response_middleware_macro(attr: TokenStream, item: TokenStream) ->
     let gen_code: TokenStream2 = quote! {
         #input_fn
         inventory::submit! {
-            hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::ResponseMiddleware(#order),
-                handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
+            ::hyperlane::HookMacro {
+                hook_type: ::hyperlane::HookType::ResponseMiddleware(#order),
+                handler: |ctx: ::hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }
     };

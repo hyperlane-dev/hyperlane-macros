@@ -153,9 +153,9 @@ pub(crate) fn disable_ws_hook_macro(attr: TokenStream, item: TokenStream) -> Tok
     let gen_code: TokenStream2 = quote! {
         #input_fn
         inventory::submit! {
-            hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::DisableWsHook(#path),
-                handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
+            ::hyperlane::HookMacro {
+                hook_type: ::hyperlane::HookType::DisableWsHook(#path),
+                handler: |ctx: ::hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }
     };

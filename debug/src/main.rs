@@ -2,6 +2,7 @@ use hyperlane::*;
 use hyperlane_macros::*;
 use serde::{Deserialize, Serialize};
 
+const STEP: &str = "step";
 const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
 const CUSTOM_STATUS_CODE: i32 = 200;
 const CUSTOM_REASON: &str = "Accepted";
@@ -15,29 +16,11 @@ struct TestData {
     age: u32,
 }
 
-#[response_body("1")]
-#[request_middleware]
-#[response_version(HttpVersion::HTTP1_1)]
-async fn request_middleware(ctx: Context) {}
-
-#[response_body("2")]
-#[request_middleware(1)]
-#[response_version(HttpVersion::HTTP1_1)]
-async fn request_middleware_1(ctx: Context) {}
-
-#[response_middleware]
-async fn response_middleware(ctx: Context) {
-    if ctx.get_request().await.get_upgrade_type().is_ws() {
-        return;
-    }
-}
-
 #[send]
-#[response_middleware(1)]
-async fn response_middleware_1(ctx: Context) {}
-
 #[panic_hook]
-#[send]
+#[panic_hook(1)]
+#[panic_hook("2")]
+#[response_body("panic_hook")]
 async fn panic_hook(ctx: Context) {}
 
 #[route("/disable_http_hook")]
@@ -50,13 +33,56 @@ async fn disable_http_hook(ctx: Context) {}
 #[disable_ws_hook("/disable_ws_hook")]
 async fn disable_ws_hook(ctx: Context) {}
 
+#[connected_hook]
+#[connected_hook(1)]
+#[connected_hook("2")]
+#[response_header(STEP => "connected_hook")]
+async fn connected_hook(ctx: Context) {}
+
+#[pre_upgrade_hook]
+#[pre_upgrade_hook(1)]
+#[pre_upgrade_hook("2")]
+#[response_header(STEP => "pre_upgrade_hook")]
+async fn pre_upgrade_hook(ctx: Context) {}
+
+#[request_middleware]
+#[response_header(SERVER => HYPERLANE)]
+#[response_version(HttpVersion::HTTP1_1)]
+#[response_header(STEP => "request_middleware_1")]
+async fn request_middleware_1(ctx: Context) {}
+
+#[request_middleware(2)]
+#[response_header(STEP => "request_middleware_2")]
+async fn request_middleware_2(ctx: Context) {}
+
+#[request_middleware("3")]
+#[response_header(STEP => "request_middleware_3")]
+async fn request_middleware_3(ctx: Context) {}
+
+#[response_middleware]
+#[response_header(STEP => "response_middleware_1")]
+async fn response_middleware_1(ctx: Context) {}
+
+#[response_middleware(2)]
+#[response_header(STEP => "response_middleware_2")]
+async fn response_middleware_2(ctx: Context) {}
+
+#[send]
+#[response_middleware("3")]
+#[response_header(STEP => "response_middleware_3")]
+async fn response_middleware_3(ctx: Context) {
+    if ctx.get_request().await.get_upgrade_type().is_ws() {
+        return;
+    }
+}
+
 #[get]
 #[http]
-async fn ctx_pre_hook(ctx: Context) {}
+async fn pre_hook(ctx: Context) {}
 
 #[flush]
 #[response_status_code(200)]
-async fn ctx_post_hook(ctx: Context) {}
+async fn post_hook(ctx: Context) {}
 
 #[route("/response")]
 #[response_body(RESPONSE_DATA)]
@@ -65,79 +91,79 @@ async fn ctx_post_hook(ctx: Context) {}
 #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
 async fn response(ctx: Context) {}
 
-#[connect]
 #[route("/connect")]
 #[response_body("connect")]
+#[connect]
 async fn connect(ctx: Context) {}
 
-#[delete]
 #[route("/delete")]
 #[response_body("delete")]
+#[delete]
 async fn delete(ctx: Context) {}
 
-#[head]
 #[route("/head")]
 #[response_body("head")]
+#[head]
 async fn head(ctx: Context) {}
 
-#[options]
 #[route("/options")]
 #[response_body("options")]
+#[options]
 async fn options(ctx: Context) {}
 
-#[patch]
 #[route("/patch")]
 #[response_body("patch")]
+#[patch]
 async fn patch(ctx: Context) {}
 
-#[put]
 #[route("/put")]
 #[response_body("put")]
+#[put]
 async fn put(ctx: Context) {}
 
-#[trace]
 #[route("/trace")]
 #[response_body("trace")]
+#[trace]
 async fn trace(ctx: Context) {}
 
-#[h2c]
 #[route("/h2c")]
 #[response_body("h2c")]
+#[h2c]
 async fn h2c(ctx: Context) {}
 
-#[http]
 #[route("/http")]
 #[response_body("http")]
+#[http]
 async fn http_only(ctx: Context) {}
 
-#[http0_9]
 #[route("/http0_9")]
 #[response_body("http0.9")]
+#[http0_9]
 async fn http0_9(ctx: Context) {}
 
-#[http1_0]
 #[route("/http1_0")]
 #[response_body("http1.0")]
+#[http1_0]
 async fn http1_0(ctx: Context) {}
 
-#[http1_1]
 #[route("/http1_1")]
 #[response_body("http1.1")]
+#[http1_1]
 async fn http1_1(ctx: Context) {}
 
-#[http2]
 #[route("/http2")]
 #[response_body("http2")]
+#[http2]
 async fn http2(ctx: Context) {}
 
-#[http3]
 #[route("/http3")]
 #[response_body("http3")]
+#[http3]
 async fn http3(ctx: Context) {}
 
-#[tls]
 #[route("/tls")]
 #[response_body("tls")]
+#[tls]
 async fn tls(ctx: Context) {}
 
 #[http1_1_or_higher]
@@ -165,38 +191,38 @@ async fn unknown_version(ctx: Context) {}
 #[response_body("unknown all")]
 async fn unknown_all(ctx: Context) {}
 
+#[route("/get")]
+#[send_once_body]
+#[response_body("get")]
 #[ws]
 #[get]
-#[send_body]
-#[route("/get")]
-#[response_body("get")]
 async fn get(ctx: Context) {}
 
-#[post]
 #[send_once]
 #[route("/post")]
 #[response_body("post")]
+#[post]
 async fn post(ctx: Context) {}
 
-#[ws]
-#[send_once_body]
+#[send_body]
 #[route("/websocket")]
 #[response_body("websocket")]
+#[ws]
 async fn websocket(ctx: Context) {}
 
-#[route("/ctx_hook")]
-#[pre_hook(ctx_pre_hook)]
-#[post_hook(ctx_post_hook)]
+#[route("/hook")]
+#[pre_hook(pre_hook)]
+#[post_hook(post_hook)]
 #[response_body("Testing hook macro")]
-async fn ctx_hook(ctx: Context) {}
+async fn hook(ctx: Context) {}
 
-#[http]
 #[closed]
 #[route("/get_post")]
 #[methods(get, post)]
 #[response_reason_phrase("OK")]
 #[response_status_code(200)]
 #[response_body("get_post")]
+#[http]
 async fn get_post(ctx: Context) {}
 
 #[route("/attributes")]

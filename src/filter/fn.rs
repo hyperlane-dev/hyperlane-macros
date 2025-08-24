@@ -13,9 +13,8 @@ pub(crate) fn filter_unknown_macro(item: TokenStream) -> TokenStream {
     expand_macro_with_before_insertion(item, |context| {
         quote! {
             {
-                let request: Request = #context.get_request().await;
+                let request: ::hyperlane::Request = #context.get_request().await;
                 if !request.is_unknown_method() || !request.is_unknown_upgrade() || !request.is_unknown_version() {
-                    let _ = #context.aborted().await;
                     return;
                 }
             }

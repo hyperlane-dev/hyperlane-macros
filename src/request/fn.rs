@@ -15,7 +15,7 @@ pub(crate) fn request_body_macro(attr: TokenStream, item: TokenStream) -> TokenS
     let variable: Ident = body_param.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestBody = #context.get_request_body().await;
+            let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
         }
     })
 }
@@ -36,7 +36,7 @@ pub(crate) fn request_body_json_macro(attr: TokenStream, item: TokenStream) -> T
     let type_name: Type = body_param.type_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
+            let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
         }
     })
 }
@@ -78,7 +78,7 @@ pub(crate) fn attributes_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let variable: Ident = attributes.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: HashMapArcAnySendSync = #context.get_attributes().await;
+            let #variable: ::hyperlane::HashMapArcAnySendSync = #context.get_attributes().await;
         }
     })
 }
@@ -99,7 +99,7 @@ pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenSt
     let key_name: Expr = route_param.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionString = #context.get_route_param(#key_name).await;
+            let #variable: ::hyperlane::OptionString = #context.get_route_param(#key_name).await;
         }
     })
 }
@@ -119,7 +119,7 @@ pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenS
     let variable: Ident = route_params.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RouteParams = #context.get_route_params().await;
+            let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
         }
     })
 }
@@ -140,7 +140,7 @@ pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> Token
     let key_name: Expr = request_query.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestQuerysValue = #context.get_request_query(#key_name).await;
+            let #variable: ::hyperlane::OptionRequestQuerysValue = #context.get_request_query(#key_name).await;
         }
     })
 }
@@ -160,7 +160,7 @@ pub(crate) fn request_querys_macro(attr: TokenStream, item: TokenStream) -> Toke
     let variable: Ident = request_query.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestQuerys = #context.get_request_querys().await;
+            let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
         }
     })
 }
@@ -181,7 +181,7 @@ pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> Toke
     let key_name: Expr = request_header.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionRequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
+            let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
         }
     })
 }
@@ -201,7 +201,7 @@ pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> Tok
     let variable: Ident = request_headers.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestHeaders = #context.get_request_headers().await;
+            let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
         }
     })
 }
@@ -222,7 +222,7 @@ pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> Toke
     let key: Expr = cookie_data.key_name;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: OptionCookiesValue = #context.get_request_cookie(#key).await;
+            let #variable: ::hyperlane::OptionCookiesValue = #context.get_request_cookie(#key).await;
         }
     })
 }
@@ -242,7 +242,7 @@ pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> Tok
     let variable: Ident = cookies_data.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: Cookies = #context.get_request_cookies().await;
+            let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
         }
     })
 }
@@ -262,7 +262,7 @@ pub(crate) fn request_version_macro(attr: TokenStream, item: TokenStream) -> Tok
     let variable: Ident = version_data.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestVersion = #context.get_request_version().await;
+            let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
         }
     })
 }
@@ -282,7 +282,7 @@ pub(crate) fn request_path_macro(attr: TokenStream, item: TokenStream) -> TokenS
     let variable: Ident = path_data.variable;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let #variable: RequestPath = #context.get_request_path().await;
+            let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
         }
     })
 }

@@ -15,14 +15,12 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
     let referer_value: Expr = referer_data.referer_value;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let referer: OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
+            let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
                 if referer_header != #referer_value {
-                    let _ = #context.aborted().await;
                     return;
                 }
             } else {
-                let _ = #context.aborted().await;
                 return;
             }
         }
@@ -44,10 +42,9 @@ pub(crate) fn referer_filter_macro(attr: TokenStream, item: TokenStream) -> Toke
     let referer_value: Expr = referer_data.referer_value;
     expand_macro_with_before_insertion(item, |context| {
         quote! {
-            let referer: OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
+            let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
                 if referer_header == #referer_value {
-                    let _ = #context.aborted().await;
                     return;
                 }
             }

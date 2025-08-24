@@ -26,7 +26,7 @@ fn parse_expr(input: TokenStream) -> syn::Result<Expr> {
 pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     expand_macro_with_attr_and_before_insertion(attr, item, parse_expr, |context, value| {
         quote! {
-            #context.set_response_status_code(hyperlane::ResponseStatusCode::from(#value as usize)).await;
+            #context.set_response_status_code(::hyperlane::ResponseStatusCode::from(#value as usize)).await;
         }
     })
 }

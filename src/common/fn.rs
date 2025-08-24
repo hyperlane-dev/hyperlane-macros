@@ -160,33 +160,22 @@ pub(crate) fn expand_macro_with_before_return_insertion(
     input: TokenStream,
     before_return_fn: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
-    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let before_return_code: TokenStream2 = before_return_fn(context);
-            let stmts: &mut Vec<Stmt> = &mut input_fn.block.stmts;
-            if let Some(last_stmt) = stmts.pop() {
-                let gen_code: TokenStream2 = quote! {
-                    #(#attrs)*
-                    #vis #sig {
-                        #(#stmts)*
-                        #before_return_code
-                        #last_stmt
-                    }
-                };
-                gen_code.into()
-            } else {
-                let gen_code: TokenStream2 = quote! {
-                    #(#attrs)*
-                    #vis #sig {
-                        #before_return_code
-                    }
-                };
-                gen_code.into()
-            }
+            let orig_stmts: Vec<Stmt> = input_fn.block.stmts;
+            let gen_code: TokenStream2 = quote! {
+                #(#attrs)*
+                #vis #sig {
+                    #(#orig_stmts)*
+                    #before_return_code
+                }
+            };
+            gen_code.into()
         }
         Err(err) => err.to_compile_error().into(),
     }

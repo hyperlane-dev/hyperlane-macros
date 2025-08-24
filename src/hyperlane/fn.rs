@@ -31,36 +31,11 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     });
     if type_name == "Server" {
         init_statements.push(quote! {
-            let mut hooks: Vec<_> = inventory::iter::<HookMacro>.into_iter().collect();
-            assert_hooks_unique_order(&hooks);
+            let mut hooks: Vec<::hyperlane::HookMacro> = inventory::iter().cloned().collect();
+            assert_hook_unique_order(hooks.clone());
             hooks.sort_by_key(|hook| hook.hook_type.get());
             for hook in hooks {
-                match hook.hook_type {
-                    hyperlane::HookType::PanicHook(_) => {
-                        #var_name.panic_hook(hook.handler).await;
-                    },
-                    hyperlane::HookType::DisableHttpHook(path) => {
-                        #var_name.disable_http_hook(path).await;
-                    },
-                    hyperlane::HookType::DisableWsHook(path) => {
-                        #var_name.disable_ws_hook(path).await;
-                    },
-                    hyperlane::HookType::ConnectedHook(_) => {
-                        #var_name.connected_hook(hook.handler).await;
-                    },
-                    hyperlane::HookType::PreUpgradeHook(_) => {
-                        #var_name.pre_upgrade_hook(hook.handler).await;
-                    },
-                    hyperlane::HookType::RequestMiddleware(_) => {
-                        #var_name.request_middleware(hook.handler).await;
-                    },
-                    hyperlane::HookType::Route(path) => {
-                        #var_name.route(path, hook.handler).await;
-                    },
-                    hyperlane::HookType::ResponseMiddleware(_) => {
-                        #var_name.response_middleware(hook.handler).await;
-                    },
-                }
+                #var_name.handle_hook(hook.clone()).await;
             }
         });
     }
