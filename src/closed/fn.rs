@@ -21,3 +21,10 @@ pub(crate) fn closed_macro(item: TokenStream) -> TokenStream {
         }
     })
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "closed",
+        handler: Handler::Simple(closed_macro),
+    }
+}

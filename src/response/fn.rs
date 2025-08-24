@@ -22,6 +22,13 @@ pub(crate) fn response_status_code_macro(attr: TokenStream, item: TokenStream) -
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "response_status_code",
+        handler: Handler::WithAttr(response_status_code_macro),
+    }
+}
+
 /// Sets response reason phrase from macro input.
 ///
 /// # Arguments
@@ -42,6 +49,13 @@ pub(crate) fn response_reason_phrase_macro(attr: TokenStream, item: TokenStream)
             #context.set_response_reason_phrase(#value).await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "response_reason_phrase",
+        handler: Handler::WithAttr(response_reason_phrase_macro),
+    }
 }
 
 /// Sets or replaces response header from macro input.
@@ -73,6 +87,13 @@ pub(crate) fn response_header_macro(attr: TokenStream, item: TokenStream) -> Tok
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "response_header",
+        handler: Handler::WithAttr(response_header_macro),
+    }
+}
+
 /// Sets response body from macro input.
 ///
 /// # Arguments
@@ -91,6 +112,13 @@ pub(crate) fn response_body_macro(attr: TokenStream, item: TokenStream) -> Token
             #context.set_response_body(#body).await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "response_body",
+        handler: Handler::WithAttr(response_body_macro),
+    }
 }
 
 /// Sets response version from macro input.
@@ -113,4 +141,11 @@ pub(crate) fn response_version_macro(attr: TokenStream, item: TokenStream) -> To
             #context.set_response_version(#value).await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "response_version",
+        handler: Handler::WithAttr(response_version_macro),
+    }
 }

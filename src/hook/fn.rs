@@ -34,6 +34,13 @@ pub(crate) fn connected_hook_macro(attr: TokenStream, item: TokenStream) -> Toke
     gen_code.into()
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "connected_hook",
+        handler: Handler::WithAttr(connected_hook_macro),
+    }
+}
+
 /// Registers a pre-upgrade hook.
 ///
 /// This macro takes a function as input and registers it as a pre-upgrade hook.
@@ -51,7 +58,7 @@ pub(crate) fn connected_hook_macro(attr: TokenStream, item: TokenStream) -> Toke
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with the hook registration.
-pub(crate) fn pre_upgrade_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn prologue_upgrade_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
@@ -66,6 +73,13 @@ pub(crate) fn pre_upgrade_hook_macro(attr: TokenStream, item: TokenStream) -> To
         }
     };
     gen_code.into()
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "prologue_upgrade_hook",
+        handler: Handler::WithAttr(prologue_upgrade_hook_macro),
+    }
 }
 
 /// Registers a panic hook.
@@ -102,6 +116,13 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     gen_code.into()
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "panic_hook",
+        handler: Handler::WithAttr(panic_hook_macro),
+    }
+}
+
 /// Disables the default HTTP hook for a specific path.
 ///
 /// This macro takes a function as input and registers it to disable the default
@@ -130,6 +151,13 @@ pub(crate) fn disable_http_hook_macro(attr: TokenStream, item: TokenStream) -> T
         }
     };
     gen_code.into()
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "disable_http_hook",
+        handler: Handler::WithAttr(disable_http_hook_macro),
+    }
 }
 
 /// Disables the default WebSocket hook for a specific path.
@@ -162,6 +190,13 @@ pub(crate) fn disable_ws_hook_macro(attr: TokenStream, item: TokenStream) -> Tok
     gen_code.into()
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "disable_ws_hook",
+        handler: Handler::WithAttr(disable_ws_hook_macro),
+    }
+}
+
 /// Expands macro to add pre-hook function call.
 ///
 /// # Arguments
@@ -172,13 +207,20 @@ pub(crate) fn disable_ws_hook_macro(attr: TokenStream, item: TokenStream) -> Tok
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with pre-hook call.
-pub(crate) fn pre_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn prologue_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let function_name: Ident = parse_macro_input!(attr as Ident);
     inject_at_start(item, |context| {
         quote! {
             let _ = #function_name(#context.clone()).await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "prologue_hook",
+        handler: Handler::WithAttr(prologue_hook_macro),
+    }
 }
 
 /// Expands macro to add post-hook function call.
@@ -191,11 +233,18 @@ pub(crate) fn pre_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with post-hook call.
-pub(crate) fn post_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn epilogue_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let function_name: Ident = parse_macro_input!(attr as Ident);
     inject_at_end(item, |context| {
         quote! {
             let _ = #function_name(#context.clone()).await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "epilogue_hook",
+        handler: Handler::WithAttr(epilogue_hook_macro),
+    }
 }

@@ -17,3 +17,8 @@ pub(crate) struct OrderAttr {
     /// The optional order expression provided in the macro attribute.
     pub(crate) order: Option<Expr>,
 }
+
+pub(crate) struct InjectableMacro {
+    pub name: &'static str,
+    pub handler: Handler,
+}

@@ -17,6 +17,13 @@ macro_rules! impl_http_method_macro {
                 create_method_check($method, proc_macro2::Span::call_site()),
             )
         }
+
+        inventory::submit! {
+            InjectableMacro {
+                name: $method,
+                handler: Handler::Simple($name),
+            }
+        }
     };
 }
 
@@ -24,7 +31,7 @@ macro_rules! impl_http_method_macro {
 impl_http_method_macro!(get_handler, "get");
 
 // This macro expands to a check that aborts the request if the HTTP method is not POST.
-impl_http_method_macro!(post_handler, "post");
+impl_http_method_macro!(epilogue_handler, "post");
 
 // This macro expands to a check that aborts the request if the HTTP method is not PUT.
 impl_http_method_macro!(put_handler, "put");
@@ -112,5 +119,12 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
             gen_code.into()
         }
         Err(err) => err.to_compile_error().into(),
+    }
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "methods",
+        handler: Handler::WithAttr(methods_macro),
     }
 }

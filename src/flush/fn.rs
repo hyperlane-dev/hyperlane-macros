@@ -16,3 +16,10 @@ pub(crate) fn flush_macro(item: TokenStream) -> TokenStream {
         }
     })
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "flush",
+        handler: Handler::Simple(flush_macro),
+    }
+}

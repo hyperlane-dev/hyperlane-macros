@@ -146,20 +146,20 @@ cargo add hyperlane-macros
 ### Host Macros
 
 - `#[host("hostname")]` - Restrict function execution to requests with a specific host header value
-- `#[host_filter("hostname")]` - Filter requests that match a specific host header value
+- `#[reject_host("hostname")]` - Reject requests that match a specific host header value
 
 ### Referer Macros
 
 - `#[referer("url")]` - Restrict function execution to requests with a specific referer header value
-- `#[referer_filter("url")]` - Filter requests that match a specific referer header value
+- `#[reject_referer("url")]` - Reject requests that match a specific referer header value
 
 ### Hook Macros
 
-- `#[pre_hook(function_name)]` - Execute specified function before the main handler function
-- `#[post_hook(function_name)]` - Execute specified function after the main handler function
+- `#[prologue_hook(function_name)]` - Execute specified function before the main handler function
+- `#[epilogue_hook(function_name)]` - Execute specified function after the main handler function
 - `#[connected_hook]` - Execute function when a new client connection is established
 - `#[panic_hook]` - Execute function when a panic occurs within the server
-- `#[pre_upgrade_hook]` - Execute function before any protocol upgrade occurs
+- `#[prologue_upgrade_hook]` - Execute function before any protocol upgrade occurs
 
 ### Disable Hook Macros
 
@@ -188,12 +188,12 @@ cargo add hyperlane-macros
 
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
-- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`, `#[connected_hook]`, `#[pre_upgrade_hook]`)
+- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`, `#[connected_hook]`, `#[prologue_upgrade_hook]`)
 
 ### Best Practice Warning
 
 - Request related macros are mostly query functions, while response related macros are mostly assignment functions.
-- When using `pre_hook` or `post_hook` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
+- When using `prologue_hook` or `epilogue_hook` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
 
 ## Example Usage
 
@@ -216,11 +216,13 @@ struct TestData {
     age: u32,
 }
 
-#[send]
 #[panic_hook]
 #[panic_hook(1)]
 #[panic_hook("2")]
-#[response_body("panic_hook")]
+#[epilogue_hooks[
+    send,
+    response_body("panic_hook")
+]]
 async fn panic_hook(ctx: Context) {}
 
 #[route("/disable_http_hook")]
@@ -239,11 +241,11 @@ async fn disable_ws_hook(ctx: Context) {}
 #[response_header(STEP => "connected_hook")]
 async fn connected_hook(ctx: Context) {}
 
-#[pre_upgrade_hook]
-#[pre_upgrade_hook(1)]
-#[pre_upgrade_hook("2")]
-#[response_header(STEP => "pre_upgrade_hook")]
-async fn pre_upgrade_hook(ctx: Context) {}
+#[prologue_upgrade_hook]
+#[prologue_upgrade_hook(1)]
+#[prologue_upgrade_hook("2")]
+#[response_header(STEP => "prologue_upgrade_hook")]
+async fn prologue_upgrade_hook(ctx: Context) {}
 
 #[request_middleware]
 #[response_header(SERVER => HYPERLANE)]
@@ -263,26 +265,34 @@ async fn request_middleware_3(ctx: Context) {}
 #[response_header(STEP => "response_middleware_1")]
 async fn response_middleware_1(ctx: Context) {}
 
-#[send]
-#[flush]
 #[response_middleware(2)]
-#[response_header(STEP => "response_middleware_2")]
-#[reject(ctx.get_request().await.is_ws())]
+#[prologue_hooks[
+    reject(ctx.get_request().await.is_ws()),
+    response_header(STEP => "response_middleware_2")
+]]
+#[epilogue_hooks[
+    send,
+    flush
+]]
 async fn response_middleware_2(ctx: Context) {}
 
-#[send_body]
-#[flush]
 #[response_middleware("3")]
-#[response_header(STEP => "response_middleware_3")]
-#[ws]
+#[prologue_hooks[
+    ws,
+    response_header(STEP => "response_middleware_3")
+]]
+#[epilogue_hooks[
+    send_body,
+    flush
+]]
 async fn response_middleware_3(ctx: Context) {}
 
 #[get]
 #[http]
-async fn pre_hook(ctx: Context) {}
+async fn prologue_hook(ctx: Context) {}
 
 #[response_status_code(200)]
-async fn post_hook(ctx: Context) {}
+async fn epilogue_hook(ctx: Context) {}
 
 #[route("/response")]
 #[response_body(RESPONSE_DATA)]
@@ -292,121 +302,163 @@ async fn post_hook(ctx: Context) {}
 async fn response(ctx: Context) {}
 
 #[route("/connect")]
-#[response_body("connect")]
-#[connect]
+#[prologue_hooks[
+    connect,
+    response_body("connect")
+]]
 async fn connect(ctx: Context) {}
 
 #[route("/delete")]
-#[response_body("delete")]
-#[delete]
+#[prologue_hooks[
+    delete,
+    response_body("delete")
+]]
 async fn delete(ctx: Context) {}
 
 #[route("/head")]
-#[response_body("head")]
-#[head]
+#[prologue_hooks[
+    head,
+    response_body("head")
+]]
 async fn head(ctx: Context) {}
 
 #[route("/options")]
-#[response_body("options")]
-#[options]
+#[prologue_hooks[
+    options,
+    response_body("options")
+]]
 async fn options(ctx: Context) {}
 
 #[route("/patch")]
-#[response_body("patch")]
-#[patch]
+#[prologue_hooks[
+    patch,
+    response_body("patch")
+]]
 async fn patch(ctx: Context) {}
 
 #[route("/put")]
-#[response_body("put")]
-#[put]
+#[prologue_hooks[
+    put,
+    response_body("put")
+]]
 async fn put(ctx: Context) {}
 
 #[route("/trace")]
-#[response_body("trace")]
-#[trace]
+#[prologue_hooks[
+    trace,
+    response_body("trace")
+]]
 async fn trace(ctx: Context) {}
 
 #[route("/h2c")]
-#[response_body("h2c")]
-#[h2c]
+#[prologue_hooks[
+    h2c,
+    response_body("h2c")
+]]
 async fn h2c(ctx: Context) {}
 
 #[route("/http")]
-#[response_body("http")]
-#[http]
+#[prologue_hooks[
+    http,
+    response_body("http")
+]]
 async fn http_only(ctx: Context) {}
 
 #[route("/http0_9")]
-#[response_body("http0.9")]
-#[http0_9]
+#[prologue_hooks[
+    http0_9,
+    response_body("http0_9")
+]]
 async fn http0_9(ctx: Context) {}
 
 #[route("/http1_0")]
-#[response_body("http1.0")]
-#[http1_0]
+#[prologue_hooks[
+    http1_0,
+    response_body("http1_0")
+]]
 async fn http1_0(ctx: Context) {}
 
 #[route("/http1_1")]
-#[response_body("http1.1")]
-#[http1_1]
+#[prologue_hooks[
+    http1_1,
+    response_body("http1_1")
+]]
 async fn http1_1(ctx: Context) {}
 
 #[route("/http2")]
-#[response_body("http2")]
-#[http2]
+#[prologue_hooks[
+    http2,
+    response_body("http2")
+]]
 async fn http2(ctx: Context) {}
 
 #[route("/http3")]
-#[response_body("http3")]
-#[http3]
+#[prologue_hooks[
+    http3,
+    response_body("http3")
+]]
 async fn http3(ctx: Context) {}
 
 #[route("/tls")]
-#[response_body("tls")]
-#[tls]
+#[prologue_hooks[
+    tls,
+    response_body("tls")
+]]
 async fn tls(ctx: Context) {}
 
-#[http1_1_or_higher]
 #[route("/http1_1_or_higher")]
-#[response_body("http1.1+")]
+#[prologue_hooks[
+    http1_1_or_higher,
+    response_body("http1_1_or_higher")
+]]
 async fn http1_1_or_higher(ctx: Context) {}
 
 #[route("/unknown_method")]
-#[response_body("unknown method")]
-#[filter(ctx.get_request().await.is_unknown_method())]
+#[prologue_hooks[
+    filter(ctx.get_request().await.is_unknown_method()),
+    response_body("unknown_method")
+]]
 async fn unknown_method(ctx: Context) {}
 
 #[route("/get")]
 #[send_once_body]
-#[response_body("get")]
-#[ws]
-#[get]
+#[prologue_hooks[
+    get,
+    ws,
+    response_body("get")
+]]
 async fn get(ctx: Context) {}
 
 #[send_once]
 #[route("/post")]
-#[response_body("post")]
-#[post]
+#[prologue_hooks[
+    post,
+    response_body("post")
+]]
 async fn post(ctx: Context) {}
 
-#[route("/websocket")]
-#[response_body("websocket")]
-#[ws]
+#[route("/ws")]
+#[prologue_hooks[
+    ws,
+    response_body("ws")
+]]
 async fn websocket(ctx: Context) {}
 
 #[route("/hook")]
-#[pre_hook(pre_hook)]
-#[post_hook(post_hook)]
+#[prologue_hook(prologue_hook)]
+#[epilogue_hook(epilogue_hook)]
 #[response_body("Testing hook macro")]
 async fn hook(ctx: Context) {}
 
 #[closed]
 #[route("/get_post")]
-#[methods(get, post)]
-#[response_reason_phrase("OK")]
-#[response_status_code(200)]
-#[response_body("get_post")]
-#[http]
+#[prologue_hooks[
+    http,
+    methods(get, post),
+    response_body("get_post"),
+    response_status_code(200),
+    response_reason_phrase("OK")
+]]
 async fn get_post(ctx: Context) {}
 
 #[route("/attributes")]
@@ -454,10 +506,12 @@ async fn request_body(ctx: Context) {}
 #[response_body("host string literal: localhost")]
 async fn host(ctx: Context) {}
 
-#[route("/host_filter")]
-#[host_filter("filter.localhost")]
-#[response_body("host filter string literal")]
-async fn host_filter(ctx: Context) {}
+#[route("/reject_host")]
+#[prologue_hooks[
+    reject_host("filter.localhost"),
+    response_body("host filter string literal")
+]]
+async fn reject_host(ctx: Context) {}
 
 #[route("/attribute")]
 #[response_body(format!("request attribute: {request_attribute_option:?}"))]
@@ -470,14 +524,18 @@ async fn attribute(ctx: Context) {}
 async fn request_body_json(ctx: Context) {}
 
 #[route("/referer")]
-#[referer("http://localhost")]
-#[response_body("referer string literal: http://localhost")]
+#[prologue_hooks[
+    referer("http://localhost"),
+    response_body("referer string literal: http://localhost")
+]]
 async fn referer(ctx: Context) {}
 
-#[route("/referer_filter")]
-#[referer_filter("http://localhost")]
-#[response_body("referer filter string literal")]
-async fn referer_filter(ctx: Context) {}
+#[route("/reject_referer")]
+#[prologue_hooks[
+    reject_referer("http://localhost"),
+    response_body("referer filter string literal")
+]]
+async fn reject_referer(ctx: Context) {}
 
 #[route("/cookies")]
 #[response_body(format!("All cookies: {cookie_value:?}"))]

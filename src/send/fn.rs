@@ -17,6 +17,13 @@ pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "send",
+        handler: Handler::Simple(send_macro),
+    }
+}
+
 /// Sends only the response body.
 ///
 /// # Arguments
@@ -32,6 +39,13 @@ pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
             let _ = #context.send_body().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "send_body",
+        handler: Handler::Simple(send_body_macro),
+    }
 }
 
 /// Sends the response once with both headers and body (no keep-alive).
@@ -51,6 +65,13 @@ pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "send_once",
+        handler: Handler::Simple(send_once_macro),
+    }
+}
+
 /// Sends only the response body once (no keep-alive).
 ///
 /// # Arguments
@@ -66,4 +87,11 @@ pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
             let _ = #context.send_once_body().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "send_once_body",
+        handler: Handler::Simple(send_once_body_macro),
+    }
 }

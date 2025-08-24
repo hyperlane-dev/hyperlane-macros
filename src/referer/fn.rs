@@ -27,7 +27,14 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
     })
 }
 
-/// Filters requests not matching the specified Referer header.
+inventory::submit! {
+    InjectableMacro {
+        name: "referer",
+        handler: Handler::WithAttr(referer_macro),
+    }
+}
+
+/// Reject requests not matching the specified Referer header.
 ///
 /// # Arguments
 ///
@@ -37,7 +44,7 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inverse Referer filter.
-pub(crate) fn referer_filter_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn reject_referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
     inject_at_start(item, |context| {
@@ -50,4 +57,11 @@ pub(crate) fn referer_filter_macro(attr: TokenStream, item: TokenStream) -> Toke
             }
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "reject_referer",
+        handler: Handler::WithAttr(reject_referer_macro),
+    }
 }

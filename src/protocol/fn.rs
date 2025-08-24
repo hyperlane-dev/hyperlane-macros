@@ -19,6 +19,13 @@ pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "ws",
+        handler: Handler::Simple(ws_macro),
+    }
+}
+
 /// Checks if request is HTTP protocol.
 ///
 /// # Arguments
@@ -38,6 +45,13 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "http",
+        handler: Handler::Simple(http_macro),
+    }
+}
+
 /// Implements a protocol check macro.
 ///
 /// This macro generates a function that checks if the request matches a specific protocol.
@@ -48,7 +62,7 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
 /// - `$name`: The name of the generated macro function.
 /// - `$check`: The name of the method to call on the request to perform the protocol check (e.g., `is_h2c`).
 macro_rules! impl_protocol_check_macro {
-    ($name:ident, $check:ident) => {
+    ($name:ident, $check:ident, $str_name:expr) => {
         pub(crate) fn $name(item: TokenStream) -> TokenStream {
             inject_at_start(item, |context| {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());
@@ -60,29 +74,40 @@ macro_rules! impl_protocol_check_macro {
                 }
             })
         }
+
+        inventory::submit! {
+            InjectableMacro {
+                name: $str_name,
+                handler: Handler::Simple($name),
+            }
+        }
     };
 }
 
 // Checks if the request is H2C protocol.
-impl_protocol_check_macro!(h2c_macro, is_h2c);
+impl_protocol_check_macro!(h2c_macro, is_h2c, "h2c");
 
 // Checks if the request is HTTP/0.9 protocol.
-impl_protocol_check_macro!(http0_9_macro, is_http0_9);
+impl_protocol_check_macro!(http0_9_macro, is_http0_9, "http0_9");
 
 // Checks if the request is HTTP/1.0 protocol.
-impl_protocol_check_macro!(http1_0_macro, is_http1_0);
+impl_protocol_check_macro!(http1_0_macro, is_http1_0, "http1_0");
 
 // Checks if the request is HTTP/1.1 protocol.
-impl_protocol_check_macro!(http1_1_macro, is_http1_1);
+impl_protocol_check_macro!(http1_1_macro, is_http1_1, "http1_1");
 
 // Checks if the request is HTTP/1.1 or higher protocol.
-impl_protocol_check_macro!(http1_1_or_higher_macro, is_http1_1_or_higher);
+impl_protocol_check_macro!(
+    http1_1_or_higher_macro,
+    is_http1_1_or_higher,
+    "http1_1_or_higher"
+);
 
 // Checks if the request is HTTP/2 protocol.
-impl_protocol_check_macro!(http2_macro, is_http2);
+impl_protocol_check_macro!(http2_macro, is_http2, "http2");
 
 // Checks if the request is HTTP/3 protocol.
-impl_protocol_check_macro!(http3_macro, is_http3);
+impl_protocol_check_macro!(http3_macro, is_http3, "http3");
 
 // Checks if the request is TLS protocol.
-impl_protocol_check_macro!(tls_macro, is_tls);
+impl_protocol_check_macro!(tls_macro, is_tls, "tls");

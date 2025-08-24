@@ -14,6 +14,7 @@ mod hook;
 mod host;
 mod http;
 mod hyperlane;
+mod inject;
 mod protocol;
 mod referer;
 mod reject;
@@ -33,6 +34,7 @@ pub(crate) use hook::*;
 pub(crate) use host::*;
 pub(crate) use http::*;
 pub(crate) use hyperlane::*;
+pub(crate) use inject::*;
 pub(crate) use protocol::*;
 pub(crate) use referer::*;
 pub(crate) use reject::*;
@@ -48,10 +50,13 @@ pub(crate) use proc_macro2::TokenStream as TokenStream2;
 pub(crate) use quote::quote;
 pub(crate) use syn::{
     Ident, Token,
-    parse::{Parse, ParseStream, Result},
+    parse::{Parse, ParseStream, Parser, Result},
     punctuated::Punctuated,
+    token::Comma,
     *,
 };
+
+inventory::collect!(InjectableMacro);
 
 /// Restricts function execution to HTTP GET requests only.
 ///
@@ -98,7 +103,7 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    post_handler(item)
+    epilogue_handler(item)
 }
 
 /// Restricts function execution to HTTP PUT requests only.
@@ -962,7 +967,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
     host_macro(attr, item)
 }
 
-/// Filters requests that have no host header.
+/// Reject requests that have no host header.
 ///
 /// This attribute macro ensures the decorated function only executes when the incoming request
 /// has a host header present. Requests without a host header will be filtered out.
@@ -973,7 +978,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[host_filter("localhost")]
+/// #[reject_host("localhost")]
 /// async fn handle_with_host(ctx: Context) {
 ///     // Function body for requests with host header
 /// }
@@ -982,8 +987,8 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn host_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
-    host_filter_macro(attr, item)
+pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
+    reject_host_macro(attr, item)
 }
 
 /// Restricts function execution to requests with a specific referer.
@@ -1015,7 +1020,7 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
     referer_macro(attr, item)
 }
 
-/// Filters requests that have a specific referer header.
+/// Reject requests that have a specific referer header.
 ///
 /// This attribute macro ensures the decorated function only executes when the incoming request
 /// does not have a referer header that matches the specified value. Requests with the matching referer header will be filtered out.
@@ -1026,7 +1031,7 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[referer_filter("http://localhost")]
+/// #[reject_referer("http://localhost")]
 /// async fn handle_without_spam_referer(ctx: Context) {
 ///     // Function body for requests not from localhost
 /// }
@@ -1035,8 +1040,8 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a string literal specifying the referer value to filter out and should be
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn referer_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
-    referer_filter_macro(attr, item)
+pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
+    reject_referer_macro(attr, item)
 }
 
 /// Executes a specified function before the main handler function.
@@ -1051,13 +1056,13 @@ pub fn referer_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[get]
-/// async fn pre_handler(ctx: Context) {
+/// async fn prologue_handler(ctx: Context) {
 ///     // Pre-execution logic
 /// }
 ///
-/// #[pre_hook(pre_handler)]
+/// #[prologue_hook(prologue_handler)]
 /// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs after pre_handler)
+///     // Main function logic (runs after prologue_handler)
 /// }
 /// ```
 ///
@@ -1065,8 +1070,8 @@ pub fn referer_filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// must accept a `Context` parameter. Avoid combining this macro with other macros on the
 /// same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
-pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    pre_hook_macro(attr, item)
+pub fn prologue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    prologue_hook_macro(attr, item)
 }
 
 /// Executes a specified function after the main handler function.
@@ -1081,13 +1086,13 @@ pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[send]
-/// async fn post_handler(ctx: Context) {
+/// async fn epilogue_handler(ctx: Context) {
 ///     // Post-execution logic
 /// }
 ///
-/// #[post_hook(post_handler)]
+/// #[epilogue_hook(epilogue_handler)]
 /// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs before post_handler)
+///     // Main function logic (runs before epilogue_handler)
 /// }
 /// ```
 ///
@@ -1095,8 +1100,8 @@ pub fn pre_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// must accept a `Context` parameter. Avoid combining this macro with other macros on the
 /// same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
-pub fn post_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    post_hook_macro(attr, item)
+pub fn epilogue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    epilogue_hook_macro(attr, item)
 }
 
 /// Extracts the raw request body into a specified variable.
@@ -1256,7 +1261,7 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// // For route like "/users/{id}/posts/{post_id}"
+/// // For route like "/users/{id}/posts/{epilogue_id}"
 /// #[route_params(params)]
 /// async fn handle_nested_route(ctx: Context) {
 ///     for (key, value) in params {
@@ -1621,10 +1626,10 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[pre_upgrade_hook]
-/// #[pre_upgrade_hook(1)]
-/// #[pre_upgrade_hook("2")]
-/// async fn handle_pre_upgrade(ctx: Context) {
+/// #[prologue_upgrade_hook]
+/// #[prologue_upgrade_hook(1)]
+/// #[prologue_upgrade_hook("2")]
+/// async fn handle_prologue_upgrade(ctx: Context) {
 ///     // Pre-upgrade logic
 /// }
 /// ```
@@ -1633,8 +1638,8 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
-pub fn pre_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    pre_upgrade_hook_macro(attr, item)
+pub fn prologue_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
+    prologue_upgrade_hook_macro(attr, item)
 }
 
 /// Registers a function as a connected hook.
@@ -1747,4 +1752,44 @@ pub fn disable_http_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn disable_ws_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     disable_ws_hook_macro(attr, item)
+}
+
+/// Injects a list of macros before the decorated function.
+///
+/// The macros are applied in head-insertion order, meaning the first macro in the list
+/// is the outermost macro.
+///
+/// # Usage
+///
+/// ```rust,ignore
+/// use hyperlane_macros::{self as hyperlane, post, send};
+///
+/// #[hyperlane::prologue_hooks(post, send)]
+/// async fn handler(ctx: Context) {
+///     // ...
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+    prologue_hooks_macro(attr, item)
+}
+
+/// Injects a list of macros after the decorated function.
+///
+/// The macros are applied in tail-insertion order, meaning the last macro in the list
+/// is the outermost macro.
+///
+/// # Usage
+///
+/// ```rust,ignore
+/// use hyperlane_macros::{self as hyperlane, post, send};
+///
+/// #[hyperlane::epilogue_hooks(post, send)]
+/// async fn handler(ctx: Context) {
+///     // ...
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+    epilogue_hooks_macro(attr, item)
 }

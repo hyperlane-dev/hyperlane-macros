@@ -48,3 +48,10 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     };
     gen_code.into()
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "hyperlane",
+        handler: Handler::WithAttr(hyperlane_macro),
+    }
+}

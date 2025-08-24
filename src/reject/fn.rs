@@ -28,3 +28,10 @@ pub(crate) fn reject_macro(attr: TokenStream, item: TokenStream) -> TokenStream 
     item_fn.block = syn::parse2(body).unwrap();
     quote!(#item_fn).into()
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "reject",
+        handler: Handler::WithAttr(reject_macro),
+    }
+}

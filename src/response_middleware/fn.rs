@@ -33,3 +33,10 @@ pub(crate) fn response_middleware_macro(attr: TokenStream, item: TokenStream) ->
     };
     gen_code.into()
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "response_middleware",
+        handler: Handler::WithAttr(response_middleware_macro),
+    }
+}

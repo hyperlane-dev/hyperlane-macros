@@ -36,3 +36,10 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     };
     gen_code.into()
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "route",
+        handler: Handler::WithAttr(route_macro),
+    }
+}

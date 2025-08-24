@@ -21,3 +21,10 @@ pub(crate) fn aborted_macro(item: TokenStream) -> TokenStream {
         }
     })
 }
+
+inventory::submit! {
+    InjectableMacro {
+        name: "aborted",
+        handler: Handler::Simple(aborted_macro),
+    }
+}

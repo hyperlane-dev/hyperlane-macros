@@ -20,6 +20,13 @@ pub(crate) fn request_body_macro(attr: TokenStream, item: TokenStream) -> TokenS
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "request_body",
+        handler: Handler::WithAttr(request_body_macro),
+    }
+}
+
 /// Parses request body as JSON and assigns to specified variable.
 ///
 /// # Arguments
@@ -39,6 +46,13 @@ pub(crate) fn request_body_json_macro(attr: TokenStream, item: TokenStream) -> T
             let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_body_json",
+        handler: Handler::WithAttr(request_body_json_macro),
+    }
 }
 
 /// Gets request attribute by key and assigns to specified variable.
@@ -63,6 +77,13 @@ pub(crate) fn attribute_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "attribute",
+        handler: Handler::WithAttr(attribute_macro),
+    }
+}
+
 /// Gets all request attributes and assigns to specified variable.
 ///
 /// # Arguments
@@ -81,6 +102,13 @@ pub(crate) fn attributes_macro(attr: TokenStream, item: TokenStream) -> TokenStr
             let #variable: ::hyperlane::HashMapArcAnySendSync = #context.get_attributes().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "attributes",
+        handler: Handler::WithAttr(attributes_macro),
+    }
 }
 
 /// Gets route parameter by key and assigns to specified variable.
@@ -104,6 +132,13 @@ pub(crate) fn route_param_macro(attr: TokenStream, item: TokenStream) -> TokenSt
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "route_param",
+        handler: Handler::WithAttr(route_param_macro),
+    }
+}
+
 /// Gets all route parameters and assigns to specified variable.
 ///
 /// # Arguments
@@ -122,6 +157,13 @@ pub(crate) fn route_params_macro(attr: TokenStream, item: TokenStream) -> TokenS
             let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "route_params",
+        handler: Handler::WithAttr(route_params_macro),
+    }
 }
 
 /// Gets request query parameter by key and assigns to specified variable.
@@ -145,6 +187,13 @@ pub(crate) fn request_query_macro(attr: TokenStream, item: TokenStream) -> Token
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "request_query",
+        handler: Handler::WithAttr(request_query_macro),
+    }
+}
+
 /// Gets all request query parameters and assigns to specified variable.
 ///
 /// # Arguments
@@ -163,6 +212,13 @@ pub(crate) fn request_querys_macro(attr: TokenStream, item: TokenStream) -> Toke
             let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_querys",
+        handler: Handler::WithAttr(request_querys_macro),
+    }
 }
 
 /// Gets request header by key and assigns to specified variable.
@@ -186,6 +242,13 @@ pub(crate) fn request_header_macro(attr: TokenStream, item: TokenStream) -> Toke
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "request_header",
+        handler: Handler::WithAttr(request_header_macro),
+    }
+}
+
 /// Gets all request headers and assigns to specified variable.
 ///
 /// # Arguments
@@ -204,6 +267,13 @@ pub(crate) fn request_headers_macro(attr: TokenStream, item: TokenStream) -> Tok
             let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_headers",
+        handler: Handler::WithAttr(request_headers_macro),
+    }
 }
 
 /// Gets request cookie by key and assigns to specified variable.
@@ -227,6 +297,13 @@ pub(crate) fn request_cookie_macro(attr: TokenStream, item: TokenStream) -> Toke
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "request_cookie",
+        handler: Handler::WithAttr(request_cookie_macro),
+    }
+}
+
 /// Gets all request cookies and assigns to specified variable.
 ///
 /// # Arguments
@@ -245,6 +322,13 @@ pub(crate) fn request_cookies_macro(attr: TokenStream, item: TokenStream) -> Tok
             let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_cookies",
+        handler: Handler::WithAttr(request_cookies_macro),
+    }
 }
 
 /// Gets request version and assigns to specified variable.
@@ -267,6 +351,13 @@ pub(crate) fn request_version_macro(attr: TokenStream, item: TokenStream) -> Tok
     })
 }
 
+inventory::submit! {
+    InjectableMacro {
+        name: "request_version",
+        handler: Handler::WithAttr(request_version_macro),
+    }
+}
+
 /// Gets request path and assigns to specified variable.
 ///
 /// # Arguments
@@ -285,4 +376,11 @@ pub(crate) fn request_path_macro(attr: TokenStream, item: TokenStream) -> TokenS
             let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
         }
     })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_path",
+        handler: Handler::WithAttr(request_path_macro),
+    }
 }
