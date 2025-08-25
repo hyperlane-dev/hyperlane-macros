@@ -9,8 +9,8 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with flush call.
-pub(crate) fn flush_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn flush_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.flush().await;
         }
@@ -20,6 +20,6 @@ pub(crate) fn flush_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "flush",
-        handler: Handler::Simple(flush_macro),
+        handler: Handler::SimplePosition(flush_macro),
     }
 }

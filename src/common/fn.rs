@@ -72,6 +72,17 @@ pub(crate) fn inject_at_end(
     }
 }
 
+pub(crate) fn inject(
+    position: Position,
+    input: TokenStream,
+    hook: impl FnOnce(&Ident) -> TokenStream2,
+) -> TokenStream {
+    match position {
+        Position::Start => inject_at_start(input, hook),
+        Position::End => inject_at_end(input, hook),
+    }
+}
+
 /// Parses context identifier from function signature.
 ///
 /// # Arguments

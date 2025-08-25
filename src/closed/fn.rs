@@ -14,8 +14,8 @@ use crate::*;
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the closed call inserted.
-pub(crate) fn closed_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.closed().await;
         }
@@ -25,6 +25,6 @@ pub(crate) fn closed_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "closed",
-        handler: Handler::Simple(closed_macro),
+        handler: Handler::SimplePosition(closed_macro),
     }
 }

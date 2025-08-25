@@ -14,8 +14,8 @@ use crate::*;
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the aborted call inserted.
-pub(crate) fn aborted_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn aborted_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.aborted().await;
         }
@@ -25,6 +25,6 @@ pub(crate) fn aborted_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "aborted",
-        handler: Handler::Simple(aborted_macro),
+        handler: Handler::SimplePosition(aborted_macro),
     }
 }

@@ -9,8 +9,8 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with send operation.
-pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.send().await;
         }
@@ -20,7 +20,7 @@ pub(crate) fn send_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "send",
-        handler: Handler::Simple(send_macro),
+        handler: Handler::SimplePosition(send_macro),
     }
 }
 
@@ -33,8 +33,8 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with body send operation.
-pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.send_body().await;
         }
@@ -44,7 +44,7 @@ pub(crate) fn send_body_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "send_body",
-        handler: Handler::Simple(send_body_macro),
+        handler: Handler::SimplePosition(send_body_macro),
     }
 }
 
@@ -57,8 +57,8 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with single send operation.
-pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn send_once_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.send_once().await;
         }
@@ -68,7 +68,7 @@ pub(crate) fn send_once_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "send_once",
-        handler: Handler::Simple(send_once_macro),
+        handler: Handler::SimplePosition(send_once_macro),
     }
 }
 
@@ -81,8 +81,8 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with single body send operation.
-pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
-    inject_at_end(item, |context| {
+pub(crate) fn send_once_body_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             let _ = #context.send_once_body().await;
         }
@@ -92,6 +92,6 @@ pub(crate) fn send_once_body_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "send_once_body",
-        handler: Handler::Simple(send_once_body_macro),
+        handler: Handler::SimplePosition(send_once_body_macro),
     }
 }

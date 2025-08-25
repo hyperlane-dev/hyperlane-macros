@@ -11,17 +11,17 @@ use crate::*;
 /// - `$method`: The HTTP method as a string literal (e.g., "get", "post").
 macro_rules! impl_http_method_macro {
     ($name:ident, $method:expr) => {
-        pub(crate) fn $name(item: TokenStream) -> TokenStream {
-            inject_at_start(
+        pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
+            inject(
+                position,
                 item,
                 create_method_check($method, proc_macro2::Span::call_site()),
             )
         }
-
         inventory::submit! {
             InjectableMacro {
                 name: $method,
-                handler: Handler::Simple($name),
+                handler: Handler::SimplePosition($name),
             }
         }
     };

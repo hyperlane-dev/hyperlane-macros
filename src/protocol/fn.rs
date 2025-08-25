@@ -9,8 +9,8 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with protocol check.
-pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
-    inject_at_start(item, |context| {
+pub(crate) fn ws_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             if !#context.get_request().await.is_ws() {
                 return;
@@ -22,7 +22,7 @@ pub(crate) fn ws_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "ws",
-        handler: Handler::Simple(ws_macro),
+        handler: Handler::SimplePosition(ws_macro),
     }
 }
 
@@ -35,8 +35,8 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with protocol check.
-pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
-    inject_at_start(item, |context| {
+pub(crate) fn http_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
         quote! {
             if !#context.get_request().await.is_http() {
                 return;
@@ -48,7 +48,7 @@ pub(crate) fn http_macro(item: TokenStream) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "http",
-        handler: Handler::Simple(http_macro),
+        handler: Handler::SimplePosition(http_macro),
     }
 }
 
@@ -63,8 +63,8 @@ inventory::submit! {
 /// - `$check`: The name of the method to call on the request to perform the protocol check (e.g., `is_h2c`).
 macro_rules! impl_protocol_check_macro {
     ($name:ident, $check:ident, $str_name:expr) => {
-        pub(crate) fn $name(item: TokenStream) -> TokenStream {
-            inject_at_start(item, |context| {
+        pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
+            inject(position, item, |context| {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());
                 quote! {
                     let request: ::hyperlane::Request = #context.get_request().await;
@@ -74,11 +74,10 @@ macro_rules! impl_protocol_check_macro {
                 }
             })
         }
-
         inventory::submit! {
             InjectableMacro {
                 name: $str_name,
-                handler: Handler::Simple($name),
+                handler: Handler::SimplePosition($name),
             }
         }
     };
