@@ -6,8 +6,8 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream`: The attribute token stream, containing the variable and type name.
-/// - `TokenStream`: The input token stream to process, typically an `async fn`.
+/// - `TokenStream` - The attribute token stream, containing the variable and type name.
+/// - `TokenStream` - The input token stream to process, typically an `async fn`.
 ///
 /// # Returns
 ///

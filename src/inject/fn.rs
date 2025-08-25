@@ -9,6 +9,7 @@ use crate::*;
 ///
 /// - `&Meta` - The metadata of the macro to apply.
 /// - `TokenStream` - The token stream to apply the macro to.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///

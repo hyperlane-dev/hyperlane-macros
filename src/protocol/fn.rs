@@ -5,6 +5,7 @@ use crate::*;
 /// # Arguments
 ///
 /// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
@@ -31,6 +32,7 @@ inventory::submit! {
 /// # Arguments
 ///
 /// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
@@ -63,6 +65,16 @@ inventory::submit! {
 /// - `$check`: The name of the method to call on the request to perform the protocol check (e.g., `is_h2c`).
 macro_rules! impl_protocol_check_macro {
     ($name:ident, $check:ident, $str_name:expr) => {
+        /// Checks if the request matches a specific protocol.
+        ///
+        /// # Arguments
+        ///
+        /// - `TokenStream` - The input token stream to process.
+        /// - `Position` - The position to inject the code.
+        ///
+        /// # Returns
+        ///
+        /// The expanded token stream with protocol check.
         pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
             inject(position, item, |context| {
                 let check_fn = Ident::new(stringify!($check), proc_macro2::Span::call_site());

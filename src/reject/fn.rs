@@ -6,8 +6,9 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `attr`: A code block that returns a boolean value.
-/// - `item`: The function to which the attribute is applied.
+/// - `TokenStream` - A code block that returns a boolean value.
+/// - `TokenStream` - The function to which the attribute is applied.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///

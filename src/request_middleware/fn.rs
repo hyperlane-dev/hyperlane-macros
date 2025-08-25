@@ -7,7 +7,7 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream (unused).
+/// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
 /// - `TokenStream` - The input token stream representing the function to be registered as a middleware.
 ///
 /// # Note

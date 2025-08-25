@@ -7,8 +7,8 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
-/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
+/// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `TokenStream` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -48,8 +48,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
-/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
+/// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `TokenStream` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -89,8 +89,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
-/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
+/// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `TokenStream` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -130,8 +130,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
-/// - `item` - The input `TokenStream` representing the function to be registered.
+/// - `TokenStream` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
+/// - `TokenStream` - The input `TokenStream` representing the function to be registered.
 ///
 /// # Returns
 ///
@@ -167,8 +167,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
-/// - `item` - The input `TokenStream` representing the function to be registered.
+/// - `TokenStream` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
+/// - `TokenStream` - The input `TokenStream` representing the function to be registered.
 ///
 /// # Returns
 ///
@@ -201,8 +201,9 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute token stream.
-/// - `item` - The input token stream to process.
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
@@ -231,8 +232,9 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute token stream.
-/// - `item` - The input token stream to process.
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///

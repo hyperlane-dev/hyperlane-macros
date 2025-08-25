@@ -10,6 +10,7 @@ use crate::*;
 /// # Arguments
 ///
 /// - `TokenStream` - The input `TokenStream` to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///

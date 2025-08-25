@@ -6,6 +6,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
@@ -44,6 +45,7 @@ inventory::submit! {
 ///
 /// - `TokenStream` - The attribute token stream.
 /// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///

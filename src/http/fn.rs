@@ -89,9 +89,9 @@ pub(crate) fn create_method_check(
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute `TokenStream` containing the list of allowed HTTP methods.
-/// - `item` - The input `TokenStream` representing the handler function.
-/// - `position` - The position at which to inject the method check code.
+/// - `TokenStream` - The attribute `TokenStream` containing the list of allowed HTTP methods.
+/// - `TokenStream` - The input `TokenStream` representing the handler function.
+/// - `Position` - The position at which to inject the method check code.
 ///
 /// # Returns
 ///
