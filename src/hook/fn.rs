@@ -7,8 +7,8 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream, which can optionally specify an `order`.
-/// - `TokenStream` - The input token stream representing the function to be registered as a hook.
+/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -16,7 +16,7 @@ use crate::*;
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with the hook registration.
+/// Returns the expanded `TokenStream` with the hook registration.
 pub(crate) fn connected_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
@@ -48,8 +48,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream, which can optionally specify an `order`.
-/// - `TokenStream` - The input token stream representing the function to be registered as a hook.
+/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -57,7 +57,7 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with the hook registration.
+/// Returns the expanded `TokenStream` with the hook registration.
 pub(crate) fn prologue_upgrade_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
@@ -89,8 +89,8 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream, which can optionally specify an `order`.
-/// - `TokenStream` - The input token stream representing the function to be registered as a hook.
+/// - `attr` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `item` - The input `TokenStream` representing the function to be registered as a hook.
 ///
 /// # Note
 ///
@@ -98,7 +98,7 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with the hook registration.
+/// Returns the expanded `TokenStream` with the hook registration.
 pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
@@ -130,12 +130,12 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream, containing the path to disable the hook for and an optional order.
-/// - `TokenStream` - The input token stream representing the function to be registered.
+/// - `attr` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
+/// - `item` - The input `TokenStream` representing the function to be registered.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with the hook disabling registration.
+/// Returns the expanded `TokenStream` with the hook disabling registration.
 pub(crate) fn disable_http_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: PathAttr = parse_macro_input!(attr as PathAttr);
     let path: &Expr = &attr_args.path;
@@ -167,12 +167,12 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream, containing the path to disable the hook for and an optional order.
-/// - `TokenStream` - The input token stream representing the function to be registered.
+/// - `attr` - The attribute `TokenStream`, containing the path to disable the hook for and an optional order.
+/// - `item` - The input `TokenStream` representing the function to be registered.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with the hook disabling registration.
+/// Returns the expanded `TokenStream` with the hook disabling registration.
 pub(crate) fn disable_ws_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: PathAttr = parse_macro_input!(attr as PathAttr);
     let path: &Expr = &attr_args.path;
@@ -201,12 +201,12 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
-/// - `TokenStream` - The input token stream to process.
+/// - `attr` - The attribute token stream.
+/// - `item` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with pre-hook call.
+/// Returns the expanded `TokenStream` with pre-hook call.
 pub(crate) fn prologue_hook_macro(
     attr: TokenStream,
     item: TokenStream,
@@ -231,12 +231,12 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
-/// - `TokenStream` - The input token stream to process.
+/// - `attr` - The attribute token stream.
+/// - `item` - The input token stream to process.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with post-hook call.
+/// Returns the expanded `TokenStream` with post-hook call.
 pub(crate) fn epilogue_hook_macro(
     attr: TokenStream,
     item: TokenStream,

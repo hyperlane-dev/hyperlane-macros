@@ -7,8 +7,12 @@ use crate::*;
 ///
 /// # Arguments
 ///
-/// - `$name`: The name of the generated handler function.
-/// - `$method`: The HTTP method as a string literal (e.g., "get", "post").
+/// - `$name` - The name of the generated handler function.
+/// - `$method` - The HTTP method as a string literal (e.g., "get", "post").
+///
+/// # Returns
+///
+/// Returns a macro that generates a handler function for the specified HTTP method.
 macro_rules! impl_http_method_macro {
     ($name:ident, $method:expr) => {
         pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
@@ -27,43 +31,43 @@ macro_rules! impl_http_method_macro {
     };
 }
 
-// This macro expands to a check that aborts the request if the HTTP method is not GET.
+// Generates a handler that checks if the HTTP method is GET.
 impl_http_method_macro!(get_handler, "get");
 
-// This macro expands to a check that aborts the request if the HTTP method is not POST.
+// Generates a handler that checks if the HTTP method is POST.
 impl_http_method_macro!(epilogue_handler, "post");
 
-// This macro expands to a check that aborts the request if the HTTP method is not PUT.
+// Generates a handler that checks if the HTTP method is PUT.
 impl_http_method_macro!(put_handler, "put");
 
-// This macro expands to a check that aborts the request if the HTTP method is not DELETE.
+// Generates a handler that checks if the HTTP method is DELETE.
 impl_http_method_macro!(delete_handler, "delete");
 
-// This macro expands to a check that aborts the request if the HTTP method is not PATCH.
+// Generates a handler that checks if the HTTP method is PATCH.
 impl_http_method_macro!(patch_handler, "patch");
 
-// This macro expands to a check that aborts the request if the HTTP method is not HEAD.
+// Generates a handler that checks if the HTTP method is HEAD.
 impl_http_method_macro!(head_handler, "head");
 
-// This macro expands to a check that aborts the request if the HTTP method is not OPTIONS.
+// Generates a handler that checks if the HTTP method is OPTIONS.
 impl_http_method_macro!(options_handler, "options");
 
-// This macro expands to a check that aborts the request if the HTTP method is not CONNECT.
+// Generates a handler that checks if the HTTP method is CONNECT.
 impl_http_method_macro!(connect_handler, "connect");
 
-// This macro expands to a check that aborts the request if the HTTP method is not TRACE.
+// Generates a handler that checks if the HTTP method is TRACE.
 impl_http_method_macro!(trace_handler, "trace");
 
-/// Creates method check function for HTTP request validation.
+/// Creates a method check function for HTTP request validation.
 ///
 /// # Arguments
 ///
-/// - `&str` - The method name string.
-/// - `proc_macro2::Span` - The span for error reporting.
+/// - `method_name` - The HTTP method name as a string.
+/// - `span` - The span for error reporting.
 ///
 /// # Returns
 ///
-/// - `impl FnOnce(&Ident) -> TokenStream2` - The generated check function.
+/// Returns a closure that generates the method check code.
 pub(crate) fn create_method_check(
     method_name: &str,
     span: proc_macro2::Span,
@@ -80,14 +84,18 @@ pub(crate) fn create_method_check(
 
 /// Handles HTTP requests for multiple method types.
 ///
+/// This macro allows a handler to respond to multiple HTTP methods.
+/// It generates code that checks if the request method matches any of the specified methods.
+///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
-/// - `TokenStream` - The input token stream to process.
+/// - `attr` - The attribute `TokenStream` containing the list of allowed HTTP methods.
+/// - `item` - The input `TokenStream` representing the handler function.
+/// - `position` - The position at which to inject the method check code.
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with methods check.
+/// Returns the expanded `TokenStream` with the methods check code injected.
 pub(crate) fn methods_macro(
     attr: TokenStream,
     item: TokenStream,

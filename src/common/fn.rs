@@ -69,6 +69,17 @@ fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStrea
     }
 }
 
+/// Injects code into a function at a specified position.
+///
+/// # Arguments
+///
+/// - `Position` - The position at which to inject the code (`Prologue` or `Epilogue`).
+/// - `TokenStream` - The input `TokenStream` of the function to modify.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the function's context identifier.
+///
+/// # Returns
+///
+/// - `TokenStream` - Returns the modified `TokenStream` with the injected code.
 pub(crate) fn inject(
     position: Position,
     input: TokenStream,
@@ -88,7 +99,7 @@ pub(crate) fn inject(
 ///
 /// # Returns
 ///
-/// - `syn::Result<&Ident>` - The parsed context identifier or error.
+/// - `syn::Result<&Ident>` - Returns a `syn::Result` containing the context identifier if successful, or an error otherwise.
 pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
     match sig.inputs.first() {
         Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
@@ -117,11 +128,13 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
 /// - Any other expression types will result in `None`.
 /// - If `opt_expr` is `None`, the result is also `None`.
 ///
-/// # Parameters
-/// - `opt_expr` - An optional reference to the expression to convert.
+/// # Arguments
+///
+/// - `&Option<Expr>` - An optional reference to the expression to convert.
 ///
 /// # Returns
-/// - A `TokenStream2` representing `Some(isize)` for supported literals, or `None` otherwise.
+///
+/// - `TokenStream` - A `TokenStream2` representing `Some(isize)` for supported literals, or `None` otherwise.
 pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
     match opt_expr {
         Some(expr) => match expr {
