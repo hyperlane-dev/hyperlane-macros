@@ -221,8 +221,12 @@ struct TestData {
 #[panic_hook]
 #[panic_hook(1)]
 #[panic_hook("2")]
-#[epilogue_hooks(send, response_body("panic_hook"))]
-async fn panic_hook(ctx: Context) {}
+#[epilogue_hooks(response_body("panic_hook"), send)]
+async fn panic_hook(ctx: Context) {
+    if true {
+        return;
+    }
+}
 
 #[route("/disable_http_hook")]
 #[response_body("disable_http_hook")]
@@ -270,7 +274,11 @@ async fn response_middleware_1(ctx: Context) {}
     response_header(STEP => "response_middleware_2")
 )]
 #[epilogue_hooks(send, flush)]
-async fn response_middleware_2(ctx: Context) {}
+async fn response_middleware_2(ctx: Context) {
+    if true {
+        return;
+    }
+}
 
 #[response_middleware("3")]
 #[prologue_hooks(

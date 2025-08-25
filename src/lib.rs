@@ -79,7 +79,7 @@ inventory::collect!(InjectableMacro);
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    get_handler(item, Position::Start)
+    get_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP POST requests only.
@@ -103,7 +103,7 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    epilogue_handler(item, Position::Start)
+    epilogue_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP PUT requests only.
@@ -127,7 +127,7 @@ pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn put(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    put_handler(item, Position::Start)
+    put_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP DELETE requests only.
@@ -151,7 +151,7 @@ pub fn put(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    delete_handler(item, Position::Start)
+    delete_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP PATCH requests only.
@@ -175,7 +175,7 @@ pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn patch(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    patch_handler(item, Position::Start)
+    patch_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP HEAD requests only.
@@ -199,7 +199,7 @@ pub fn patch(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn head(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    head_handler(item, Position::Start)
+    head_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP OPTIONS requests only.
@@ -223,7 +223,7 @@ pub fn head(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn options(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    options_handler(item, Position::Start)
+    options_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP CONNECT requests only.
@@ -247,7 +247,7 @@ pub fn options(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn connect(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    connect_handler(item, Position::Start)
+    connect_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP TRACE requests only.
@@ -271,7 +271,7 @@ pub fn connect(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn trace(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    trace_handler(item, Position::Start)
+    trace_handler(item, Position::Prologue)
 }
 
 /// Allows function to handle multiple HTTP methods.
@@ -300,7 +300,7 @@ pub fn trace(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
-    methods_macro(attr, item)
+    methods_macro(attr, item, Position::Prologue)
 }
 
 /// Restricts function execution to WebSocket upgrade requests only.
@@ -324,7 +324,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn ws(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    ws_macro(item, Position::Start)
+    ws_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to standard HTTP requests only.
@@ -348,7 +348,7 @@ pub fn ws(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http_macro(item, Position::Start)
+    http_macro(item, Position::Prologue)
 }
 
 /// Sets the HTTP status code for the response.
@@ -384,7 +384,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// and should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
-    response_status_code_macro(attr, item)
+    response_status_code_macro(attr, item, Position::Prologue)
 }
 
 /// Sets the HTTP reason phrase for the response.
@@ -420,7 +420,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
-    response_reason_phrase_macro(attr, item)
+    response_reason_phrase_macro(attr, item, Position::Prologue)
 }
 
 /// Sets or replaces a specific HTTP response header.
@@ -470,7 +470,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// Should be applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
-    response_header_macro(attr, item)
+    response_header_macro(attr, item, Position::Prologue)
 }
 
 /// Sets the HTTP response body.
@@ -506,7 +506,7 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
-    response_body_macro(attr, item)
+    response_body_macro(attr, item, Position::Prologue)
 }
 
 /// Sets the HTTP response version.
@@ -530,7 +530,7 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
-    response_version_macro(attr, item)
+    response_version_macro(attr, item, Position::Prologue)
 }
 
 /// Automatically sends the complete response after function execution.
@@ -555,7 +555,7 @@ pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_macro(item, Position::End)
+    send_macro(item, Position::Epilogue)
 }
 
 /// Automatically sends only the response body after function execution.
@@ -580,7 +580,7 @@ pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_macro(item, Position::End)
+    send_body_macro(item, Position::Epilogue)
 }
 
 /// Sends the complete response exactly once after function execution.
@@ -605,7 +605,7 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_once_macro(item, Position::End)
+    send_once_macro(item, Position::Epilogue)
 }
 
 /// Sends only the response body exactly once after function execution.
@@ -630,7 +630,7 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_once_body_macro(item, Position::End)
+    send_once_body_macro(item, Position::Epilogue)
 }
 
 /// Flushes the response stream after function execution.
@@ -655,7 +655,7 @@ pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    flush_macro(item, Position::Start)
+    flush_macro(item, Position::Prologue)
 }
 
 /// Handles aborted request scenarios.
@@ -679,7 +679,7 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    aborted_macro(item, Position::Start)
+    aborted_macro(item, Position::Prologue)
 }
 
 /// Handles closed connection scenarios.
@@ -703,7 +703,7 @@ pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    closed_macro(item, Position::Start)
+    closed_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/2 Cleartext (h2c) requests only.
@@ -727,7 +727,7 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    h2c_macro(item, Position::Start)
+    h2c_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/0.9 requests only.
@@ -751,7 +751,7 @@ pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http0_9_macro(item, Position::Start)
+    http0_9_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.0 requests only.
@@ -775,7 +775,7 @@ pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_0_macro(item, Position::Start)
+    http1_0_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.1 requests only.
@@ -799,7 +799,7 @@ pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_macro(item, Position::Start)
+    http1_1_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.1 or higher protocol versions.
@@ -823,7 +823,7 @@ pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_or_higher_macro(item, Position::Start)
+    http1_1_or_higher_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/2 requests only.
@@ -847,7 +847,7 @@ pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http2_macro(item, Position::Start)
+    http2_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/3 requests only.
@@ -871,7 +871,7 @@ pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http3_macro(item, Position::Start)
+    http3_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to TLS-encrypted requests only.
@@ -895,7 +895,7 @@ pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    tls_macro(item, Position::Start)
+    tls_macro(item, Position::Prologue)
 }
 
 /// Filters requests based on a boolean condition.
@@ -915,7 +915,7 @@ pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
-    filter_macro(attr, item)
+    filter_macro(attr, item, Position::Prologue)
 }
 
 /// Rejects requests based on a boolean condition.
@@ -935,7 +935,7 @@ pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_attribute]
 pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
-    reject_macro(attr, item)
+    reject_macro(attr, item, Position::Prologue)
 }
 
 /// Restricts function execution to requests with a specific host.
@@ -964,7 +964,7 @@ pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
-    host_macro(attr, item)
+    host_macro(attr, item, Position::Prologue)
 }
 
 /// Reject requests that have no host header.
@@ -988,7 +988,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
-    reject_host_macro(attr, item)
+    reject_host_macro(attr, item, Position::Prologue)
 }
 
 /// Restricts function execution to requests with a specific referer.
@@ -1017,7 +1017,7 @@ pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
-    referer_macro(attr, item)
+    referer_macro(attr, item, Position::Prologue)
 }
 
 /// Reject requests that have a specific referer header.
@@ -1041,7 +1041,7 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// applied to async functions that accept a `Context` parameter.
 #[proc_macro_attribute]
 pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
-    reject_referer_macro(attr, item)
+    reject_referer_macro(attr, item, Position::Prologue)
 }
 
 /// Executes a specified function before the main handler function.
@@ -1071,7 +1071,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
 pub fn prologue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    prologue_hook_macro(attr, item)
+    prologue_hook_macro(attr, item, Position::Prologue)
 }
 
 /// Executes a specified function after the main handler function.
@@ -1101,7 +1101,7 @@ pub fn prologue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
 pub fn epilogue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    epilogue_hook_macro(attr, item)
+    epilogue_hook_macro(attr, item, Position::Epilogue)
 }
 
 /// Extracts the raw request body into a specified variable.
@@ -1126,7 +1126,7 @@ pub fn epilogue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// in the function scope as a `RequestBody` type.
 #[proc_macro_attribute]
 pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_body_macro(attr, item)
+    request_body_macro(attr, item, Position::Prologue)
 }
 
 /// Parses the request body as JSON into a specified variable and type.
@@ -1159,7 +1159,7 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available in the function scope as a `Result<Type, JsonError>`.
 #[proc_macro_attribute]
 pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_body_json_macro(attr, item)
+    request_body_json_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific attribute value into a variable.
@@ -1194,7 +1194,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as an `Option<Type>` in the function scope.
 #[proc_macro_attribute]
 pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
-    attribute_macro(attr, item)
+    attribute_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts all attributes into a HashMap variable.
@@ -1220,7 +1220,7 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a HashMap in the function scope.
 #[proc_macro_attribute]
 pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
-    attributes_macro(attr, item)
+    attributes_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific route parameter into a variable.
@@ -1247,7 +1247,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as an `Option<String>` in the function scope.
 #[proc_macro_attribute]
 pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
-    route_param_macro(attr, item)
+    route_param_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts all route parameters into a collection variable.
@@ -1274,7 +1274,7 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a collection in the function scope.
 #[proc_macro_attribute]
 pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
-    route_params_macro(attr, item)
+    route_params_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific request query parameter into a variable.
@@ -1301,7 +1301,7 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as an `Option<String>` in the function scope.
 #[proc_macro_attribute]
 pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_query_macro(attr, item)
+    request_query_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts all request query parameters into a collection variable.
@@ -1328,7 +1328,7 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a collection in the function scope.
 #[proc_macro_attribute]
 pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_querys_macro(attr, item)
+    request_querys_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific HTTP request header into a variable.
@@ -1361,7 +1361,7 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// or `"Header-Name" => variable_name`. The variable will be available as an `Option<String>`.
 #[proc_macro_attribute]
 pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_header_macro(attr, item)
+    request_header_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts all HTTP request headers into a collection variable.
@@ -1387,7 +1387,7 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a collection in the function scope.
 #[proc_macro_attribute]
 pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_headers_macro(attr, item)
+    request_headers_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific cookie value or all cookies into a variable.
@@ -1414,7 +1414,7 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// For all cookies extraction, the variable will be available as `String`.
 #[proc_macro_attribute]
 pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_cookie_macro(attr, item)
+    request_cookie_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts all cookies as a raw string into a variable.
@@ -1441,7 +1441,7 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a String in the function scope.
 #[proc_macro_attribute]
 pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_cookies_macro(attr, item)
+    request_cookies_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts the HTTP request version into a variable.
@@ -1465,7 +1465,7 @@ pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a RequestVersion type in the function scope.
 #[proc_macro_attribute]
 pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_version_macro(attr, item)
+    request_version_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts the HTTP request path into a variable.
@@ -1492,7 +1492,7 @@ pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The variable will be available as a RequestPath type in the function scope.
 #[proc_macro_attribute]
 pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_path_macro(attr, item)
+    request_path_macro(attr, item, Position::Prologue)
 }
 
 /// Creates a new instance of a specified type with a given variable name.

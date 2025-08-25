@@ -10,10 +10,14 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with Referer filter.
-pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn referer_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
-    inject_at_start(item, |context| {
+    inject(position, item, |context| {
         quote! {
             let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
@@ -30,7 +34,7 @@ pub(crate) fn referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream
 inventory::submit! {
     InjectableMacro {
         name: "referer",
-        handler: Handler::WithAttr(referer_macro),
+        handler: Handler::WithAttrPosition(referer_macro),
     }
 }
 
@@ -44,10 +48,14 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inverse Referer filter.
-pub(crate) fn reject_referer_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn reject_referer_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
     let referer_data: RefererData = parse_macro_input!(attr as RefererData);
     let referer_value: Expr = referer_data.referer_value;
-    inject_at_start(item, |context| {
+    inject(position, item, |context| {
         quote! {
             let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
             if let Some(referer_header) = referer {
@@ -62,6 +70,6 @@ pub(crate) fn reject_referer_macro(attr: TokenStream, item: TokenStream) -> Toke
 inventory::submit! {
     InjectableMacro {
         name: "reject_referer",
-        handler: Handler::WithAttr(reject_referer_macro),
+        handler: Handler::WithAttrPosition(reject_referer_macro),
     }
 }

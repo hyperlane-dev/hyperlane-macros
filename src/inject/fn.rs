@@ -39,7 +39,7 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
     for injectable_macro in inventory::iter::<InjectableMacro>() {
         if injectable_macro.name == macro_name {
             return match injectable_macro.handler {
-                Handler::SimplePosition(handler) => {
+                Handler::NoAttrPosition(handler) => {
                     if !macro_attr.is_empty() {
                         panic!("Macro {} does not take attributes", macro_name);
                     }
@@ -72,7 +72,7 @@ pub(crate) fn prologue_hooks_macro(attr: TokenStream, item: TokenStream) -> Toke
         .expect("Failed to parse macro attributes");
     let mut current_stream: TokenStream = item;
     for meta in metas.iter().rev() {
-        current_stream = apply_macro(meta, current_stream, Position::Start);
+        current_stream = apply_macro(meta, current_stream, Position::Prologue);
     }
     current_stream
 }
@@ -96,7 +96,7 @@ pub(crate) fn epilogue_hooks_macro(attr: TokenStream, item: TokenStream) -> Toke
         .expect("Failed to parse macro attributes");
     let mut current_stream: TokenStream = item;
     for meta in metas.iter() {
-        current_stream = apply_macro(meta, current_stream, Position::End);
+        current_stream = apply_macro(meta, current_stream, Position::Epilogue);
     }
     current_stream
 }

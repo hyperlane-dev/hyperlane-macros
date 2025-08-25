@@ -10,7 +10,7 @@ use crate::*;
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inserted code.
-pub(crate) fn inject_at_start(
+fn inject_at_start(
     input: TokenStream,
     before_fn: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
@@ -46,10 +46,7 @@ pub(crate) fn inject_at_start(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inserted code.
-pub(crate) fn inject_at_end(
-    input: TokenStream,
-    after_fn: impl FnOnce(&Ident) -> TokenStream2,
-) -> TokenStream {
+fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStream2) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
@@ -78,8 +75,8 @@ pub(crate) fn inject(
     hook: impl FnOnce(&Ident) -> TokenStream2,
 ) -> TokenStream {
     match position {
-        Position::Start => inject_at_start(input, hook),
-        Position::End => inject_at_end(input, hook),
+        Position::Prologue => inject_at_start(input, hook),
+        Position::Epilogue => inject_at_end(input, hook),
     }
 }
 

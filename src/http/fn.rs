@@ -21,7 +21,7 @@ macro_rules! impl_http_method_macro {
         inventory::submit! {
             InjectableMacro {
                 name: $method,
-                handler: Handler::SimplePosition($name),
+                handler: Handler::NoAttrPosition($name),
             }
         }
     };
@@ -88,13 +88,15 @@ pub(crate) fn create_method_check(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with methods check.
-pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn methods_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let item_clone_1: TokenStream = item.clone();
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
-    let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
-    let block: &Block = &input_fn.block;
-    let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
@@ -103,20 +105,13 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
                     #context.get_request().await.#check_fn()
                 }
             });
-            let check_expr: TokenStream2 = quote! {
-                if !(#(#method_checks)||*) {
-                    return;
+            inject(position, item_clone_1, |_| {
+                quote! {
+                    if !(#(#method_checks)||*) {
+                        return;
+                    }
                 }
-            };
-            let stmts: &Vec<Stmt> = &block.stmts;
-            let gen_code: TokenStream2 = quote! {
-                #(#attrs)*
-                #vis #sig {
-                    #check_expr
-                    #(#stmts)*
-                }
-            };
-            gen_code.into()
+            })
         }
         Err(err) => err.to_compile_error().into(),
     }
@@ -125,6 +120,6 @@ pub(crate) fn methods_macro(attr: TokenStream, item: TokenStream) -> TokenStream
 inventory::submit! {
     InjectableMacro {
         name: "methods",
-        handler: Handler::WithAttr(methods_macro),
+        handler: Handler::WithAttrPosition(methods_macro),
     }
 }

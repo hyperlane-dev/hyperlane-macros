@@ -20,7 +20,7 @@ pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "send",
-        handler: Handler::SimplePosition(send_macro),
+        handler: Handler::NoAttrPosition(send_macro),
     }
 }
 
@@ -44,7 +44,7 @@ pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStr
 inventory::submit! {
     InjectableMacro {
         name: "send_body",
-        handler: Handler::SimplePosition(send_body_macro),
+        handler: Handler::NoAttrPosition(send_body_macro),
     }
 }
 
@@ -68,7 +68,7 @@ pub(crate) fn send_once_macro(item: TokenStream, position: Position) -> TokenStr
 inventory::submit! {
     InjectableMacro {
         name: "send_once",
-        handler: Handler::SimplePosition(send_once_macro),
+        handler: Handler::NoAttrPosition(send_once_macro),
     }
 }
 
@@ -92,6 +92,6 @@ pub(crate) fn send_once_body_macro(item: TokenStream, position: Position) -> Tok
 inventory::submit! {
     InjectableMacro {
         name: "send_once_body",
-        handler: Handler::SimplePosition(send_once_body_macro),
+        handler: Handler::NoAttrPosition(send_once_body_macro),
     }
 }

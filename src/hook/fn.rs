@@ -207,9 +207,13 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with pre-hook call.
-pub(crate) fn prologue_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn prologue_hook_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
     let function_name: Ident = parse_macro_input!(attr as Ident);
-    inject_at_start(item, |context| {
+    inject(position, item, |context| {
         quote! {
             let _ = #function_name(#context.clone()).await;
         }
@@ -219,7 +223,7 @@ pub(crate) fn prologue_hook_macro(attr: TokenStream, item: TokenStream) -> Token
 inventory::submit! {
     InjectableMacro {
         name: "prologue_hook",
-        handler: Handler::WithAttr(prologue_hook_macro),
+        handler: Handler::WithAttrPosition(prologue_hook_macro),
     }
 }
 
@@ -233,9 +237,13 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with post-hook call.
-pub(crate) fn epilogue_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn epilogue_hook_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
     let function_name: Ident = parse_macro_input!(attr as Ident);
-    inject_at_end(item, |context| {
+    inject(position, item, |context| {
         quote! {
             let _ = #function_name(#context.clone()).await;
         }
@@ -245,6 +253,6 @@ pub(crate) fn epilogue_hook_macro(attr: TokenStream, item: TokenStream) -> Token
 inventory::submit! {
     InjectableMacro {
         name: "epilogue_hook",
-        handler: Handler::WithAttr(epilogue_hook_macro),
+        handler: Handler::WithAttrPosition(epilogue_hook_macro),
     }
 }

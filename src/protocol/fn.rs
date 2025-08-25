@@ -22,7 +22,7 @@ pub(crate) fn ws_macro(item: TokenStream, position: Position) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "ws",
-        handler: Handler::SimplePosition(ws_macro),
+        handler: Handler::NoAttrPosition(ws_macro),
     }
 }
 
@@ -48,7 +48,7 @@ pub(crate) fn http_macro(item: TokenStream, position: Position) -> TokenStream {
 inventory::submit! {
     InjectableMacro {
         name: "http",
-        handler: Handler::SimplePosition(http_macro),
+        handler: Handler::NoAttrPosition(http_macro),
     }
 }
 
@@ -77,7 +77,7 @@ macro_rules! impl_protocol_check_macro {
         inventory::submit! {
             InjectableMacro {
                 name: $str_name,
-                handler: Handler::SimplePosition($name),
+                handler: Handler::NoAttrPosition($name),
             }
         }
     };
