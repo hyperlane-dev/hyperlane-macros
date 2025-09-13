@@ -72,6 +72,9 @@ cargo add hyperlane-macros
 - `#[send_body]` - Send only response body after function execution
 - `#[send_once]` - Send complete response exactly once after function execution
 - `#[send_body_once]` - Send response body exactly once after function execution
+- `#[send_with_data("data")]` - Send complete response with specified data after function execution
+- `#[send_once_with_data("data")]` - Send complete response exactly once with specified data after function execution
+- `#[send_body_with_data("data")]` - Send only response body with specified data after function execution
 
 ### Flush Macros
 
@@ -164,16 +167,15 @@ cargo add hyperlane-macros
 ### Middleware Macros
 
 - `#[request_middleware]` - Register a function as a request middleware
+- `#[request_middleware(order)]` - Register a function as a request middleware with specified order
 - `#[response_middleware]` - Register a function as a response middleware
+- `#[response_middleware(order)]` - Register a function as a response middleware with specified order
+- `#[panic_hook]` - Register a function as a panic hook
+- `#[panic_hook(order)]` - Register a function as a panic hook with specified order
 
 ### Response Header Macros
 
-- `#[response_header("key", "value")]` - Add a specific HTTP response header with the given key and value (add to existing headers)
-- `#[response_header("key" => "value")]` - Set a specific HTTP response header with the given key and value (overwrite existing)
-
 ### Response Body Macros
-
-- `#[response_body(value)]` - Set the HTTP response body with the given value
 
 ### Route Macros
 
@@ -221,41 +223,32 @@ async fn panic_hook(ctx: Context) {
     }
 }
 
-#[route("/disable_http_hook")]
-#[response_body("disable_http_hook")]
-#[disable_http_hook("/disable_http_hook")]
-async fn disable_http_hook(ctx: Context) {}
+#[ws]
+#[request_middleware]
+#[epilogue_hooks(
+    response_status_code(101),
+    response_version(HttpVersion::HTTP1_1),
+    response_header(SERVER => HYPERLANE),
+    response_header(UPGRADE => WEBSOCKET),
+    response_header(CONNECTION => UPGRADE),
+    response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY),
+    response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
+    response_header(STEP => "upgrade_hook"),
+    send
+)]
+async fn upgrade_hook(ctx: Context) {}
 
-#[route("/disable_ws_hook")]
-#[response_body("disable_ws_hook")]
-#[disable_ws_hook("/disable_ws_hook")]
-async fn disable_ws_hook(ctx: Context) {}
-
-#[connected_hook]
-#[connected_hook(1)]
-#[connected_hook("2")]
+#[request_middleware(2)]
+#[response_status_code(200)]
+#[response_header(SERVER => HYPERLANE)]
+#[response_version(HttpVersion::HTTP1_1)]
+#[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 #[response_header(STEP => "connected_hook")]
 async fn connected_hook(ctx: Context) {}
 
-#[prologue_upgrade_hook]
-#[prologue_upgrade_hook(1)]
-#[prologue_upgrade_hook("2")]
-#[response_header(STEP => "prologue_upgrade_hook")]
-async fn prologue_upgrade_hook(ctx: Context) {}
-
-#[request_middleware]
-#[response_header(SERVER => HYPERLANE)]
-#[response_version(HttpVersion::HTTP1_1)]
-#[response_header(STEP => "request_middleware_1")]
-async fn request_middleware_1(ctx: Context) {}
-
-#[request_middleware(2)]
-#[response_header(STEP => "request_middleware_2")]
-async fn request_middleware_2(ctx: Context) {}
-
 #[request_middleware("3")]
-#[response_header(STEP => "request_middleware_3")]
-async fn request_middleware_3(ctx: Context) {}
+#[response_header(STEP => "request_middleware")]
+async fn request_middleware(ctx: Context) {}
 
 #[response_middleware]
 #[response_header(STEP => "response_middleware_1")]
@@ -267,11 +260,7 @@ async fn response_middleware_1(ctx: Context) {}
     response_header(STEP => "response_middleware_2")
 )]
 #[epilogue_hooks(send, flush)]
-async fn response_middleware_2(ctx: Context) {
-    if true {
-        return;
-    }
-}
+async fn response_middleware_2(ctx: Context) {}
 
 #[response_middleware("3")]
 #[prologue_hooks(
@@ -376,9 +365,41 @@ async fn get(ctx: Context) {}
 #[prologue_hooks(post, response_body("post"))]
 async fn post(ctx: Context) {}
 
-#[route("/ws")]
-#[prologue_hooks(ws, response_body("ws"))]
-async fn websocket(ctx: Context) {}
+#[ws]
+#[route("/ws1")]
+#[ws_from_stream(1024, response)]
+async fn websocket_1(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws2")]
+#[ws_from_stream(response, 1024)]
+async fn websocket_2(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws3")]
+#[ws_from_stream(response)]
+async fn websocket_3(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws4")]
+#[ws_from_stream(1024)]
+async fn websocket_4(ctx: Context) {
+    let body: ResponseBody = ctx.get_response_body().await;
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
 
 #[route("/hook")]
 #[prologue_hook(prologue_hook)]
@@ -407,29 +428,65 @@ async fn attributes(ctx: Context) {}
 #[route_params(request_route_params)]
 async fn route_params(ctx: Context) {}
 
-#[route("/request_querys")]
-#[response_body(format!("request querys: {request_querys:?}"))]
-#[request_querys(request_querys)]
-async fn request_querys(ctx: Context) {}
-
-#[route("/request_headers")]
-#[response_body(format!("request headers: {request_headers:?}"))]
-#[request_headers(request_headers)]
-async fn request_headers(ctx: Context) {}
-
 #[route("/route_param/:test")]
 #[response_body(format!("route param: {request_route_param:?}"))]
 #[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {}
 
+#[route("/request_querys")]
+#[epilogue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send,
+    http_from_stream(1024, _response)
+)]
+#[prologue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send
+)]
+async fn request_querys(ctx: Context) {}
+
+#[route("/request_headers")]
+#[epilogue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send,
+    http_from_stream(_response, 1024)
+)]
+#[prologue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send
+)]
+async fn request_headers(ctx: Context) {}
+
 #[route("/request_query")]
-#[response_body(format!("request query: {request_query_option:?}"))]
-#[request_query("test" => request_query_option)]
+#[epilogue_hooks(
+    request_query("test" => request_query_option),
+    response_body(format!("request query: {request_query_option:?}")),
+    send,
+    http_from_stream(1024)
+)]
+#[prologue_hooks(
+    request_query("test" => request_query_option),
+    response_body(format!("request query: {request_query_option:?}")),
+    send
+)]
 async fn request_query(ctx: Context) {}
 
 #[route("/request_header")]
-#[response_body(format!("request header: {request_header_option:?}"))]
-#[request_header(HOST => request_header_option)]
+#[epilogue_hooks(
+    request_header(HOST => request_header_option),
+    response_body(format!("request header: {request_header_option:?}")),
+    send,
+    http_from_stream(_response)
+)]
+#[prologue_hooks(
+    request_header(HOST => request_header_option),
+    response_body(format!("request header: {request_header_option:?}")),
+    send
+)]
 async fn request_header(ctx: Context) {}
 
 #[response_body(format!("raw body: {raw_body:?}"))]
