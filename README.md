@@ -223,15 +223,24 @@ async fn panic_hook(ctx: Context) {
     }
 }
 
-#[ws]
 #[request_middleware]
 #[epilogue_hooks(
-    response_status_code(101),
+    response_status_code(200),
     response_version(HttpVersion::HTTP1_1),
     response_header(SERVER => HYPERLANE),
+    response_header(CONNECTION => KEEP_ALIVE),
+    response_header(CONTENT_TYPE => TEXT_PLAIN),
+    response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY),
+    response_header(STEP => "request_middleware"),
+)]
+async fn request_middleware(ctx: Context) {}
+
+#[ws]
+#[request_middleware(1)]
+#[epilogue_hooks(
+    response_status_code(101),
     response_header(UPGRADE => WEBSOCKET),
     response_header(CONNECTION => UPGRADE),
-    response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY),
     response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
     response_header(STEP => "upgrade_hook"),
     send
@@ -245,10 +254,6 @@ async fn upgrade_hook(ctx: Context) {}
 #[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 #[response_header(STEP => "connected_hook")]
 async fn connected_hook(ctx: Context) {}
-
-#[request_middleware("3")]
-#[response_header(STEP => "request_middleware")]
-async fn request_middleware(ctx: Context) {}
 
 #[response_middleware]
 #[response_header(STEP => "response_middleware_1")]
