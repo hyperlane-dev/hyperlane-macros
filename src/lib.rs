@@ -1784,6 +1784,9 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// Using no parameters (default buffer size):
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[http_from_stream]
 /// async fn handle_data(ctx: Context) {
 ///     // Process data from HTTP stream with default buffer size
@@ -1792,6 +1795,9 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// Basic usage with buffer size:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[ws_from_stream(1024)]
 /// async fn handle_data(ctx: Context) {
 ///     // Process data from stream with 1024 byte buffer
@@ -1800,6 +1806,9 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// Using a variable name for the data:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[ws_from_stream(data)]
 /// async fn handle_data(ctx: Context) {
 ///     // Data will be available in the `data` variable
@@ -1808,6 +1817,9 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// Using both buffer size and variable name:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[ws_from_stream(1024, payload)]
 /// async fn handle_large_data(ctx: Context) {
 ///     // Process large data with 1024 byte buffer, available in `payload` variable
@@ -1816,6 +1828,9 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// Reversing buffer size and variable name:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[ws_from_stream(payload, 1024)]
 /// async fn handle_reversed_data(ctx: Context) {
 ///     // Process data with 1024 byte buffer, available in `payload` variable
@@ -1849,6 +1864,9 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Using no parameters (default buffer size):
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[http_from_stream]
 /// async fn handle_data(ctx: Context) {
 ///     // Process data from HTTP stream with default buffer size
@@ -1857,6 +1875,9 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Basic usage with buffer size:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[http_from_stream(1024)]
 /// async fn handle_data(ctx: Context) {
 ///     // Process data from stream with 1024 byte buffer
@@ -1865,6 +1886,9 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Using a variable name for the data:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[http_from_stream(data)]
 /// async fn handle_data(ctx: Context) {
 ///     // Data will be available in the `data` variable
@@ -1873,6 +1897,9 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Using both buffer size and variable name:
 /// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[http_from_stream(1024, payload)]
 /// async fn handle_large_data(ctx: Context) {
 ///     // Process large data with 1024 byte buffer, available in `payload` variable
