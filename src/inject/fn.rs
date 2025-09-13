@@ -41,7 +41,6 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
         if injectable_macro.name == macro_name {
             return match injectable_macro.handler {
                 Handler::WithAttr(handler) => handler(macro_attr, item_stream),
-                Handler::AttrPosition(handler) => handler(macro_attr, item_stream),
                 Handler::NoAttrPosition(handler) => {
                     if !macro_attr.is_empty() {
                         panic!("Macro {} does not take attributes", macro_name);

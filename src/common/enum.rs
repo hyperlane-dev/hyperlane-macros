@@ -12,11 +12,6 @@ pub(crate) enum Handler {
     /// where the content inside the parentheses is parsed and processed as input.
     /// The `MacroHandlerWithAttr` contains the logic to interpret and expand such macros.
     WithAttr(MacroHandlerWithAttr),
-    /// A macro handler for macros that accept attribute arguments and depend on position.
-    /// This variant is used for macros with syntax like `#[my_macro(...)]`, similar to `WithAttr`.
-    /// The difference is that `WithAttrPosition` also incorporates the syntactic position
-    /// of the macro invocation into the expansion logic.
-    AttrPosition(MacroHandlerWithAttr),
     /// A macro handler for simple macros that do not take any attributes.
     ///
     /// This variant is used for attribute-like macros that are invoked as `#[my_macro]`

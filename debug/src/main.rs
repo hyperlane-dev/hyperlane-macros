@@ -231,29 +231,65 @@ async fn attributes(ctx: Context) {}
 #[route_params(request_route_params)]
 async fn route_params(ctx: Context) {}
 
-#[route("/request_querys")]
-#[response_body(format!("request querys: {request_querys:?}"))]
-#[request_querys(request_querys)]
-async fn request_querys(ctx: Context) {}
-
-#[route("/request_headers")]
-#[response_body(format!("request headers: {request_headers:?}"))]
-#[request_headers(request_headers)]
-async fn request_headers(ctx: Context) {}
-
 #[route("/route_param/:test")]
 #[response_body(format!("route param: {request_route_param:?}"))]
 #[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {}
 
+#[route("/request_querys")]
+#[epilogue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send,
+    http_from_stream(1024, _response)
+)]
+#[prologue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send
+)]
+async fn request_querys(ctx: Context) {}
+
+#[route("/request_headers")]
+#[epilogue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send,
+    http_from_stream(_response, 1024)
+)]
+#[prologue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send
+)]
+async fn request_headers(ctx: Context) {}
+
 #[route("/request_query")]
-#[response_body(format!("request query: {request_query_option:?}"))]
-#[request_query("test" => request_query_option)]
+#[epilogue_hooks(
+    request_query("test" => request_query_option),
+    response_body(format!("request query: {request_query_option:?}")),
+    send,
+    http_from_stream(1024)
+)]
+#[prologue_hooks(
+    request_query("test" => request_query_option),
+    response_body(format!("request query: {request_query_option:?}")),
+    send
+)]
 async fn request_query(ctx: Context) {}
 
 #[route("/request_header")]
-#[response_body(format!("request header: {request_header_option:?}"))]
-#[request_header(HOST => request_header_option)]
+#[epilogue_hooks(
+    request_header(HOST => request_header_option),
+    response_body(format!("request header: {request_header_option:?}")),
+    send,
+    http_from_stream(_response)
+)]
+#[prologue_hooks(
+    request_header(HOST => request_header_option),
+    response_body(format!("request header: {request_header_option:?}")),
+    send
+)]
 async fn request_header(ctx: Context) {}
 
 #[response_body(format!("raw body: {raw_body:?}"))]

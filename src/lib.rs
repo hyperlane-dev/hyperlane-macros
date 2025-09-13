@@ -10,9 +10,11 @@ mod closed;
 mod common;
 mod filter;
 mod flush;
+mod from_stream;
 mod hook;
 mod host;
 mod http;
+mod http_from_stream;
 mod hyperlane;
 mod inject;
 mod protocol;
@@ -24,16 +26,18 @@ mod response;
 mod response_middleware;
 mod route;
 mod send;
-mod websocket;
+mod stream;
 
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
 pub(crate) use common::*;
 pub(crate) use filter::*;
 pub(crate) use flush::*;
+pub(crate) use from_stream::*;
 pub(crate) use hook::*;
 pub(crate) use host::*;
 pub(crate) use http::*;
+pub(crate) use http_from_stream::*;
 pub(crate) use hyperlane::*;
 pub(crate) use inject::*;
 pub(crate) use protocol::*;
@@ -45,7 +49,7 @@ pub(crate) use response::*;
 pub(crate) use response_middleware::*;
 pub(crate) use route::*;
 pub(crate) use send::*;
-pub(crate) use websocket::*;
+pub(crate) use stream::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
@@ -1765,32 +1769,94 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// data can be read from a WebSocket stream. The function body is only executed
 /// if data is successfully read from the stream.
 ///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[ws_from_stream(1024)]
-/// #[ws_from_stream(response)]
-/// #[ws_from_stream(1024, response)]
-/// #[ws_from_stream(response, 1024)]
-/// async fn handle_websocket_data(ctx: Context) {
-///     // Function body will only execute if data is successfully read from the stream
-///     // The `data` variable will contain the read data
-/// }
-/// ```
-///
 /// # Arguments
 ///
-/// - `buffer` - The buffer to read from the WebSocket stream.
-/// - `variable_name` - The variable name to store the read data.
+/// - `TokenStream`: The buffer to read from the WebSocket stream.
+/// - `TokenStream`: The function item to be modified
 ///
 /// # Returns
 ///
-/// This macro doesn't return a value directly, but it modifies the function to
-/// include WebSocket stream processing logic.
+/// Returns a TokenStream containing the modified function with WebSocket stream processing logic.
+///
+/// # Examples
+///
+/// Basic usage with buffer size:
+/// ```rust
+/// #[ws_from_stream(1024)]
+/// async fn handle_data(ctx: Context) {
+///     // Process data from stream with 1024 byte buffer
+/// }
+/// ```
+///
+/// Using a variable name for the data:
+/// ```rust
+/// #[ws_from_stream(data)]
+/// async fn handle_data(ctx: Context) {
+///     // Data will be available in the `data` variable
+/// }
+/// ```
+///
+/// Using both buffer size and variable name:
+/// ```rust
+/// #[ws_from_stream(1024, payload)]
+/// async fn handle_large_data(ctx: Context) {
+///     // Process large data with 1024 byte buffer, available in `payload` variable
+/// }
+/// ```
+///
+/// Reversing buffer size and variable name:
+/// ```rust
+/// #[ws_from_stream(payload, 1024)]
+/// async fn handle_reversed_data(ctx: Context) {
+///     // Process data with 1024 byte buffer, available in `payload` variable
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
     ws_from_stream_macro(attr, item)
+}
+
+/// Wraps function body with HTTP stream processing.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from an HTTP stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// # Arguments
+///
+/// - `TokenStream`: The buffer to read from the HTTP stream.
+/// - `TokenStream`: The function item to be modified
+///
+/// # Returns
+///
+/// Returns a TokenStream containing the modified function with HTTP stream processing logic.
+///
+/// # Examples
+///
+/// Basic usage with buffer size:
+/// ```rust
+/// #[http_from_stream(1024)]
+/// async fn handle_data(ctx: Context) {
+///     // Process data from stream with 1024 byte buffer
+/// }
+/// ```
+///
+/// Using a variable name for the data:
+/// ```rust
+/// #[http_from_stream(data)]
+/// async fn handle_data(ctx: Context) {
+///     // Data will be available in the `data` variable
+/// }
+/// ```
+///
+/// Using both buffer size and variable name:
+/// ```rust
+/// #[http_from_stream(1024, payload)]
+/// async fn handle_large_data(ctx: Context) {
+///     // Process large data with 1024 byte buffer, available in `payload` variable
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn http_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
+    http_from_stream_macro(attr, item)
 }
