@@ -26,41 +26,27 @@ async fn panic_hook(ctx: Context) {
     }
 }
 
-#[route("/disable_http_hook")]
-#[response_body("disable_http_hook")]
-#[disable_http_hook("/disable_http_hook")]
-async fn disable_http_hook(ctx: Context) {}
+#[ws]
+#[request_middleware]
+#[epilogue_hooks(
+    response_version(HttpVersion::HTTP1_1),
+    response_header(UPGRADE => WEBSOCKET),
+    response_header(CONNECTION => UPGRADE),
+    response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap_or_default())),
+    response_header(STEP => "upgrade_hook"),
+    send
+)]
+async fn upgrade_hook(ctx: Context) {}
 
-#[route("/disable_ws_hook")]
-#[response_body("disable_ws_hook")]
-#[disable_ws_hook("/disable_ws_hook")]
-async fn disable_ws_hook(ctx: Context) {}
-
-#[connected_hook]
-#[connected_hook(1)]
-#[connected_hook("2")]
+#[request_middleware]
 #[response_header(STEP => "connected_hook")]
 async fn connected_hook(ctx: Context) {}
-
-#[prologue_upgrade_hook]
-#[prologue_upgrade_hook(1)]
-#[prologue_upgrade_hook("2")]
-#[response_header(STEP => "prologue_upgrade_hook")]
-async fn prologue_upgrade_hook(ctx: Context) {}
 
 #[request_middleware]
 #[response_header(SERVER => HYPERLANE)]
 #[response_version(HttpVersion::HTTP1_1)]
 #[response_header(STEP => "request_middleware_1")]
-async fn request_middleware_1(ctx: Context) {}
-
-#[request_middleware(2)]
-#[response_header(STEP => "request_middleware_2")]
-async fn request_middleware_2(ctx: Context) {}
-
-#[request_middleware("3")]
-#[response_header(STEP => "request_middleware_3")]
-async fn request_middleware_3(ctx: Context) {}
+async fn request_middleware(ctx: Context) {}
 
 #[response_middleware]
 #[response_header(STEP => "response_middleware_1")]
@@ -181,8 +167,8 @@ async fn get(ctx: Context) {}
 #[prologue_hooks(post, response_body("post"))]
 async fn post(ctx: Context) {}
 
+#[ws]
 #[route("/ws")]
-#[prologue_hooks(ws, response_body("ws"))]
 async fn websocket(ctx: Context) {}
 
 #[route("/hook")]

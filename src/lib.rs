@@ -583,6 +583,30 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_macro(item, Position::Epilogue)
 }
 
+/// Sends the complete response with data after function execution.
+///
+/// This attribute macro ensures that the response (request headers and body) is automatically sent
+/// to the client after the function completes execution, with the specified data.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[send_with_data("Hello, World!")]
+/// async fn auto_send_with_data_handler(ctx: Context) {
+///     // Response is automatically sent with the specified data after function returns
+/// }
+/// ```
+///
+/// The macro accepts data to send and should be applied to async functions
+/// that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn send_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_with_data_macro(attr, item, Position::Epilogue)
+}
+
 /// Sends the complete response exactly once after function execution.
 ///
 /// This attribute macro ensures that the response is sent exactly once to the client,
@@ -631,6 +655,30 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_once_body_macro(item, Position::Epilogue)
+}
+
+/// Sends the complete response exactly once with data after function execution.
+///
+/// This attribute macro ensures that the response is sent exactly once to the client,
+/// preventing multiple response transmissions for single-use scenarios, with the specified data.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[send_once_with_data("One-time response")]
+/// async fn send_once_with_data_handler(ctx: Context) {
+///     // Response is sent exactly once with the specified data after function returns
+/// }
+/// ```
+///
+/// The macro accepts data to send and should be applied to async functions
+/// that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn send_once_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_once_with_data_macro(attr, item, Position::Epilogue)
 }
 
 /// Flushes the response stream after function execution.
@@ -1611,68 +1659,6 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
     response_middleware_macro(attr, item)
 }
 
-/// Registers a function as a pre-upgrade hook.
-///
-/// This attribute macro registers the decorated function to be executed before a connection
-/// is upgraded (e.g., to WebSocket). This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
-///
-/// # Note
-///
-/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[prologue_upgrade_hook]
-/// #[prologue_upgrade_hook(1)]
-/// #[prologue_upgrade_hook("2")]
-/// async fn handle_prologue_upgrade(ctx: Context) {
-///     // Pre-upgrade logic
-/// }
-/// ```
-///
-/// # Dependencies
-///
-/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
-#[proc_macro_attribute]
-pub fn prologue_upgrade_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    prologue_upgrade_hook_macro(attr, item)
-}
-
-/// Registers a function as a connected hook.
-///
-/// This attribute macro registers the decorated function to be executed when a new client
-/// connection is established. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
-///
-/// # Note
-///
-/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[connected_hook]
-/// #[connected_hook(1)]
-/// #[connected_hook("2")]
-/// async fn handle_new_connection(ctx: Context) {
-///     // Connection handling logic
-/// }
-/// ```
-///
-/// # Dependencies
-///
-/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
-#[proc_macro_attribute]
-pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    connected_hook_macro(attr, item)
-}
-
 /// Registers a function as a panic hook.
 ///
 /// This attribute macro registers the decorated function to handle panics that occur
@@ -1702,56 +1688,6 @@ pub fn connected_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
     panic_hook_macro(attr, item)
-}
-
-/// Disables the default HTTP hook.
-///
-/// This attribute macro disables the default HTTP handling logic, allowing for a fully
-/// custom implementation. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[disable_http_hook("/")]
-/// async fn custom_http_logic(ctx: Context) {
-///     // Custom logic to replace default HTTP hook
-/// }
-/// ```
-///
-/// # Dependencies
-///
-/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
-#[proc_macro_attribute]
-pub fn disable_http_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    disable_http_hook_macro(attr, item)
-}
-
-/// Disables the default WebSocket hook.
-///
-/// This attribute macro disables the default WebSocket handling logic, allowing for a fully
-/// custom implementation. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[disable_ws_hook("/")]
-/// async fn custom_ws_logic(ctx: Context) {
-///     // Custom logic to replace default WebSocket hook
-/// }
-/// ```
-///
-/// # Dependencies
-///
-/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
-#[proc_macro_attribute]
-pub fn disable_ws_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    disable_ws_hook_macro(attr, item)
 }
 
 /// Injects a list of macros before the decorated function.
@@ -1794,4 +1730,29 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_hooks_macro(attr, item)
+}
+
+/// Sends only the response body with data after function execution.
+///
+/// This attribute macro ensures that only the response body is automatically sent
+/// to the client after the function completes, handling request headers separately,
+/// with the specified data.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[send_body_with_data("Response body content")]
+/// async fn send_body_with_data_handler(ctx: Context) {
+///     // Response body is automatically sent with the specified data after function returns
+/// }
+/// ```
+///
+/// The macro accepts data to send and should be applied to async functions
+/// that accept a `Context` parameter.
+#[proc_macro_attribute]
+pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_body_with_data_macro(attr, item, Position::Epilogue)
 }

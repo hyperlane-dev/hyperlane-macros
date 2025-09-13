@@ -157,16 +157,9 @@ cargo add hyperlane-macros
 
 - `#[prologue_hook(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hook(function_name)]` - Execute specified function after the main handler function
-- `#[connected_hook]` - Execute function when a new client connection is established
 - `#[panic_hook]` - Execute function when a panic occurs within the server
-- `#[prologue_upgrade_hook]` - Execute function before any protocol upgrade occurs
 - `#[prologue_hooks(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
 - `#[epilogue_hooks(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
-
-### Disable Hook Macros
-
-- `#[disable_http_hook]` - Disable HTTP handling for a specific route
-- `#[disable_ws_hook]` - Disable WebSocket handling for a specific route
 
 ### Middleware Macros
 
@@ -190,7 +183,7 @@ cargo add hyperlane-macros
 
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
-- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`, `#[connected_hook]`, `#[prologue_upgrade_hook]`)
+- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`)
 
 ### Best Practice Warning
 

@@ -1,25 +1,5 @@
 use crate::*;
 
-/// Parses the attributes for the `PathAttr` macro.
-///
-/// This implementation of the `Parse` trait allows `syn` to parse
-/// a `path` expression from the macro's attribute tokens.
-impl Parse for PathAttr {
-    /// Parses the input stream into a `PathAttr` struct.
-    ///
-    /// # Arguments
-    ///
-    /// - `ParseStream` - The token stream to parse.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing the parsed `PathAttr` or an error.
-    fn parse(input: ParseStream) -> Result<Self> {
-        let path: Expr = input.parse()?;
-        Ok(PathAttr { path })
-    }
-}
-
 /// Parses the attributes for the `OrderAttr` macro.
 ///
 /// This implementation of the `Parse` trait allows `syn` to parse
