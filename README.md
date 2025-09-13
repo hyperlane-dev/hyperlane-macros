@@ -372,27 +372,27 @@ async fn post(ctx: Context) {}
 
 #[ws]
 #[route("/ws1")]
-#[ws_from_stream(1024, response)]
+#[ws_from_stream(1024, request)]
 async fn websocket_1(ctx: Context) {
-    let body: ResponseBody = response.get_body().clone();
+    let body: RequestBody = request.get_body().clone();
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
 
 #[ws]
 #[route("/ws2")]
-#[ws_from_stream(response, 1024)]
+#[ws_from_stream(request, 1024)]
 async fn websocket_2(ctx: Context) {
-    let body: ResponseBody = response.get_body().clone();
+    let body: RequestBody = request.get_body().clone();
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
 
 #[ws]
 #[route("/ws3")]
-#[ws_from_stream(response)]
+#[ws_from_stream(request)]
 async fn websocket_3(ctx: Context) {
-    let body: ResponseBody = response.get_body().clone();
+    let body: RequestBody = request.get_body().clone();
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
@@ -401,7 +401,7 @@ async fn websocket_3(ctx: Context) {
 #[route("/ws4")]
 #[ws_from_stream(1024)]
 async fn websocket_4(ctx: Context) {
-    let body: ResponseBody = ctx.get_response_body().await;
+    let body: RequestBody = ctx.get_request_body().await;
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
@@ -443,7 +443,7 @@ async fn route_param(ctx: Context) {}
     request_querys(request_querys),
     response_body(format!("request querys: {request_querys:?}")),
     send,
-    http_from_stream(1024, _response)
+    http_from_stream(1024, _request)
 )]
 #[prologue_hooks(
     request_querys(request_querys),
@@ -457,7 +457,7 @@ async fn request_querys(ctx: Context) {}
     request_headers(request_headers),
     response_body(format!("request headers: {request_headers:?}")),
     send,
-    http_from_stream(_response, 1024)
+    http_from_stream(_request, 1024)
 )]
 #[prologue_hooks(
     request_headers(request_headers),
@@ -485,7 +485,7 @@ async fn request_query(ctx: Context) {}
     request_header(HOST => request_header_option),
     response_body(format!("request header: {request_header_option:?}")),
     send,
-    http_from_stream(_response)
+    http_from_stream(_request)
 )]
 #[prologue_hooks(
     request_header(HOST => request_header_option),
