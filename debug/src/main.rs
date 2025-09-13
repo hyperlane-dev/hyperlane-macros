@@ -29,23 +29,28 @@ async fn panic_hook(ctx: Context) {
 #[ws]
 #[request_middleware]
 #[epilogue_hooks(
+    response_status_code(101),
     response_version(HttpVersion::HTTP1_1),
+    response_header(SERVER => HYPERLANE),
     response_header(UPGRADE => WEBSOCKET),
     response_header(CONNECTION => UPGRADE),
-    response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap_or_default())),
+    response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY),
+    response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
     response_header(STEP => "upgrade_hook"),
     send
 )]
 async fn upgrade_hook(ctx: Context) {}
 
-#[request_middleware]
+#[request_middleware(2)]
+#[response_status_code(200)]
+#[response_header(SERVER => HYPERLANE)]
+#[response_version(HttpVersion::HTTP1_1)]
+#[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
 #[response_header(STEP => "connected_hook")]
 async fn connected_hook(ctx: Context) {}
 
-#[request_middleware]
-#[response_header(SERVER => HYPERLANE)]
-#[response_version(HttpVersion::HTTP1_1)]
-#[response_header(STEP => "request_middleware_1")]
+#[request_middleware("3")]
+#[response_header(STEP => "request_middleware")]
 async fn request_middleware(ctx: Context) {}
 
 #[response_middleware]
@@ -58,11 +63,7 @@ async fn response_middleware_1(ctx: Context) {}
     response_header(STEP => "response_middleware_2")
 )]
 #[epilogue_hooks(send, flush)]
-async fn response_middleware_2(ctx: Context) {
-    if true {
-        return;
-    }
-}
+async fn response_middleware_2(ctx: Context) {}
 
 #[response_middleware("3")]
 #[prologue_hooks(
@@ -158,7 +159,7 @@ async fn http1_1_or_higher(ctx: Context) {}
 async fn unknown_method(ctx: Context) {}
 
 #[route("/get")]
-#[send_once_body]
+#[send_body_once]
 #[prologue_hooks(ws, get, response_body("get"))]
 async fn get(ctx: Context) {}
 
@@ -168,8 +169,40 @@ async fn get(ctx: Context) {}
 async fn post(ctx: Context) {}
 
 #[ws]
-#[route("/ws")]
-async fn websocket(ctx: Context) {}
+#[route("/ws1")]
+#[ws_from_stream(1024, response)]
+async fn websocket_1(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws2")]
+#[ws_from_stream(response, 1024)]
+async fn websocket_2(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws3")]
+#[ws_from_stream(response)]
+async fn websocket_3(ctx: Context) {
+    let body: ResponseBody = response.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws4")]
+#[ws_from_stream(1024)]
+async fn websocket_4(ctx: Context) {
+    let body: ResponseBody = ctx.get_response_body().await;
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
 
 #[route("/hook")]
 #[prologue_hook(prologue_hook)]

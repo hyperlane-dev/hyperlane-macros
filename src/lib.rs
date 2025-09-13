@@ -24,6 +24,7 @@ mod response;
 mod response_middleware;
 mod route;
 mod send;
+mod websocket;
 
 pub(crate) use aborted::*;
 pub(crate) use closed::*;
@@ -44,6 +45,7 @@ pub(crate) use response::*;
 pub(crate) use response_middleware::*;
 pub(crate) use route::*;
 pub(crate) use send::*;
+pub(crate) use websocket::*;
 
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
@@ -643,8 +645,8 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_once_body]
-/// async fn send_once_body_handler(ctx: Context) {
+/// #[send_body_once]
+/// async fn send_body_once_handler(ctx: Context) {
 ///     let _ = ctx.set_response_body("One-time body content").await;
 ///     // Response body is sent exactly once after function returns
 /// }
@@ -653,8 +655,8 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `Context` parameter.
 #[proc_macro_attribute]
-pub fn send_once_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_once_body_macro(item, Position::Epilogue)
+pub fn send_body_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_body_once_macro(item, Position::Epilogue)
 }
 
 /// Sends the complete response exactly once with data after function execution.
@@ -1755,4 +1757,40 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_with_data_macro(attr, item, Position::Epilogue)
+}
+
+/// Wraps function body with WebSocket stream processing.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from a WebSocket stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[ws_from_stream(1024)]
+/// #[ws_from_stream(response)]
+/// #[ws_from_stream(1024, response)]
+/// #[ws_from_stream(response, 1024)]
+/// async fn handle_websocket_data(ctx: Context) {
+///     // Function body will only execute if data is successfully read from the stream
+///     // The `data` variable will contain the read data
+/// }
+/// ```
+///
+/// # Arguments
+///
+/// - `buffer` - The buffer to read from the WebSocket stream.
+/// - `variable_name` - The variable name to store the read data.
+///
+/// # Returns
+///
+/// This macro doesn't return a value directly, but it modifies the function to
+/// include WebSocket stream processing logic.
+#[proc_macro_attribute]
+pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
+    ws_from_stream_macro(attr, item)
 }

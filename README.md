@@ -71,7 +71,7 @@ cargo add hyperlane-macros
 - `#[send]` - Send complete response (headers and body) after function execution
 - `#[send_body]` - Send only response body after function execution
 - `#[send_once]` - Send complete response exactly once after function execution
-- `#[send_once_body]` - Send response body exactly once after function execution
+- `#[send_body_once]` - Send response body exactly once after function execution
 
 ### Flush Macros
 
@@ -367,7 +367,7 @@ async fn http1_1_or_higher(ctx: Context) {}
 async fn unknown_method(ctx: Context) {}
 
 #[route("/get")]
-#[send_once_body]
+#[send_body_once]
 #[prologue_hooks(ws, get, response_body("get"))]
 async fn get(ctx: Context) {}
 

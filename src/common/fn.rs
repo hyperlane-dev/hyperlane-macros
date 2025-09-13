@@ -153,3 +153,22 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
         None => quote! { None },
     }
 }
+
+/// Checks if an expression is an integer literal.
+///
+/// # Arguments
+///
+/// - `expr` - The expression to check.
+///
+/// # Returns
+///
+/// - `bool` - Returns `true` if the expression is an integer literal, `false` otherwise.
+pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
+    matches!(
+        expr,
+        Expr::Lit(ExprLit {
+            lit: Lit::Int(_),
+            ..
+        })
+    )
+}
