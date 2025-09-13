@@ -14,7 +14,6 @@ mod from_stream;
 mod hook;
 mod host;
 mod http;
-mod http_from_stream;
 mod hyperlane;
 mod inject;
 mod protocol;
@@ -37,7 +36,6 @@ pub(crate) use from_stream::*;
 pub(crate) use hook::*;
 pub(crate) use host::*;
 pub(crate) use http::*;
-pub(crate) use http_from_stream::*;
 pub(crate) use hyperlane::*;
 pub(crate) use inject::*;
 pub(crate) use protocol::*;
@@ -1769,6 +1767,10 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// data can be read from a WebSocket stream. The function body is only executed
 /// if data is successfully read from the stream.
 ///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from a WebSocket stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
 /// # Arguments
 ///
 /// - `TokenStream`: The buffer to read from the WebSocket stream.
@@ -1779,6 +1781,14 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// Returns a TokenStream containing the modified function with WebSocket stream processing logic.
 ///
 /// # Examples
+///
+/// Using no parameters (default buffer size):
+/// ```rust
+/// #[http_from_stream]
+/// async fn handle_data(ctx: Context) {
+///     // Process data from HTTP stream with default buffer size
+/// }
+/// ```
 ///
 /// Basic usage with buffer size:
 /// ```rust
@@ -1822,6 +1832,10 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// data can be read from an HTTP stream. The function body is only executed
 /// if data is successfully read from the stream.
 ///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from an HTTP stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
 /// # Arguments
 ///
 /// - `TokenStream`: The buffer to read from the HTTP stream.
@@ -1832,6 +1846,14 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Returns a TokenStream containing the modified function with HTTP stream processing logic.
 ///
 /// # Examples
+///
+/// Using no parameters (default buffer size):
+/// ```rust
+/// #[http_from_stream]
+/// async fn handle_data(ctx: Context) {
+///     // Process data from HTTP stream with default buffer size
+/// }
+/// ```
 ///
 /// Basic usage with buffer size:
 /// ```rust

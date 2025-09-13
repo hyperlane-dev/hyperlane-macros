@@ -51,10 +51,10 @@ impl Parse for FromStreamData {
         let mut buffer: Option<Expr> = None;
         let mut variable_name: Option<Expr> = None;
         if input.is_empty() {
-            return Err(syn::Error::new(
-                input.span(),
-                "at least one parameter (buffer size or variable name) must be provided",
-            ));
+            return Ok(FromStreamData {
+                buffer,
+                variable_name,
+            });
         }
         let first_expr: Expr = input.parse()?;
         if input.is_empty() {

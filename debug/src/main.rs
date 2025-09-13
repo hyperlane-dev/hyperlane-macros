@@ -175,18 +175,18 @@ async fn post(ctx: Context) {}
 
 #[ws]
 #[route("/ws1")]
-#[ws_from_stream(1024, request)]
+#[ws_from_stream]
 async fn websocket_1(ctx: Context) {
-    let body: RequestBody = request.get_body().clone();
+    let body: RequestBody = ctx.get_request_body().await;
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
 
 #[ws]
 #[route("/ws2")]
-#[ws_from_stream(request, 1024)]
+#[ws_from_stream(1024)]
 async fn websocket_2(ctx: Context) {
-    let body: RequestBody = request.get_body().clone();
+    let body: RequestBody = ctx.get_request_body().await;
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
@@ -202,9 +202,18 @@ async fn websocket_3(ctx: Context) {
 
 #[ws]
 #[route("/ws4")]
-#[ws_from_stream(1024)]
+#[ws_from_stream(1024, request)]
 async fn websocket_4(ctx: Context) {
-    let body: RequestBody = ctx.get_request_body().await;
+    let body: RequestBody = request.get_body().clone();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+    ctx.send_body_list_with_data(body_list).await.unwrap();
+}
+
+#[ws]
+#[route("/ws5")]
+#[ws_from_stream(request, 1024)]
+async fn websocket_5(ctx: Context) {
+    let body: RequestBody = request.get_body().clone();
     let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
     ctx.send_body_list_with_data(body_list).await.unwrap();
 }
@@ -241,33 +250,15 @@ async fn route_params(ctx: Context) {}
 #[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {}
 
-#[route("/request_querys")]
+#[route("/host")]
+#[host("localhost")]
 #[epilogue_hooks(
-    request_querys(request_querys),
-    response_body(format!("request querys: {request_querys:?}")),
+    response_body("host string literal: localhost"),
     send,
-    http_from_stream(1024, _request)
+    http_from_stream
 )]
-#[prologue_hooks(
-    request_querys(request_querys),
-    response_body(format!("request querys: {request_querys:?}")),
-    send
-)]
-async fn request_querys(ctx: Context) {}
-
-#[route("/request_headers")]
-#[epilogue_hooks(
-    request_headers(request_headers),
-    response_body(format!("request headers: {request_headers:?}")),
-    send,
-    http_from_stream(_request, 1024)
-)]
-#[prologue_hooks(
-    request_headers(request_headers),
-    response_body(format!("request headers: {request_headers:?}")),
-    send
-)]
-async fn request_headers(ctx: Context) {}
+#[prologue_hooks(response_body("host string literal: localhost"), send)]
+async fn host(ctx: Context) {}
 
 #[route("/request_query")]
 #[epilogue_hooks(
@@ -297,15 +288,38 @@ async fn request_query(ctx: Context) {}
 )]
 async fn request_header(ctx: Context) {}
 
+#[route("/request_querys")]
+#[epilogue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send,
+    http_from_stream(1024, _request)
+)]
+#[prologue_hooks(
+    request_querys(request_querys),
+    response_body(format!("request querys: {request_querys:?}")),
+    send
+)]
+async fn request_querys(ctx: Context) {}
+
+#[route("/request_headers")]
+#[epilogue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send,
+    http_from_stream(_request, 1024)
+)]
+#[prologue_hooks(
+    request_headers(request_headers),
+    response_body(format!("request headers: {request_headers:?}")),
+    send
+)]
+async fn request_headers(ctx: Context) {}
+
 #[response_body(format!("raw body: {raw_body:?}"))]
 #[request_body(raw_body)]
 #[route("/request_body")]
 async fn request_body(ctx: Context) {}
-
-#[route("/host")]
-#[host("localhost")]
-#[response_body("host string literal: localhost")]
-async fn host(ctx: Context) {}
 
 #[route("/reject_host")]
 #[prologue_hooks(
