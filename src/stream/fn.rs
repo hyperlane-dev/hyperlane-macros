@@ -1,4 +1,60 @@
 use crate::*;
+use syn::Ident;
+
+/// Generates stream processing loop based on context and data.
+///
+/// This function abstracts the common logic between HTTP and WebSocket stream macros.
+/// It creates a token stream that wraps function body with a loop that reads from
+/// a specified stream method.
+///
+/// # Arguments
+///
+/// - `&Ident` - The context identifier to use for stream access
+/// - `&str` - The stream method to call (e.g., "http_from_stream" or "ws_from_stream")
+/// - `&FromStreamData` - The FromStreamData containing buffer size and variable name
+/// - `&[Stmt]` - The statements to execute when data is successfully read
+///
+/// # Returns
+///
+/// - `TokenStream2` - The generated loop code as a token stream
+pub(crate) fn generate_stream(
+    context: &Ident,
+    stream_method: &str,
+    data: &FromStreamData,
+    stmts: &[Stmt],
+) -> TokenStream2 {
+    let method_ident: Ident = Ident::new(stream_method, proc_macro2::Span::call_site());
+    match (data.buffer.clone(), data.variable_name.clone()) {
+        (Some(buffer), Some(variable_name)) => {
+            quote! {
+                while let Ok(#variable_name) = #context.#method_ident(#buffer).await {
+                    #(#stmts)*
+                }
+            }
+        }
+        (Some(buffer), None) => {
+            quote! {
+                while #context.#method_ident(#buffer).await.is_ok() {
+                    #(#stmts)*
+                }
+            }
+        }
+        (None, Some(variable_name)) => {
+            quote! {
+                while let Ok(#variable_name) = #context.#method_ident(hyperlane::DEFAULT_BUFFER_SIZE).await {
+                    #(#stmts)*
+                }
+            }
+        }
+        (None, None) => {
+            quote! {
+                while #context.#method_ident(hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
+                    #(#stmts)*
+                }
+            }
+        }
+    }
+}
 
 /// Wraps function body with HTTP stream processing.
 ///
@@ -24,36 +80,8 @@ pub(crate) fn http_from_stream_macro(attr: TokenStream, item: TokenStream) -> To
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
-            let loop_stream: TokenStream2 = match (data.buffer, data.variable_name) {
-                (Some(buffer), Some(variable_name)) => {
-                    quote! {
-                        while let Ok(#variable_name) = #context.http_from_stream(#buffer).await {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (Some(buffer), None) => {
-                    quote! {
-                        while #context.http_from_stream(#buffer).await.is_ok() {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (None, Some(variable_name)) => {
-                    quote! {
-                        while let Ok(#variable_name) = #context.http_from_stream(hyperlane::DEFAULT_BUFFER_SIZE).await {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (None, None) => {
-                    quote! {
-                        while #context.ws_from_stream(hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
-                            #(#stmts)*
-                        }
-                    }
-                }
-            };
+            let loop_stream: TokenStream2 =
+                generate_stream(&context, "http_from_stream", &data, stmts);
             quote! {
                 #(#attrs)*
                 #vis #sig {
@@ -97,36 +125,8 @@ pub(crate) fn ws_from_stream_macro(attr: TokenStream, item: TokenStream) -> Toke
     match parse_context_from_fn(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
-            let loop_stream: TokenStream2 = match (data.buffer, data.variable_name) {
-                (Some(buffer), Some(variable_name)) => {
-                    quote! {
-                        while let Ok(#variable_name) = #context.ws_from_stream(#buffer).await {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (Some(buffer), None) => {
-                    quote! {
-                        while #context.ws_from_stream(#buffer).await.is_ok() {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (None, Some(variable_name)) => {
-                    quote! {
-                        while let Ok(#variable_name) = #context.ws_from_stream(hyperlane::DEFAULT_BUFFER_SIZE).await {
-                            #(#stmts)*
-                        }
-                    }
-                }
-                (None, None) => {
-                    quote! {
-                        while #context.ws_from_stream(hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
-                            #(#stmts)*
-                        }
-                    }
-                }
-            };
+            let loop_stream: TokenStream2 =
+                generate_stream(&context, "ws_from_stream", &data, stmts);
             quote! {
                 #(#attrs)*
                 #vis #sig {
