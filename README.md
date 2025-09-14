@@ -251,6 +251,7 @@ async fn request_middleware(ctx: Context) {}
 #[ws]
 #[request_middleware(1)]
 #[epilogue_hooks(
+    response_body(&vec![]),
     response_status_code(101),
     response_header(UPGRADE => WEBSOCKET),
     response_header(CONNECTION => UPGRADE),
