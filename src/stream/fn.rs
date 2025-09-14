@@ -41,14 +41,14 @@ pub(crate) fn generate_stream(
         }
         (None, Some(variable_name)) => {
             quote! {
-                while let Ok(#variable_name) = #context.#method_ident(hyperlane::DEFAULT_BUFFER_SIZE).await {
+                while let Ok(#variable_name) = #context.#method_ident(::hyperlane::DEFAULT_BUFFER_SIZE).await {
                     #(#stmts)*
                 }
             }
         }
         (None, None) => {
             quote! {
-                while #context.#method_ident(hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
+                while #context.#method_ident(::hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
                     #(#stmts)*
                 }
             }

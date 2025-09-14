@@ -25,9 +25,9 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let gen_code: TokenStream2 = quote! {
         #input_fn
         inventory::submit! {
-            hyperlane::HookMacro {
-                hook_type: hyperlane::HookType::PanicHook(#order),
-                handler: |ctx: hyperlane::Context| Box::pin(#fn_name(ctx)),
+            ::hyperlane::HookMacro {
+                hook_type: ::hyperlane::HookType::PanicHook(#order),
+                handler: |ctx: ::hyperlane::Context| Box::pin(#fn_name(ctx)),
             }
         }
     };

@@ -254,7 +254,7 @@ async fn request_middleware(ctx: Context) {}
     response_status_code(101),
     response_header(UPGRADE => WEBSOCKET),
     response_header(CONNECTION => UPGRADE),
-    response_header(SEC_WEBSOCKET_ACCEPT => WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
+    response_header(SEC_WEBSOCKET_ACCEPT => &WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
     response_header(STEP => "upgrade_hook"),
     send
 )]
@@ -296,7 +296,7 @@ async fn prologue_hook(ctx: Context) {}
 async fn epilogue_hook(ctx: Context) {}
 
 #[route("/response")]
-#[response_body(RESPONSE_DATA)]
+#[response_body(&RESPONSE_DATA)]
 #[response_reason_phrase(CUSTOM_REASON)]
 #[response_status_code(CUSTOM_STATUS_CODE)]
 #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
@@ -388,8 +388,8 @@ async fn post(ctx: Context) {}
 #[ws_from_stream]
 async fn websocket_1(ctx: Context) {
     let body: RequestBody = ctx.get_request_body().await;
-    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-    ctx.send_body_list_with_data(body_list).await.unwrap();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+    ctx.send_body_list_with_data(&body_list).await.unwrap();
 }
 
 #[ws]
@@ -397,8 +397,8 @@ async fn websocket_1(ctx: Context) {
 #[ws_from_stream(1024)]
 async fn websocket_2(ctx: Context) {
     let body: RequestBody = ctx.get_request_body().await;
-    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-    ctx.send_body_list_with_data(body_list).await.unwrap();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+    ctx.send_body_list_with_data(&body_list).await.unwrap();
 }
 
 #[ws]
@@ -406,8 +406,8 @@ async fn websocket_2(ctx: Context) {
 #[ws_from_stream(request)]
 async fn websocket_3(ctx: Context) {
     let body: RequestBody = request.get_body().clone();
-    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-    ctx.send_body_list_with_data(body_list).await.unwrap();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+    ctx.send_body_list_with_data(&body_list).await.unwrap();
 }
 
 #[ws]
@@ -415,8 +415,8 @@ async fn websocket_3(ctx: Context) {
 #[ws_from_stream(1024, request)]
 async fn websocket_4(ctx: Context) {
     let body: RequestBody = request.get_body().clone();
-    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-    ctx.send_body_list_with_data(body_list).await.unwrap();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+    ctx.send_body_list_with_data(&body_list).await.unwrap();
 }
 
 #[ws]
@@ -424,8 +424,8 @@ async fn websocket_4(ctx: Context) {
 #[ws_from_stream(request, 1024)]
 async fn websocket_5(ctx: Context) {
     let body: RequestBody = request.get_body().clone();
-    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-    ctx.send_body_list_with_data(body_list).await.unwrap();
+    let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+    ctx.send_body_list_with_data(&body_list).await.unwrap();
 }
 
 #[route("/hook")]
@@ -446,17 +446,17 @@ async fn hook(ctx: Context) {}
 async fn get_post(ctx: Context) {}
 
 #[route("/attributes")]
-#[response_body(format!("request attributes: {request_attributes:?}"))]
+#[response_body(&format!("request attributes: {request_attributes:?}"))]
 #[attributes(request_attributes)]
 async fn attributes(ctx: Context) {}
 
 #[route("/route_params/:test")]
-#[response_body(format!("request route params: {request_route_params:?}"))]
+#[response_body(&format!("request route params: {request_route_params:?}"))]
 #[route_params(request_route_params)]
 async fn route_params(ctx: Context) {}
 
 #[route("/route_param/:test")]
-#[response_body(format!("route param: {request_route_param:?}"))]
+#[response_body(&format!("route param: {request_route_param:?}"))]
 #[route_param("test" => request_route_param)]
 async fn route_param(ctx: Context) {}
 
@@ -473,13 +473,13 @@ async fn host(ctx: Context) {}
 #[route("/request_query")]
 #[epilogue_hooks(
     request_query("test" => request_query_option),
-    response_body(format!("request query: {request_query_option:?}")),
+    response_body(&format!("request query: {request_query_option:?}")),
     send,
     http_from_stream(1024)
 )]
 #[prologue_hooks(
     request_query("test" => request_query_option),
-    response_body(format!("request query: {request_query_option:?}")),
+    response_body(&format!("request query: {request_query_option:?}")),
     send
 )]
 async fn request_query(ctx: Context) {}
@@ -487,13 +487,13 @@ async fn request_query(ctx: Context) {}
 #[route("/request_header")]
 #[epilogue_hooks(
     request_header(HOST => request_header_option),
-    response_body(format!("request header: {request_header_option:?}")),
+    response_body(&format!("request header: {request_header_option:?}")),
     send,
     http_from_stream(_request)
 )]
 #[prologue_hooks(
     request_header(HOST => request_header_option),
-    response_body(format!("request header: {request_header_option:?}")),
+    response_body(&format!("request header: {request_header_option:?}")),
     send
 )]
 async fn request_header(ctx: Context) {}
@@ -501,13 +501,13 @@ async fn request_header(ctx: Context) {}
 #[route("/request_querys")]
 #[epilogue_hooks(
     request_querys(request_querys),
-    response_body(format!("request querys: {request_querys:?}")),
+    response_body(&format!("request querys: {request_querys:?}")),
     send,
     http_from_stream(1024, _request)
 )]
 #[prologue_hooks(
     request_querys(request_querys),
-    response_body(format!("request querys: {request_querys:?}")),
+    response_body(&format!("request querys: {request_querys:?}")),
     send
 )]
 async fn request_querys(ctx: Context) {}
@@ -515,18 +515,18 @@ async fn request_querys(ctx: Context) {}
 #[route("/request_headers")]
 #[epilogue_hooks(
     request_headers(request_headers),
-    response_body(format!("request headers: {request_headers:?}")),
+    response_body(&format!("request headers: {request_headers:?}")),
     send,
     http_from_stream(_request, 1024)
 )]
 #[prologue_hooks(
     request_headers(request_headers),
-    response_body(format!("request headers: {request_headers:?}")),
+    response_body(&format!("request headers: {request_headers:?}")),
     send
 )]
 async fn request_headers(ctx: Context) {}
 
-#[response_body(format!("raw body: {raw_body:?}"))]
+#[response_body(&format!("raw body: {raw_body:?}"))]
 #[request_body(raw_body)]
 #[route("/request_body")]
 async fn request_body(ctx: Context) {}
@@ -539,12 +539,12 @@ async fn request_body(ctx: Context) {}
 async fn reject_host(ctx: Context) {}
 
 #[route("/attribute")]
-#[response_body(format!("request attribute: {request_attribute_option:?}"))]
+#[response_body(&format!("request attribute: {request_attribute_option:?}"))]
 #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
 async fn attribute(ctx: Context) {}
 
 #[route("/request_body_json")]
-#[response_body(format!("request data: {request_data_result:?}"))]
+#[response_body(&format!("request data: {request_data_result:?}"))]
 #[request_body_json(request_data_result: TestData)]
 async fn request_body_json(ctx: Context) {}
 
@@ -563,22 +563,22 @@ async fn referer(ctx: Context) {}
 async fn reject_referer(ctx: Context) {}
 
 #[route("/cookies")]
-#[response_body(format!("All cookies: {cookie_value:?}"))]
+#[response_body(&format!("All cookies: {cookie_value:?}"))]
 #[request_cookies(cookie_value)]
 async fn cookies(ctx: Context) {}
 
 #[route("/cookie")]
-#[response_body(format!("Session cookie: {session_cookie_opt:?}"))]
+#[response_body(&format!("Session cookie: {session_cookie_opt:?}"))]
 #[request_cookie("test" => session_cookie_opt)]
 async fn cookie(ctx: Context) {}
 
 #[route("/request_version")]
-#[response_body(format!("HTTP Version: {http_version}"))]
+#[response_body(&format!("HTTP Version: {http_version}"))]
 #[request_version(http_version)]
 async fn request_version_test(ctx: Context) {}
 
 #[route("/request_path")]
-#[response_body(format!("Request Path: {request_path}"))]
+#[response_body(&format!("Request Path: {request_path}"))]
 #[request_path(request_path)]
 async fn request_path_test(ctx: Context) {}
 
