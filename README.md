@@ -230,11 +230,7 @@ struct TestData {
 #[panic_hook(1)]
 #[panic_hook("2")]
 #[epilogue_hooks(response_body("panic_hook"), send)]
-async fn panic_hook(ctx: Context) {
-    if true {
-        return;
-    }
-}
+async fn panic_hook(ctx: Context) {}
 
 #[request_middleware]
 #[epilogue_hooks(
