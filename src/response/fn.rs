@@ -56,7 +56,7 @@ pub(crate) fn response_reason_phrase_macro(
     };
     inject(position, item, |context| {
         quote! {
-            #context.set_response_reason_phrase(#value).await;
+            #context.set_response_reason_phrase(&#value).await;
         }
     })
 }
@@ -91,12 +91,12 @@ pub(crate) fn response_header_macro(
     inject(position, item, |context| match operation {
         HeaderOperation::Add => {
             quote! {
-                #context.add_response_header(#key, #value).await;
+                #context.add_response_header(&#key, &#value).await;
             }
         }
         HeaderOperation::Set => {
             quote! {
-                #context.set_response_header(#key, #value).await;
+                #context.set_response_header(&#key, &#value).await;
             }
         }
     })
@@ -129,7 +129,7 @@ pub(crate) fn response_body_macro(
     let body: Expr = body_data.body;
     inject(position, item, |context| {
         quote! {
-            #context.set_response_body(#body).await;
+            #context.set_response_body(&#body).await;
         }
     })
 }

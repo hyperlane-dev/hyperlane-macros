@@ -87,7 +87,7 @@ pub(crate) fn attribute_macro(
     let key_name: Expr = attribute.key_name;
     inject(position, item, |context| {
         quote! {
-            let #variable: Option<#type_name> = #context.try_get_attribute::<#type_name>(#key_name).await;
+            let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
         }
     })
 }
