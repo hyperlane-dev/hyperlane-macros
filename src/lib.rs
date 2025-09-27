@@ -513,6 +513,28 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_body_macro(attr, item, Position::Prologue)
 }
 
+/// Clears all response headers.
+///
+/// This attribute macro clears all response headers from the response.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[clear_response_headers]
+/// async fn clear_headers(ctx: Context) {
+///     // Clear all response headers
+/// }
+/// ```
+///
+/// The macro should be applied to async functions that accept a `Context` parameter.   
+#[proc_macro_attribute]
+pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    clear_response_headers_macro(item, Position::Prologue)
+}
+
 /// Sets the HTTP response version.
 ///
 /// This attribute macro configures the HTTP response version that will be sent with the response.
@@ -1705,13 +1727,13 @@ pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[prologue_hooks(post, send)]
+/// #[prologue_macro(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn prologue_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     prologue_hooks_macro(attr, item)
 }
 
@@ -1726,13 +1748,13 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[epilogue_hooks(post, send)]
+/// #[epilogue_macro(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn epilogue_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_hooks_macro(attr, item)
 }
 

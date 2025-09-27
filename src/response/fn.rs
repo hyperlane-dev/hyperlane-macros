@@ -141,6 +141,32 @@ inventory::submit! {
     }
 }
 
+/// Clears all response headers from macro input.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with header operation.
+pub(crate) fn clear_response_headers_macro(item: TokenStream, position: Position) -> TokenStream {
+    inject(position, item, |context| {
+        quote! {
+            #context.clear_response_headers().await;
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "clear_response_headers",
+        handler: Handler::NoAttrPosition(clear_response_headers_macro),
+    }
+}
+
 /// Sets response version from macro input.
 ///
 /// # Arguments
