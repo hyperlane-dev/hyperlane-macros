@@ -41,64 +41,76 @@ inventory::submit! {
     }
 }
 
-/// Expands macro to add pre-hook function call.
+/// Expands macro to add multiple pre-hook function calls.
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The attribute token stream containing a list of function names.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
-/// Returns the expanded `TokenStream` with pre-hook call.
-pub(crate) fn prologue_hook_macro(
+/// Returns the expanded `TokenStream` with multiple pre-hook calls.
+pub(crate) fn prologue_hooks_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let function_name: Ident = parse_macro_input!(attr as Ident);
+    let functions: Punctuated<Ident, Token![,]> =
+        parse_macro_input!(attr with Punctuated::parse_terminated);
     inject(position, item, |context| {
+        let hook_calls = functions.iter().map(|function_name| {
+            quote! {
+                let _ = #function_name(#context.clone()).await;
+            }
+        });
         quote! {
-            let _ = #function_name(#context.clone()).await;
+            #(#hook_calls)*
         }
     })
 }
 
 inventory::submit! {
     InjectableMacro {
-        name: "prologue_hook",
-        handler: Handler::WithAttrPosition(prologue_hook_macro),
+        name: "prologue_hooks",
+        handler: Handler::WithAttrPosition(prologue_hooks_macro),
     }
 }
 
-/// Expands macro to add post-hook function call.
+/// Expands macro to add multiple post-hook function calls.
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The attribute token stream containing a list of function names.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
-/// Returns the expanded `TokenStream` with post-hook call.
-pub(crate) fn epilogue_hook_macro(
+/// Returns the expanded `TokenStream` with multiple post-hook calls.
+pub(crate) fn epilogue_hooks_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let function_name: Ident = parse_macro_input!(attr as Ident);
+    let functions: Punctuated<Ident, Token![,]> =
+        parse_macro_input!(attr with Punctuated::parse_terminated);
     inject(position, item, |context| {
+        let hook_calls = functions.iter().map(|function_name| {
+            quote! {
+                let _ = #function_name(#context.clone()).await;
+            }
+        });
         quote! {
-            let _ = #function_name(#context.clone()).await;
+            #(#hook_calls)*
         }
     })
 }
 
 inventory::submit! {
     InjectableMacro {
-        name: "epilogue_hook",
-        handler: Handler::WithAttrPosition(epilogue_hook_macro),
+        name: "epilogue_hooks",
+        handler: Handler::WithAttrPosition(epilogue_hooks_macro),
     }
 }

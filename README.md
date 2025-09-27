@@ -158,11 +158,11 @@ cargo add hyperlane-macros
 
 ### Hook Macros
 
-- `#[prologue_hook(function_name)]` - Execute specified function before the main handler function
-- `#[epilogue_hook(function_name)]` - Execute specified function after the main handler function
+- `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
+- `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
 - `#[panic_hook]` - Execute function when a panic occurs within the server
-- `#[prologue_macro(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
-- `#[epilogue_macro(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
+- `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
+- `#[epilogue_macros(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
 ### Middleware Macros
 
@@ -203,7 +203,7 @@ cargo add hyperlane-macros
 ### Best Practice Warning
 
 - Request related macros are mostly query functions, while response related macros are mostly assignment functions.
-- When using `prologue_hook` or `epilogue_hook` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
+- When using `prologue_hooks` or `epilogue_hooks` macros, it is not recommended to combine them with other macros (such as `#[get]`, `#[post]`, `#[http]`, etc.) on the same function. These macros should be placed in the hook functions themselves. If you are not clear about how macros are expanded, combining them may lead to problematic code behavior.
 
 ## Example Usage
 
@@ -229,11 +229,11 @@ struct TestData {
 #[panic_hook]
 #[panic_hook(1)]
 #[panic_hook("2")]
-#[epilogue_macro(response_body("panic_hook"), send)]
+#[epilogue_macros(response_body("panic_hook"), send)]
 async fn panic_hook(ctx: Context) {}
 
 #[request_middleware]
-#[epilogue_macro(
+#[epilogue_macros(
     response_status_code(200),
     response_version(HttpVersion::HTTP1_1),
     response_header(SERVER => HYPERLANE),
@@ -246,7 +246,7 @@ async fn request_middleware(ctx: Context) {}
 
 #[ws]
 #[request_middleware(1)]
-#[epilogue_macro(
+#[epilogue_macros(
     response_body(&vec![]),
     response_status_code(101),
     response_header(UPGRADE => WEBSOCKET),
@@ -270,27 +270,27 @@ async fn connected_hook(ctx: Context) {}
 async fn response_middleware_1(ctx: Context) {}
 
 #[response_middleware(2)]
-#[prologue_macro(
+#[prologue_macros(
     reject(ctx.get_request().await.is_ws()),
     response_header(STEP => "response_middleware_2")
 )]
-#[epilogue_macro(send, flush)]
+#[epilogue_macros(send, flush)]
 async fn response_middleware_2(ctx: Context) {}
 
 #[response_middleware("3")]
-#[prologue_macro(
+#[prologue_macros(
     ws,
     response_header(STEP => "response_middleware_3")
 )]
-#[epilogue_macro(send_body, flush)]
+#[epilogue_macros(send_body, flush)]
 async fn response_middleware_3(ctx: Context) {}
 
 #[get]
 #[http]
-async fn prologue_hook(ctx: Context) {}
+async fn prologue_hooks(ctx: Context) {}
 
 #[response_status_code(200)]
-async fn epilogue_hook(ctx: Context) {}
+async fn epilogue_hooks(ctx: Context) {}
 
 #[route("/response")]
 #[response_body(&RESPONSE_DATA)]
@@ -300,71 +300,71 @@ async fn epilogue_hook(ctx: Context) {}
 async fn response(ctx: Context) {}
 
 #[route("/connect")]
-#[prologue_macro(connect, response_body("connect"))]
+#[prologue_macros(connect, response_body("connect"))]
 async fn connect(ctx: Context) {}
 
 #[route("/delete")]
-#[prologue_macro(delete, response_body("delete"))]
+#[prologue_macros(delete, response_body("delete"))]
 async fn delete(ctx: Context) {}
 
 #[route("/head")]
-#[prologue_macro(head, response_body("head"))]
+#[prologue_macros(head, response_body("head"))]
 async fn head(ctx: Context) {}
 
 #[route("/options")]
-#[prologue_macro(options, response_body("options"))]
+#[prologue_macros(options, response_body("options"))]
 async fn options(ctx: Context) {}
 
 #[route("/patch")]
-#[prologue_macro(patch, response_body("patch"))]
+#[prologue_macros(patch, response_body("patch"))]
 async fn patch(ctx: Context) {}
 
 #[route("/put")]
-#[prologue_macro(put, response_body("put"))]
+#[prologue_macros(put, response_body("put"))]
 async fn put(ctx: Context) {}
 
 #[route("/trace")]
-#[prologue_macro(trace, response_body("trace"))]
+#[prologue_macros(trace, response_body("trace"))]
 async fn trace(ctx: Context) {}
 
 #[route("/h2c")]
-#[prologue_macro(h2c, response_body("h2c"))]
+#[prologue_macros(h2c, response_body("h2c"))]
 async fn h2c(ctx: Context) {}
 
 #[route("/http")]
-#[prologue_macro(http, response_body("http"))]
+#[prologue_macros(http, response_body("http"))]
 async fn http_only(ctx: Context) {}
 
 #[route("/http0_9")]
-#[prologue_macro(http0_9, response_body("http0_9"))]
+#[prologue_macros(http0_9, response_body("http0_9"))]
 async fn http0_9(ctx: Context) {}
 
 #[route("/http1_0")]
-#[prologue_macro(http1_0, response_body("http1_0"))]
+#[prologue_macros(http1_0, response_body("http1_0"))]
 async fn http1_0(ctx: Context) {}
 
 #[route("/http1_1")]
-#[prologue_macro(http1_1, response_body("http1_1"))]
+#[prologue_macros(http1_1, response_body("http1_1"))]
 async fn http1_1(ctx: Context) {}
 
 #[route("/http2")]
-#[prologue_macro(http2, response_body("http2"))]
+#[prologue_macros(http2, response_body("http2"))]
 async fn http2(ctx: Context) {}
 
 #[route("/http3")]
-#[prologue_macro(http3, response_body("http3"))]
+#[prologue_macros(http3, response_body("http3"))]
 async fn http3(ctx: Context) {}
 
 #[route("/tls")]
-#[prologue_macro(tls, response_body("tls"))]
+#[prologue_macros(tls, response_body("tls"))]
 async fn tls(ctx: Context) {}
 
 #[route("/http1_1_or_higher")]
-#[prologue_macro(http1_1_or_higher, response_body("http1_1_or_higher"))]
+#[prologue_macros(http1_1_or_higher, response_body("http1_1_or_higher"))]
 async fn http1_1_or_higher(ctx: Context) {}
 
 #[route("/unknown_method")]
-#[prologue_macro(
+#[prologue_macros(
     clear_response_headers,
     filter(ctx.get_request().await.is_unknown_method()),
     response_body("unknown_method")
@@ -373,12 +373,12 @@ async fn unknown_method(ctx: Context) {}
 
 #[route("/get")]
 #[send_body_once]
-#[prologue_macro(ws, get, response_body("get"))]
+#[prologue_macros(ws, get, response_body("get"))]
 async fn get(ctx: Context) {}
 
 #[send_once]
 #[route("/post")]
-#[prologue_macro(post, response_body("post"))]
+#[prologue_macros(post, response_body("post"))]
 async fn post(ctx: Context) {}
 
 #[ws]
@@ -427,14 +427,14 @@ async fn websocket_5(ctx: Context) {
 }
 
 #[route("/hook")]
-#[prologue_hook(prologue_hook)]
-#[epilogue_hook(epilogue_hook)]
+#[prologue_hooks(prologue_hooks)]
+#[epilogue_hooks(epilogue_hooks)]
 #[response_body("Testing hook macro")]
 async fn hook(ctx: Context) {}
 
 #[closed]
 #[route("/get_post")]
-#[prologue_macro(
+#[prologue_macros(
     http,
     methods(get, post),
     response_body("get_post"),
@@ -460,22 +460,22 @@ async fn route_param(ctx: Context) {}
 
 #[route("/host")]
 #[host("localhost")]
-#[epilogue_macro(
+#[epilogue_macros(
     response_body("host string literal: localhost"),
     send,
     http_from_stream
 )]
-#[prologue_macro(response_body("host string literal: localhost"), send)]
+#[prologue_macros(response_body("host string literal: localhost"), send)]
 async fn host(ctx: Context) {}
 
 #[route("/request_query")]
-#[epilogue_macro(
+#[epilogue_macros(
     request_query("test" => request_query_option),
     response_body(&format!("request query: {request_query_option:?}")),
     send,
     http_from_stream(1024)
 )]
-#[prologue_macro(
+#[prologue_macros(
     request_query("test" => request_query_option),
     response_body(&format!("request query: {request_query_option:?}")),
     send
@@ -483,13 +483,13 @@ async fn host(ctx: Context) {}
 async fn request_query(ctx: Context) {}
 
 #[route("/request_header")]
-#[epilogue_macro(
+#[epilogue_macros(
     request_header(HOST => request_header_option),
     response_body(&format!("request header: {request_header_option:?}")),
     send,
     http_from_stream(_request)
 )]
-#[prologue_macro(
+#[prologue_macros(
     request_header(HOST => request_header_option),
     response_body(&format!("request header: {request_header_option:?}")),
     send
@@ -497,13 +497,13 @@ async fn request_query(ctx: Context) {}
 async fn request_header(ctx: Context) {}
 
 #[route("/request_querys")]
-#[epilogue_macro(
+#[epilogue_macros(
     request_querys(request_querys),
     response_body(&format!("request querys: {request_querys:?}")),
     send,
     http_from_stream(1024, _request)
 )]
-#[prologue_macro(
+#[prologue_macros(
     request_querys(request_querys),
     response_body(&format!("request querys: {request_querys:?}")),
     send
@@ -511,13 +511,13 @@ async fn request_header(ctx: Context) {}
 async fn request_querys(ctx: Context) {}
 
 #[route("/request_headers")]
-#[epilogue_macro(
+#[epilogue_macros(
     request_headers(request_headers),
     response_body(&format!("request headers: {request_headers:?}")),
     send,
     http_from_stream(_request, 1024)
 )]
-#[prologue_macro(
+#[prologue_macros(
     request_headers(request_headers),
     response_body(&format!("request headers: {request_headers:?}")),
     send
@@ -530,7 +530,7 @@ async fn request_headers(ctx: Context) {}
 async fn request_body(ctx: Context) {}
 
 #[route("/reject_host")]
-#[prologue_macro(
+#[prologue_macros(
     reject_host("filter.localhost"),
     response_body("host filter string literal")
 )]
@@ -547,14 +547,14 @@ async fn attribute(ctx: Context) {}
 async fn request_body_json(ctx: Context) {}
 
 #[route("/referer")]
-#[prologue_macro(
+#[prologue_macros(
     referer("http://localhost"),
     response_body("referer string literal: http://localhost")
 )]
 async fn referer(ctx: Context) {}
 
 #[route("/reject_referer")]
-#[prologue_macro(
+#[prologue_macros(
     reject_referer("http://localhost"),
     response_body("referer filter string literal")
 )]

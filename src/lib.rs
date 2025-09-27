@@ -1118,10 +1118,10 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
     reject_referer_macro(attr, item, Position::Prologue)
 }
 
-/// Executes a specified function before the main handler function.
+/// Executes multiple specified functions before the main handler function.
 ///
-/// This attribute macro configures a pre-execution hook that runs before the main function logic.
-/// The specified hook function will be called first, followed by the main function execution.
+/// This attribute macro configures multiple pre-execution hooks that run before the main function logic.
+/// The specified hook functions will be called in the order provided, followed by the main function execution.
 ///
 /// # Usage
 ///
@@ -1130,28 +1130,33 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[get]
-/// async fn prologue_handler(ctx: Context) {
-///     // Pre-execution logic
+/// async fn prologue_handler1(ctx: Context) {
+///     // First pre-execution logic
 /// }
 ///
-/// #[prologue_hook(prologue_handler)]
+/// #[http]
+/// async fn prologue_handler2(ctx: Context) {
+///     // Second pre-execution logic
+/// }
+///
+/// #[prologue_hooks(prologue_handler1, prologue_handler2)]
 /// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs after prologue_handler)
+///     // Main function logic (runs after prologue_handler1 and prologue_handler2)
 /// }
 /// ```
 ///
-/// The macro accepts a function name as parameter. Both the hook function and main function
-/// must accept a `Context` parameter. Avoid combining this macro with other macros on the
-/// same function to prevent macro expansion conflicts.
+/// The macro accepts a comma-separated list of function names as parameters. All hook functions
+/// and the main function must accept a `Context` parameter. Avoid combining this macro with other
+/// macros on the same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
-pub fn prologue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    prologue_hook_macro(attr, item, Position::Prologue)
+pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+    prologue_hooks_macro(attr, item, Position::Prologue)
 }
 
-/// Executes a specified function after the main handler function.
+/// Executes multiple specified functions after the main handler function.
 ///
-/// This attribute macro configures a post-execution hook that runs after the main function logic.
-/// The main function will execute first, followed by the specified hook function.
+/// This attribute macro configures multiple post-execution hooks that run after the main function logic.
+/// The main function will execute first, followed by the specified hook functions in the order provided.
 ///
 /// # Usage
 ///
@@ -1160,22 +1165,27 @@ pub fn prologue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[send]
-/// async fn epilogue_handler(ctx: Context) {
-///     // Post-execution logic
+/// async fn epilogue_handler1(ctx: Context) {
+///     // First post-execution logic
 /// }
 ///
-/// #[epilogue_hook(epilogue_handler)]
+/// #[flush]
+/// async fn epilogue_handler2(ctx: Context) {
+///     // Second post-execution logic
+/// }
+///
+/// #[epilogue_hooks(epilogue_handler1, epilogue_handler2)]
 /// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs before epilogue_handler)
+///     // Main function logic (runs before epilogue_handler1 and epilogue_handler2)
 /// }
 /// ```
 ///
-/// The macro accepts a function name as parameter. Both the hook function and main function
-/// must accept a `Context` parameter. Avoid combining this macro with other macros on the
-/// same function to prevent macro expansion conflicts.
+/// The macro accepts a comma-separated list of function names as parameters. All hook functions
+/// and the main function must accept a `Context` parameter. Avoid combining this macro with other
+/// macros on the same function to prevent macro expansion conflicts.
 #[proc_macro_attribute]
-pub fn epilogue_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    epilogue_hook_macro(attr, item, Position::Epilogue)
+pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
+    epilogue_hooks_macro(attr, item, Position::Epilogue)
 }
 
 /// Extracts the raw request body into a specified variable.
@@ -1727,14 +1737,14 @@ pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[prologue_macro(post, send)]
+/// #[prologue_macros(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn prologue_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    prologue_hooks_macro(attr, item)
+pub fn prologue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
+    prologue_macros_macro(attr, item)
 }
 
 /// Injects a list of macros after the decorated function.
@@ -1748,14 +1758,14 @@ pub fn prologue_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[epilogue_macro(post, send)]
+/// #[epilogue_macros(post, send)]
 /// async fn handler(ctx: Context) {
 ///     // ...
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn epilogue_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
-    epilogue_hooks_macro(attr, item)
+pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
+    epilogue_macros_macro(attr, item)
 }
 
 /// Sends only the response body with data after function execution.
