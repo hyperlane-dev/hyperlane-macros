@@ -65,6 +65,7 @@ cargo add hyperlane-macros
 - `#[response_header("key" => "value")]` - Set response header (supports literals and global constants)
 - `#[response_body("data")]` - Set response body (supports literals and global constants)
 - `#[response_version(version)]` - Set response HTTP version (supports literals and global constants)
+- `#[clear_response_headers]` - Clear all response headers
 
 ### Send Operation Macros
 
