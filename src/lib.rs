@@ -73,14 +73,21 @@ inventory::collect!(InjectableMacro);
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[get]
-/// async fn handle_get(ctx: Context) {
-///     // Function body
+/// #[route("/get")]
+/// struct Get;
+///
+/// impl ServerHook for Get {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(get, response_body("get"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
     get_handler(item, Position::Prologue)
@@ -97,14 +104,21 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[post]
-/// async fn handle_post(ctx: Context) {
-///     // Function body
+/// #[route("/post")]
+/// struct Post;
+///
+/// impl ServerHook for Post {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(post, response_body("post"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_handler(item, Position::Prologue)
@@ -121,14 +135,21 @@ pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[put]
-/// async fn handle_put(ctx: Context) {
-///     // Function body
+/// #[route("/put")]
+/// struct Put;
+///
+/// impl ServerHook for Put {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(put, response_body("put"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn put(_attr: TokenStream, item: TokenStream) -> TokenStream {
     put_handler(item, Position::Prologue)
@@ -145,14 +166,21 @@ pub fn put(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[delete]
-/// async fn handle_delete(ctx: Context) {
-///     // Function body
+/// #[route("/delete")]
+/// struct Delete;
+///
+/// impl ServerHook for Delete {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(delete, response_body("delete"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
     delete_handler(item, Position::Prologue)
@@ -169,14 +197,21 @@ pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[patch]
-/// async fn handle_patch(ctx: Context) {
-///     // Function body
+/// #[route("/patch")]
+/// struct Patch;
+///
+/// impl ServerHook for Patch {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(patch, response_body("patch"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn patch(_attr: TokenStream, item: TokenStream) -> TokenStream {
     patch_handler(item, Position::Prologue)
@@ -193,14 +228,21 @@ pub fn patch(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[head]
-/// async fn handle_head(ctx: Context) {
-///     // Function body
+/// #[route("/head")]
+/// struct Head;
+///
+/// impl ServerHook for Head {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(head, response_body("head"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn head(_attr: TokenStream, item: TokenStream) -> TokenStream {
     head_handler(item, Position::Prologue)
@@ -217,14 +259,21 @@ pub fn head(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[options]
-/// async fn handle_options(ctx: Context) {
-///     // Function body
+/// #[route("/options")]
+/// struct Options;
+///
+/// impl ServerHook for Options {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(options, response_body("options"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn options(_attr: TokenStream, item: TokenStream) -> TokenStream {
     options_handler(item, Position::Prologue)
@@ -241,14 +290,21 @@ pub fn options(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[connect]
-/// async fn handle_connect(ctx: Context) {
-///     // Function body
+/// #[route("/connect")]
+/// struct Connect;
+///
+/// impl ServerHook for Connect {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(connect, response_body("connect"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn connect(_attr: TokenStream, item: TokenStream) -> TokenStream {
     connect_handler(item, Position::Prologue)
@@ -265,14 +321,21 @@ pub fn connect(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[trace]
-/// async fn handle_trace(ctx: Context) {
-///     // Function body
+/// #[route("/trace")]
+/// struct Trace;
+///
+/// impl ServerHook for Trace {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(trace, response_body("trace"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn trace(_attr: TokenStream, item: TokenStream) -> TokenStream {
     trace_handler(item, Position::Prologue)
@@ -289,19 +352,25 @@ pub fn trace(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[methods(get, post)]
-/// async fn handle_get_post(ctx: Context) {
-///     // Function body
-/// }
+/// #[route("/get_post")]
+/// struct GetPost;
 ///
-/// #[methods(put, patch, delete)]
-/// async fn handle_modifications(ctx: Context) {
-///     // Function body
+/// impl ServerHook for GetPost {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         http,
+///         methods(get, post),
+///         response_body("get_post")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a comma-separated list of HTTP method names (lowercase) and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
     methods_macro(attr, item, Position::Prologue)
@@ -318,14 +387,25 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[ws]
-/// async fn handle_websocket(ctx: Context) {
-///     // WebSocket handling logic
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn ws(_attr: TokenStream, item: TokenStream) -> TokenStream {
     ws_macro(item, Position::Prologue)
@@ -342,14 +422,21 @@ pub fn ws(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http]
-/// async fn handle_http(ctx: Context) {
-///     // HTTP request handling logic
+/// #[route("/http")]
+/// struct HttpOnly;
+///
+/// impl ServerHook for HttpOnly {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http, response_body("http"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http_macro(item, Position::Prologue)
@@ -366,26 +453,23 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// const CUSTOM_STATUS: i32 = 418;
+/// const CUSTOM_STATUS_CODE: i32 = 200;
 ///
-/// #[response_status_code(200)]
-/// async fn success_handler(ctx: Context) {
-///     // Response will have status code 200
-/// }
+/// #[route("/response")]
+/// struct Response;
 ///
-/// #[response_status_code(404)]
-/// async fn not_found_handler(ctx: Context) {
-///     // Response will have status code 404
-/// }
+/// impl ServerHook for Response {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[response_status_code(CUSTOM_STATUS)]
-/// async fn custom_handler(ctx: Context) {
-///     // Response will have status code from global constant
+///     #[response_status_code(CUSTOM_STATUS_CODE)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a numeric HTTP status code or a global constant
-/// and should be applied to async functions that accept a `Context` parameter.
+/// and should be applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_status_code_macro(attr, item, Position::Prologue)
@@ -402,26 +486,23 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// const CUSTOM_REASON: &str = "I'm a teapot";
+/// const CUSTOM_REASON: &str = "Accepted";
 ///
-/// #[response_reason_phrase("OK")]
-/// async fn success_handler(ctx: Context) {
-///     // Response will have reason phrase "OK"
-/// }
+/// #[route("/response")]
+/// struct Response;
 ///
-/// #[response_reason_phrase("Not Found")]
-/// async fn not_found_handler(ctx: Context) {
-///     // Response will have reason phrase "Not Found"
-/// }
+/// impl ServerHook for Response {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[response_reason_phrase(CUSTOM_REASON)]
-/// async fn custom_handler(ctx: Context) {
-///     // Response will have reason phrase from global constant
+///     #[response_reason_phrase(CUSTOM_REASON)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a string literal or global constant for the reason phrase and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_reason_phrase_macro(attr, item, Position::Prologue)
@@ -439,39 +520,39 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// const HEADER_NAME: &str = "X-Custom-Header";
-/// const HEADER_VALUE: &str = "custom-value";
+/// const CUSTOM_HEADER_NAME: &str = "X-Custom-Header";
+/// const CUSTOM_HEADER_VALUE: &str = "custom-value";
 ///
-/// #[response_header("Content-Type", "application/json")]
-/// async fn json_handler(ctx: Context) {
-///     // Response will have Content-Type header set to application/json
+/// #[route("/response")]
+/// struct Response;
+///
+/// impl ServerHook for Response {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// #[response_header("X-Static-Header" => "static-value")]
-/// async fn set_header_handler(ctx: Context) {
-///     // Response will have static header replaced (overwrite existing)
-/// }
+/// #[route("/response_header")]
+/// struct ResponseHeaderTest;
 ///
-/// #[response_header(HEADER_NAME, HEADER_VALUE)]
-/// async fn dynamic_header_handler(ctx: Context) {
-///     // Response will have header from global constants
-/// }
+/// impl ServerHook for ResponseHeaderTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[response_header("Cache-Control" => "no-cache")]
-/// async fn set_cache_handler(ctx: Context) {
-///     // Response will have Cache-Control header replaced
-/// }
-///
-/// #[response_header("X-Add-Header", "add-value")]
-/// #[response_header("X-Set-Header" => "set-value")]
-/// async fn header_operations_handler(ctx: Context) {
-///     // Response will have X-Add-Header set and X-Set-Header replaced
+///     #[response_body("Testing header set and replace operations")]
+///     #[response_header("X-Add-Header", "add-value")]
+///     #[response_header("X-Set-Header" => "set-value")]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts header name and header value, both can be string literals or global constants.
 /// Use `"key", "value"` for setting headers and `"key" => "value"` for replacing headers.
-/// Should be applied to async functions that accept a `Context` parameter.
+/// Should be applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_header_macro(attr, item, Position::Prologue)
@@ -488,26 +569,23 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// const RESPONSE_DATA: &str = "Dynamic content from constant";
+/// const RESPONSE_DATA: &str = "{\"status\": \"success\"}";
 ///
-/// #[response_body("Hello, World!")]
-/// async fn hello_handler(ctx: Context) {
-///     // Response will have body "Hello, World!"
-/// }
+/// #[route("/response")]
+/// struct Response;
 ///
-/// #[response_body("{\"message\": \"success\"}")]
-/// async fn json_response_handler(ctx: Context) {
-///     // Response will have JSON body
-/// }
+/// impl ServerHook for Response {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[response_body(RESPONSE_DATA)]
-/// async fn dynamic_body_handler(ctx: Context) {
-///     // Response will have body from global constant
+///     #[response_body(&RESPONSE_DATA)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a string literal or global constant for the response body and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_body_macro(attr, item, Position::Prologue)
@@ -523,13 +601,24 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[clear_response_headers]
-/// async fn clear_headers(ctx: Context) {
-///     // Clear all response headers
+/// #[route("/unknown_method")]
+/// struct UnknownMethod;
+///
+/// impl ServerHook for UnknownMethod {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         clear_response_headers,
+///         filter(ctx.get_request().await.is_unknown_method()),
+///         response_body("unknown_method")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
-/// The macro should be applied to async functions that accept a `Context` parameter.   
+/// The macro should be applied to async functions that accept a `&Context` parameter.   
 #[proc_macro_attribute]
 pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStream {
     clear_response_headers_macro(item, Position::Prologue)
@@ -546,14 +635,25 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[response_version(HttpVersion::HTTP1_1)]
-/// async fn version_from_constant(ctx: Context) {
-///     // Response will have version from global constant
+/// #[request_middleware]
+/// struct RequestMiddleware;
+///
+/// impl ServerHook for RequestMiddleware {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(
+///         response_status_code(200),
+///         response_version(HttpVersion::HTTP1_1),
+///         response_header(SERVER => HYPERLANE)
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a variable or code block for the response version and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_version_macro(attr, item, Position::Prologue)
@@ -570,15 +670,21 @@ pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send]
-/// async fn auto_send_handler(ctx: Context) {
-///     let _ = ctx.set_response_body("Hello World").await;
-///     // Response is automatically sent after function returns
+/// #[response_middleware(2)]
+/// struct ResponseMiddleware2;
+///
+/// impl ServerHook for ResponseMiddleware2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send, flush)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_macro(item, Position::Epilogue)
@@ -595,15 +701,21 @@ pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_body]
-/// async fn auto_send_body_handler(ctx: Context) {
-///     let _ = ctx.set_response_body("Response body content").await;
-///     // Only response body is automatically sent after function returns
+/// #[response_middleware("3")]
+/// struct ResponseMiddleware3;
+///
+/// impl ServerHook for ResponseMiddleware3 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send_body, flush)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_macro(item, Position::Epilogue)
@@ -620,14 +732,21 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_with_data("Hello, World!")]
-/// async fn auto_send_with_data_handler(ctx: Context) {
-///     // Response is automatically sent with the specified data after function returns
+/// #[route("/send_with_data")]
+/// struct SendWithData;
+///
+/// impl ServerHook for SendWithData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send_with_data("Hello, World!"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts data to send and should be applied to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_with_data_macro(attr, item, Position::Epilogue)
@@ -644,15 +763,21 @@ pub fn send_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_once]
-/// async fn send_once_handler(ctx: Context) {
-///     let _ = ctx.set_response_body("One-time response").await;
-///     // Response is sent exactly once after function returns
+/// #[route("/post")]
+/// struct Post;
+///
+/// impl ServerHook for Post {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(post, response_body("post"), send_once)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_once_macro(item, Position::Epilogue)
@@ -669,15 +794,21 @@ pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_body_once]
-/// async fn send_body_once_handler(ctx: Context) {
-///     let _ = ctx.set_response_body("One-time body content").await;
-///     // Response body is sent exactly once after function returns
+/// #[route("/get")]
+/// struct Get;
+///
+/// impl ServerHook for Get {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(get, response_body("get"), send_body_once)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_body_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_once_macro(item, Position::Epilogue)
@@ -694,14 +825,21 @@ pub fn send_body_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_once_with_data("One-time response")]
-/// async fn send_once_with_data_handler(ctx: Context) {
-///     // Response is sent exactly once with the specified data after function returns
+/// #[route("/send_once_with_data")]
+/// struct SendOnceWithData;
+///
+/// impl ServerHook for SendOnceWithData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send_once_with_data("One-time response"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts data to send and should be applied to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_once_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_once_with_data_macro(attr, item, Position::Epilogue)
@@ -718,15 +856,21 @@ pub fn send_once_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[flush]
-/// async fn flush_handler(ctx: Context) {
-///     let _ = ctx.set_response_body("Immediate response").await;
-///     // Response stream is flushed after function returns
+/// #[response_middleware(2)]
+/// struct ResponseMiddleware2;
+///
+/// impl ServerHook for ResponseMiddleware2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send, flush)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
     flush_macro(item, Position::Prologue)
@@ -743,14 +887,23 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[aborted]
-/// async fn handle_aborted(ctx: Context) {
-///     // Handle aborted request logic
+/// #[route("/aborted")]
+/// struct Aborted;
+///
+/// impl ServerHook for Aborted {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[aborted]
+///     async fn handle(self, ctx: &Context) {
+///         // Handle aborted request logic
+///     }
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
     aborted_macro(item, Position::Prologue)
@@ -767,14 +920,26 @@ pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[closed]
-/// async fn handle_closed(ctx: Context) {
-///     // Handle closed connection logic
+/// #[route("/get_post")]
+/// struct GetPost;
+///
+/// impl ServerHook for GetPost {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[closed]
+///     #[prologue_macros(
+///         http,
+///         methods(get, post),
+///         response_body("get_post")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
     closed_macro(item, Position::Prologue)
@@ -791,14 +956,21 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[h2c]
-/// async fn handle_h2c(ctx: Context) {
-///     // Handle HTTP/2 cleartext requests
+/// #[route("/h2c")]
+/// struct H2c;
+///
+/// impl ServerHook for H2c {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(h2c, response_body("h2c"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
     h2c_macro(item, Position::Prologue)
@@ -815,14 +987,21 @@ pub fn h2c(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http0_9]
-/// async fn handle_http09(ctx: Context) {
-///     // Handle HTTP/0.9 requests
+/// #[route("/http0_9")]
+/// struct Http09;
+///
+/// impl ServerHook for Http09 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http0_9, response_body("http0_9"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http0_9_macro(item, Position::Prologue)
@@ -839,14 +1018,21 @@ pub fn http0_9(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http1_0]
-/// async fn handle_http10(ctx: Context) {
-///     // Handle HTTP/1.0 requests
+/// #[route("/http1_0")]
+/// struct Http10;
+///
+/// impl ServerHook for Http10 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_0, response_body("http1_0"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http1_0_macro(item, Position::Prologue)
@@ -863,14 +1049,21 @@ pub fn http1_0(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http1_1]
-/// async fn handle_http11(ctx: Context) {
-///     // Handle HTTP/1.1 requests
+/// #[route("/http1_1")]
+/// struct Http11;
+///
+/// impl ServerHook for Http11 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_1, response_body("http1_1"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http1_1_macro(item, Position::Prologue)
@@ -887,14 +1080,21 @@ pub fn http1_1(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http1_1_or_higher]
-/// async fn handle_modern_http(ctx: Context) {
-///     // Handle HTTP/1.1, HTTP/2, HTTP/3, etc.
+/// #[route("/http1_1_or_higher")]
+/// struct Http11OrHigher;
+///
+/// impl ServerHook for Http11OrHigher {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_1_or_higher, response_body("http1_1_or_higher"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http1_1_or_higher_macro(item, Position::Prologue)
@@ -911,14 +1111,21 @@ pub fn http1_1_or_higher(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http2]
-/// async fn handle_http2(ctx: Context) {
-///     // Handle HTTP/2 requests
+/// #[route("/http2")]
+/// struct Http2;
+///
+/// impl ServerHook for Http2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http2, response_body("http2"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http2_macro(item, Position::Prologue)
@@ -935,14 +1142,21 @@ pub fn http2(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http3]
-/// async fn handle_http3(ctx: Context) {
-///     // Handle HTTP/3 requests
+/// #[route("/http3")]
+/// struct Http3;
+///
+/// impl ServerHook for Http3 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http3, response_body("http3"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
     http3_macro(item, Position::Prologue)
@@ -959,14 +1173,21 @@ pub fn http3(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[tls]
-/// async fn handle_secure(ctx: Context) {
-///     // Handle TLS-encrypted requests only
+/// #[route("/tls")]
+/// struct Tls;
+///
+/// impl ServerHook for Tls {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(tls, response_body("tls"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
     tls_macro(item, Position::Prologue)
@@ -982,9 +1203,19 @@ pub fn tls(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[filter(ctx.get_request().await.is_ws())]
-/// async fn handle_ws(ctx: Context) {
-///     // This code will only run for WebSocket requests.
+/// #[route("/unknown_method")]
+/// struct UnknownMethod;
+///
+/// impl ServerHook for UnknownMethod {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         filter(ctx.get_request().await.is_unknown_method()),
+///         response_body("unknown_method")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1002,9 +1233,19 @@ pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[reject(ctx.get_request().await.is_http())]
-/// async fn handle_non_http(ctx: Context) {
-///     // This code will not run for HTTP requests.
+/// #[response_middleware(2)]
+/// struct ResponseMiddleware2;
+///
+/// impl ServerHook for ResponseMiddleware2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         reject(ctx.get_request().await.is_ws()),
+///         response_header(STEP => "response_middleware_2")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1023,19 +1264,22 @@ pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[host("localhost")]
-/// async fn handle_example_com(ctx: Context) {
-///     // Function body for localhost requests
-/// }
+/// #[route("/host")]
+/// struct Host;
 ///
-/// #[host("api.localhost")]
-/// async fn handle_api_subdomain(ctx: Context) {
-///     // Function body for api.localhost requests
+/// impl ServerHook for Host {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[host("localhost")]
+///     #[prologue_macros(response_body("host string literal: localhost"), send)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a string literal specifying the expected host value and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
     host_macro(attr, item, Position::Prologue)
@@ -1052,14 +1296,24 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[reject_host("localhost")]
-/// async fn handle_with_host(ctx: Context) {
-///     // Function body for requests with host header
+/// #[route("/reject_host")]
+/// struct RejectHost;
+///
+/// impl ServerHook for RejectHost {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         reject_host("filter.localhost"),
+///         response_body("host filter string literal")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
     reject_host_macro(attr, item, Position::Prologue)
@@ -1076,19 +1330,24 @@ pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[referer("http://localhost")]
-/// async fn handle_example_referer(ctx: Context) {
-///     // Function body for requests from localhost
-/// }
+/// #[route("/referer")]
+/// struct Referer;
 ///
-/// #[referer("https://api.localhost")]
-/// async fn handle_api_referer(ctx: Context) {
-///     // Function body for requests from api.localhost
+/// impl ServerHook for Referer {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         referer("http://localhost"),
+///         response_body("referer string literal: http://localhost")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a string literal specifying the expected referer value and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
     referer_macro(attr, item, Position::Prologue)
@@ -1105,14 +1364,24 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[reject_referer("http://localhost")]
-/// async fn handle_without_spam_referer(ctx: Context) {
-///     // Function body for requests not from localhost
+/// #[route("/reject_referer")]
+/// struct RejectReferer;
+///
+/// impl ServerHook for RejectReferer {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         reject_referer("http://localhost"),
+///         response_body("referer filter string literal")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts a string literal specifying the referer value to filter out and should be
-/// applied to async functions that accept a `Context` parameter.
+/// applied to async functions that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
     reject_referer_macro(attr, item, Position::Prologue)
@@ -1129,19 +1398,34 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[get]
-/// async fn prologue_handler1(ctx: Context) {
-///     // First pre-execution logic
+/// struct PrologueHooks;
+///
+/// impl ServerHook for PrologueHooks {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[get]
+///     #[http]
+///     async fn handle(self, _ctx: &Context) {}
 /// }
 ///
-/// #[http]
-/// async fn prologue_handler2(ctx: Context) {
-///     // Second pre-execution logic
+/// async fn prologue_hooks_fn(ctx: Context) {
+///     let hook = PrologueHooks::new(&ctx).await;
+///     hook.handle(&ctx).await;
 /// }
 ///
-/// #[prologue_hooks(prologue_handler1, prologue_handler2)]
-/// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs after prologue_handler1 and prologue_handler2)
+/// #[route("/hook")]
+/// struct Hook;
+///
+/// impl ServerHook for Hook {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_hooks(prologue_hooks_fn)]
+///     #[response_body("Testing hook macro")]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1164,19 +1448,33 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send]
-/// async fn epilogue_handler1(ctx: Context) {
-///     // First post-execution logic
+/// struct EpilogueHooks;
+///
+/// impl ServerHook for EpilogueHooks {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_status_code(200)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// #[flush]
-/// async fn epilogue_handler2(ctx: Context) {
-///     // Second post-execution logic
+/// async fn epilogue_hooks_fn(ctx: Context) {
+///     let hook = EpilogueHooks::new(&ctx).await;
+///     hook.handle(&ctx).await;
 /// }
 ///
-/// #[epilogue_hooks(epilogue_handler1, epilogue_handler2)]
-/// async fn main_handler(ctx: Context) {
-///     // Main function logic (runs before epilogue_handler1 and epilogue_handler2)
+/// #[route("/hook")]
+/// struct Hook;
+///
+/// impl ServerHook for Hook {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_hooks(epilogue_hooks_fn)]
+///     #[response_body("Testing hook macro")]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1199,10 +1497,17 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_body(raw_body)]
-/// async fn handle_raw_body(ctx: Context) {
-///     // Use the raw request body
-///     let body_content = raw_body;
+/// #[route("/request_body")]
+/// struct RequestBodyRoute;
+///
+/// impl ServerHook for RequestBodyRoute {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("raw body: {raw_body:?}"))]
+///     #[request_body(raw_body)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1223,19 +1528,25 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
-/// use serde::Deserialize;
+/// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Deserialize, Clone)]
-/// struct UserData {
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct TestData {
 ///     name: String,
 ///     age: u32,
 /// }
 ///
-/// #[request_body_json(user_data: UserData)]
-/// async fn handle_user(ctx: Context) {
-///     if let Ok(data) = user_data {
-///         // Use the parsed user data
+/// #[route("/request_body_json")]
+/// struct RequestBodyJson;
+///
+/// impl ServerHook for RequestBodyJson {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("request data: {request_data_result:?}"))]
+///     #[request_body_json(request_data_result: TestData)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1256,21 +1567,27 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
-/// use serde::Deserialize;
+/// use serde::{Deserialize, Serialize};
 ///
-/// const USER_KEY: &str = "user_data";
+/// const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
 ///
-/// #[derive(Deserialize, Clone)]
-/// struct User {
-///     id: u64,
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct TestData {
 ///     name: String,
+///     age: u32,
 /// }
 ///
-/// #[attribute(USER_KEY => user: User)]
-/// async fn handle_with_attribute(ctx: Context) {
-///     if let Some(user_data) = user {
-///         // Use the extracted attribute
+/// #[route("/attribute")]
+/// struct Attribute;
+///
+/// impl ServerHook for Attribute {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
+///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1292,11 +1609,17 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[attributes(all_attrs)]
-/// async fn handle_with_all_attributes(ctx: Context) {
-///     for (key, value) in all_attrs {
-///         // Process each attribute
+/// #[route("/attributes")]
+/// struct Attributes;
+///
+/// impl ServerHook for Attributes {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("request attributes: {request_attributes:?}"))]
+///     #[attributes(request_attributes)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1318,12 +1641,17 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// // For route like "/users/{id}"
-/// #[route_param("id" => user_id)]
-/// async fn get_user(ctx: Context) {
-///     if let Some(id) = user_id {
-///         // Use the route parameter
+/// #[route("/route_param/:test")]
+/// struct RouteParam;
+///
+/// impl ServerHook for RouteParam {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("route param: {request_route_param:?}"))]
+///     #[route_param("test" => request_route_param)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1345,12 +1673,17 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// // For route like "/users/{id}/posts/{epilogue_id}"
-/// #[route_params(params)]
-/// async fn handle_nested_route(ctx: Context) {
-///     for (key, value) in params {
-///         // Process each route parameter
+/// #[route("/route_params/:test")]
+/// struct RouteParams;
+///
+/// impl ServerHook for RouteParams {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("request route params: {request_route_params:?}"))]
+///     #[route_params(request_route_params)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1372,12 +1705,20 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// // For URL like "/search?q=rust&limit=10"
-/// #[request_query("q" => search_term)]
-/// async fn search(ctx: Context) {
-///     if let Some(term) = search_term {
-///         // Use the request query parameter
+/// #[route("/request_query")]
+/// struct RequestQuery;
+///
+/// impl ServerHook for RequestQuery {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[prologue_macros(
+///         request_query("test" => request_query_option),
+///         response_body(&format!("request query: {request_query_option:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1399,12 +1740,20 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// // For URL like "/search?q=rust&limit=10&sort=date"
-/// #[request_querys(all_params)]
-/// async fn search_with_params(ctx: Context) {
-///     for (key, value) in all_params {
-///         // Process each request query parameter
+/// #[route("/request_querys")]
+/// struct RequestQuerys;
+///
+/// impl ServerHook for RequestQuerys {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[prologue_macros(
+///         request_querys(request_querys),
+///         response_body(&format!("request querys: {request_querys:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1426,18 +1775,20 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_header(HOST => host_request_header)]
-/// async fn handle_with_host(ctx: Context) {
-///     if let Some(host) = host_request_header {
-///         // Use the host request_header value
-///     }
-/// }
+/// #[route("/request_header")]
+/// struct RequestHeader;
 ///
-/// #[request_header("Content-Type" => content_type)]
-/// async fn handle_with_content_type(ctx: Context) {
-///     if let Some(ct) = content_type {
-///         // Use the content type request_header
+/// impl ServerHook for RequestHeader {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[prologue_macros(
+///         request_header(HOST => request_header_option),
+///         response_body(&format!("request header: {request_header_option:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1459,11 +1810,20 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_headers(all_request_headers)]
-/// async fn handle_with_all_request_headers(ctx: Context) {
-///     for (name, value) in all_request_headers {
-///         // Process each request_header
+/// #[route("/request_headers")]
+/// struct RequestHeaders;
+///
+/// impl ServerHook for RequestHeaders {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[prologue_macros(
+///         request_headers(request_headers),
+///         response_body(&format!("request headers: {request_headers:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1486,11 +1846,17 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_cookie("session_id" => session_cookie_opt)]
-/// async fn handle_with_session(ctx: Context) {
-///     if let Some(session) = session_cookie_opt {
-///         // Use the session cookie value
+/// #[route("/cookie")]
+/// struct Cookie;
+///
+/// impl ServerHook for Cookie {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("Session cookie: {session_cookie_opt:?}"))]
+///     #[request_cookie("test" => session_cookie_opt)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1512,12 +1878,17 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_cookies(cookie_value)]
-/// async fn handle_with_cookies(ctx: Context) {
-///     // Use the cookie value
-///     if !cookie_value.is_empty() {
-///         // Process cookie data
+/// #[route("/cookies")]
+/// struct Cookies;
+///
+/// impl ServerHook for Cookies {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("All cookies: {cookie_value:?}"))]
+///     #[request_cookies(cookie_value)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1539,9 +1910,17 @@ pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_version(http_version)]
-/// async fn handle_with_version(ctx: Context) {
-///     // Use the HTTP version
+/// #[route("/request_version")]
+/// struct RequestVersionTest;
+///
+/// impl ServerHook for RequestVersionTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("HTTP Version: {http_version}"))]
+///     #[request_version(http_version)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1563,12 +1942,17 @@ pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_path(request_path)]
-/// async fn handle_with_path(ctx: Context) {
-///     // Use the request path
-///     if request_path.starts_with("/api/") {
-///         // Handle API requests
+/// #[route("/request_path")]
+/// struct RequestPathTest;
+///
+/// impl ServerHook for RequestPathTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
 ///     }
+///
+///     #[response_body(&format!("Request Path: {request_path}"))]
+///     #[request_path(request_path)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1590,10 +1974,13 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[hyperlane(server: Server)]
+/// #[hyperlane(config: ServerConfig)]
 /// #[tokio::main]
 /// async fn main() {
-///     // `server` is now available as: `let server: Server = Server::new().await;`
-///     // The function body can now use `server`.
+///     config.disable_nodelay().await;
+///     server.config(config).await;
+///     let server_hook: ServerControlHook = server.run().await.unwrap_or_default();
+///     server_hook.wait().await;
 /// }
 /// ```
 ///
@@ -1615,9 +2002,16 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/")]
-/// async fn route(ctx: Context) {
-///     // function body
+/// #[route("/response")]
+/// struct Response;
+///
+/// impl ServerHook for Response {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body("response")]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1649,10 +2043,19 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[request_middleware]
-/// #[request_middleware(1)]
-/// #[request_middleware("2")]
-/// async fn log_request(ctx: Context) {
-///     // Middleware logic
+/// struct RequestMiddleware;
+///
+/// impl ServerHook for RequestMiddleware {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(
+///         response_status_code(200),
+///         response_version(HttpVersion::HTTP1_1),
+///         response_header(SERVER => HYPERLANE)
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1680,10 +2083,15 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[response_middleware]
-/// #[response_middleware(1)]
-/// #[response_middleware("2")]
-/// async fn add_custom_header(ctx: Context) {
-///     // Middleware logic
+/// struct ResponseMiddleware1;
+///
+/// impl ServerHook for ResponseMiddleware1 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_header(STEP => "response_middleware_1")]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1713,8 +2121,15 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// #[panic_hook]
 /// #[panic_hook(1)]
 /// #[panic_hook("2")]
-/// async fn handle_panic(ctx: Context) {
-///     // Panic handling logic
+/// struct PanicHook;
+///
+/// impl ServerHook for PanicHook {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(response_body("panic_hook"), send)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1737,9 +2152,16 @@ pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[prologue_macros(post, send)]
-/// async fn handler(ctx: Context) {
-///     // ...
+/// #[route("/post")]
+/// struct Post;
+///
+/// impl ServerHook for Post {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(post, response_body("post"), send_once)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1758,9 +2180,16 @@ pub fn prologue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[epilogue_macros(post, send)]
-/// async fn handler(ctx: Context) {
-///     // ...
+/// #[response_middleware(2)]
+/// struct ResponseMiddleware2;
+///
+/// impl ServerHook for ResponseMiddleware2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send, flush)]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1780,14 +2209,21 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[send_body_with_data("Response body content")]
-/// async fn send_body_with_data_handler(ctx: Context) {
-///     // Response body is automatically sent with the specified data after function returns
+/// #[route("/send_body_with_data")]
+/// struct SendBodyWithData;
+///
+/// impl ServerHook for SendBodyWithData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send_body_with_data("Response body content"))]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts data to send and should be applied to async functions
-/// that accept a `Context` parameter.
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_with_data_macro(attr, item, Position::Epilogue)
@@ -1819,9 +2255,21 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http_from_stream]
-/// async fn handle_data(ctx: Context) {
-///     // Process data from HTTP stream with default buffer size
+/// #[route("/ws3")]
+/// struct Websocket3;
+///
+/// impl ServerHook for Websocket3 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
 /// }
 /// ```
 ///
@@ -1830,42 +2278,21 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[ws_from_stream(1024)]
-/// async fn handle_data(ctx: Context) {
-///     // Process data from stream with 1024 byte buffer
-/// }
-/// ```
+/// #[route("/ws2")]
+/// struct Websocket2;
 ///
-/// Using a variable name for the data:
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
+/// impl ServerHook for Websocket2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[ws_from_stream(data)]
-/// async fn handle_data(ctx: Context) {
-///     // Data will be available in the `data` variable
-/// }
-/// ```
-///
-/// Using both buffer size and variable name:
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[ws_from_stream(1024, payload)]
-/// async fn handle_large_data(ctx: Context) {
-///     // Process large data with 1024 byte buffer, available in `payload` variable
-/// }
-/// ```
-///
-/// Reversing buffer size and variable name:
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[ws_from_stream(payload, 1024)]
-/// async fn handle_reversed_data(ctx: Context) {
-///     // Process data with 1024 byte buffer, available in `payload` variable
+///     #[ws]
+///     #[ws_from_stream(1024)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1894,47 +2321,49 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Examples
 ///
-/// Using no parameters (default buffer size):
+/// Using with epilogue_macros:
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http_from_stream]
-/// async fn handle_data(ctx: Context) {
-///     // Process data from HTTP stream with default buffer size
+/// #[route("/request_query")]
+/// struct RequestQuery;
+///
+/// impl ServerHook for RequestQuery {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(
+///         request_query("test" => request_query_option),
+///         response_body(&format!("request query: {request_query_option:?}")),
+///         send,
+///         http_from_stream(1024)
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
-/// Basic usage with buffer size:
+/// Using with variable name:
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[http_from_stream(1024)]
-/// async fn handle_data(ctx: Context) {
-///     // Process data from stream with 1024 byte buffer
-/// }
-/// ```
+/// #[route("/request_header")]
+/// struct RequestHeader;
 ///
-/// Using a variable name for the data:
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
+/// impl ServerHook for RequestHeader {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
 ///
-/// #[http_from_stream(data)]
-/// async fn handle_data(ctx: Context) {
-///     // Data will be available in the `data` variable
-/// }
-/// ```
-///
-/// Using both buffer size and variable name:
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[http_from_stream(1024, payload)]
-/// async fn handle_large_data(ctx: Context) {
-///     // Process large data with 1024 byte buffer, available in `payload` variable
+///     #[epilogue_macros(
+///         request_header(HOST => request_header_option),
+///         response_body(&format!("request header: {request_header_option:?}")),
+///         send,
+///         http_from_stream(_request)
+///     )]
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 #[proc_macro_attribute]
