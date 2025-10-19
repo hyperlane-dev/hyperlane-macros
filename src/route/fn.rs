@@ -26,7 +26,7 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
     let struct_name: &Ident = &input_struct.ident;
     let factory_fn_name: Ident = Ident::new(
-        &format!("__route_factory_{}", struct_name),
+        &format!("__route_factory_{struct_name}"),
         struct_name.span(),
     );
     let gen_code: TokenStream2 = quote! {

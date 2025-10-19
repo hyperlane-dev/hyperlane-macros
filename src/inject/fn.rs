@@ -43,7 +43,7 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
                 Handler::WithAttr(handler) => handler(macro_attr, item_stream),
                 Handler::NoAttrPosition(handler) => {
                     if !macro_attr.is_empty() {
-                        panic!("Macro {} does not take attributes", macro_name);
+                        panic!("Macro {macro_name} does not take attributes");
                     }
                     handler(item_stream, position)
                 }
@@ -51,7 +51,7 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
             };
         }
     }
-    panic!("Unsupported macro: {}", macro_name);
+    panic!("Unsupported macro: {macro_name}");
 }
 
 /// Injects a list of macros before the decorated function.

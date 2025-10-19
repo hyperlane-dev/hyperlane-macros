@@ -64,7 +64,7 @@ impl ServerHook for UpgradeHook {
         response_status_code(101),
         response_header(UPGRADE => WEBSOCKET),
         response_header(CONNECTION => UPGRADE),
-        response_header(SEC_WEBSOCKET_ACCEPT => &WebSocketFrame::generate_accept_key(&ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
+        response_header(SEC_WEBSOCKET_ACCEPT => &WebSocketFrame::generate_accept_key(ctx.try_get_request_header_back(SEC_WEBSOCKET_KEY).await.unwrap())),
         response_header(STEP => "upgrade_hook"),
         send
     )]
@@ -439,7 +439,7 @@ impl ServerHook for Websocket2 {
     #[ws]
     #[ws_from_stream(request)]
     async fn handle(self, ctx: &Context) {
-        let body: &RequestBody = &request.get_body();
+        let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
@@ -457,7 +457,7 @@ impl ServerHook for Websocket3 {
     #[ws_from_stream(1024, request)]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
-        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
 }
@@ -474,7 +474,7 @@ impl ServerHook for Websocket4 {
     #[ws_from_stream(request, 1024)]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
-        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
 }

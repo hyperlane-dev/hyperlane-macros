@@ -230,7 +230,7 @@ pub(crate) fn generate_factory_fn_name(
     order_expr: &Option<Expr>,
 ) -> Ident {
     match order_expr {
-        None => Ident::new(&format!("{}_{}", prefix, struct_name), struct_name.span()),
+        None => Ident::new(&format!("{prefix}_{struct_name}"), struct_name.span()),
         Some(expr) => {
             let order_suffix = match expr {
                 Expr::Lit(ExprLit {
@@ -244,7 +244,7 @@ pub(crate) fn generate_factory_fn_name(
                 _ => "custom".to_string(),
             };
             Ident::new(
-                &format!("{}_{}_{}", prefix, struct_name, order_suffix),
+                &format!("{prefix}_{struct_name}_{order_suffix}"),
                 struct_name.span(),
             )
         }

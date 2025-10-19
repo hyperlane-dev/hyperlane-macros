@@ -72,7 +72,7 @@ pub(crate) fn create_method_check(
     method_name: &str,
     span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> TokenStream2 {
-    let check_method: Ident = Ident::new(&format!("is_{}", method_name), span);
+    let check_method: Ident = Ident::new(&format!("is_{method_name}"), span);
     move |context| {
         quote! {
             if !#context.get_request().await.#check_method() {
@@ -108,7 +108,7 @@ pub(crate) fn methods_macro(
     match parse_self_from_method(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
-                let check_fn: Ident = Ident::new(&format!("is_{}", method), method.span());
+                let check_fn: Ident = Ident::new(&format!("is_{method}"), method.span());
                 quote! {
                     #context.get_request().await.#check_fn()
                 }
