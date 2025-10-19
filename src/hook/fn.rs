@@ -30,7 +30,11 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
         #[allow(non_snake_case)]
         fn #factory_fn_name() -> ::hyperlane::ServerHookHandler {
             ::std::sync::Arc::new(|ctx: &::hyperlane::Context| {
-                ::std::boxed::Box::pin(#struct_name(ctx.clone()))
+                let ctx = ctx.clone();
+                ::std::boxed::Box::pin(async move {
+                    let hook = #struct_name::new(&ctx).await;
+                    hook.handle(&ctx).await;
+                })
             })
         }
         inventory::submit! {

@@ -50,7 +50,6 @@ impl ServerHook for RequestMiddleware {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[ws]
 #[request_middleware(1)]
 struct UpgradeHook;
 
@@ -60,6 +59,7 @@ impl ServerHook for UpgradeHook {
     }
 
     #[epilogue_macros(
+        ws,
         response_body(&vec![]),
         response_status_code(101),
         response_header(UPGRADE => WEBSOCKET),
@@ -131,8 +131,6 @@ impl ServerHook for ResponseMiddleware3 {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[get]
-#[http]
 struct PrologueHooks;
 
 impl ServerHook for PrologueHooks {
@@ -140,7 +138,9 @@ impl ServerHook for PrologueHooks {
         Self
     }
 
-    async fn handle(self, ctx: &Context) {}
+    #[get]
+    #[http]
+    async fn handle(self, _ctx: &Context) {}
 }
 
 struct EpilogueHooks;
@@ -152,6 +152,16 @@ impl ServerHook for EpilogueHooks {
 
     #[response_status_code(200)]
     async fn handle(self, ctx: &Context) {}
+}
+
+async fn prologue_hooks_fn(ctx: Context) {
+    let hook = PrologueHooks::new(&ctx).await;
+    hook.handle(&ctx).await;
+}
+
+async fn epilogue_hooks_fn(ctx: Context) {
+    let hook = EpilogueHooks::new(&ctx).await;
+    hook.handle(&ctx).await;
 }
 
 #[route("/response")]
@@ -378,7 +388,6 @@ impl ServerHook for UnknownMethod {
 }
 
 #[route("/get")]
-#[send_body_once]
 struct Get;
 
 impl ServerHook for Get {
@@ -386,11 +395,10 @@ impl ServerHook for Get {
         Self
     }
 
-    #[prologue_macros(ws, get, response_body("get"))]
+    #[prologue_macros(ws, get, response_body("get"), send_body_once)]
     async fn handle(self, ctx: &Context) {}
 }
 
-#[send_once]
 #[route("/post")]
 struct Post;
 
@@ -399,13 +407,11 @@ impl ServerHook for Post {
         Self
     }
 
-    #[prologue_macros(post, response_body("post"))]
+    #[prologue_macros(post, response_body("post"), send_once)]
     async fn handle(self, ctx: &Context) {}
 }
 
-#[ws]
 #[route("/ws1")]
-#[ws_from_stream]
 struct Websocket1;
 
 impl ServerHook for Websocket1 {
@@ -413,6 +419,7 @@ impl ServerHook for Websocket1 {
         Self
     }
 
+    #[ws]
     async fn handle(self, ctx: &Context) {
         let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -420,9 +427,7 @@ impl ServerHook for Websocket1 {
     }
 }
 
-#[ws]
 #[route("/ws2")]
-#[ws_from_stream(1024)]
 struct Websocket2;
 
 impl ServerHook for Websocket2 {
@@ -430,6 +435,8 @@ impl ServerHook for Websocket2 {
         Self
     }
 
+    #[ws]
+    #[ws_from_stream(1024)]
     async fn handle(self, ctx: &Context) {
         let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -437,9 +444,7 @@ impl ServerHook for Websocket2 {
     }
 }
 
-#[ws]
 #[route("/ws3")]
-#[ws_from_stream(request)]
 struct Websocket3;
 
 impl ServerHook for Websocket3 {
@@ -447,16 +452,16 @@ impl ServerHook for Websocket3 {
         Self
     }
 
+    #[ws]
+    #[ws_from_stream]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = request.get_body().clone();
+        let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
 }
 
-#[ws]
 #[route("/ws4")]
-#[ws_from_stream(1024, request)]
 struct Websocket4;
 
 impl ServerHook for Websocket4 {
@@ -464,16 +469,16 @@ impl ServerHook for Websocket4 {
         Self
     }
 
+    #[ws]
+    #[ws_from_stream(1024)]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = request.get_body().clone();
+        let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
 }
 
-#[ws]
 #[route("/ws5")]
-#[ws_from_stream(request, 1024)]
 struct Websocket5;
 
 impl ServerHook for Websocket5 {
@@ -481,8 +486,10 @@ impl ServerHook for Websocket5 {
         Self
     }
 
+    #[ws]
+    #[ws_from_stream(1024)]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = request.get_body().clone();
+        let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
@@ -496,13 +503,12 @@ impl ServerHook for Hook {
         Self
     }
 
-    #[prologue_hooks(PrologueHooks)]
-    #[epilogue_hooks(EpilogueHooks)]
+    #[prologue_hooks(prologue_hooks_fn)]
+    #[epilogue_hooks(epilogue_hooks_fn)]
     #[response_body("Testing hook macro")]
     async fn handle(self, ctx: &Context) {}
 }
 
-#[closed]
 #[route("/get_post")]
 struct GetPost;
 
@@ -511,6 +517,7 @@ impl ServerHook for GetPost {
         Self
     }
 
+    #[closed]
     #[prologue_macros(
         http,
         methods(get, post),
@@ -561,7 +568,6 @@ impl ServerHook for RouteParam {
 }
 
 #[route("/host")]
-#[host("localhost")]
 struct Host;
 
 impl ServerHook for Host {
@@ -569,6 +575,7 @@ impl ServerHook for Host {
         Self
     }
 
+    #[host("localhost")]
     #[epilogue_macros(
         response_body("host string literal: localhost"),
         send,

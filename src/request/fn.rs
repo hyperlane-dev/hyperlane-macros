@@ -119,7 +119,7 @@ pub(crate) fn attributes_macro(
     let variable: Ident = attributes.variable;
     inject(position, item, |context| {
         quote! {
-            let #variable: ::hyperlane::HashMapArcAnySendSync = #context.get_attributes().await;
+            let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
         }
     })
 }

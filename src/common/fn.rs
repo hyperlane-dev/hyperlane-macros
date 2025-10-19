@@ -211,6 +211,7 @@ pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
     )
 }
 
+/// Handles macros that can be applied to either structs or functions.
 /// Generates a factory function name based on prefix, struct name, and optional order.
 ///
 /// This function creates a valid Rust identifier for factory functions by:
