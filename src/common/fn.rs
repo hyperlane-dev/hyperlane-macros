@@ -127,26 +127,23 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
 /// - `syn::Result<&Ident>` - Returns the context identifier from the second parameter.
 pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
     match sig.inputs.first() {
-        Some(FnArg::Receiver(_)) => {
-            // Get the second parameter (context)
-            match sig.inputs.iter().nth(1) {
-                Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-                    Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
-                    Pat::Wild(wild) => Err(syn::Error::new_spanned(
-                        wild,
-                        "The context argument cannot be anonymous `_`, please use a named identifier",
-                    )),
-                    _ => Err(syn::Error::new_spanned(
-                        &pat_type.pat,
-                        "expected identifier as second argument (context)",
-                    )),
-                },
-                _ => Err(syn::Error::new_spanned(
-                    &sig.inputs,
-                    "expected context as second argument",
+        Some(FnArg::Receiver(_)) => match sig.inputs.iter().nth(1) {
+            Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
+                Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
+                Pat::Wild(wild) => Err(syn::Error::new_spanned(
+                    wild,
+                    "The context argument cannot be anonymous `_`, please use a named identifier",
                 )),
-            }
-        }
+                _ => Err(syn::Error::new_spanned(
+                    &pat_type.pat,
+                    "expected identifier as second argument (context)",
+                )),
+            },
+            _ => Err(syn::Error::new_spanned(
+                &sig.inputs,
+                "expected context as second argument",
+            )),
+        },
         _ => Err(syn::Error::new_spanned(
             &sig.inputs,
             "expected self as first argument for method",
