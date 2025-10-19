@@ -2252,10 +2252,10 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws3")]
-/// struct Websocket3;
+/// #[route("/ws1")]
+/// struct Websocket1;
 ///
-/// impl ServerHook for Websocket3 {
+/// impl ServerHook for Websocket1 {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -2270,7 +2270,30 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 /// ```
 ///
-/// Basic usage with buffer size:
+/// Using only buffer size:
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws5")]
+/// struct Websocket5;
+///
+/// impl ServerHook for Websocket5 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(1024)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using variable name to store request data:
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
@@ -2284,9 +2307,55 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(1024)]
+///     #[ws_from_stream(request)]
 ///     async fn handle(self, ctx: &Context) {
-///         let body: RequestBody = ctx.get_request_body().await;
+///         let body: &RequestBody = &request.get_body();
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using buffer size and variable name:
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws3")]
+/// struct Websocket3;
+///
+/// impl ServerHook for Websocket3 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(1024, request)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: &RequestBody = request.get_body();
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using variable name and buffer size (reversed order):
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws4")]
+/// struct Websocket4;
+///
+/// impl ServerHook for Websocket4 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(request, 1024)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
 ///         ctx.send_body_list_with_data(&body_list).await.unwrap();
 ///     }
