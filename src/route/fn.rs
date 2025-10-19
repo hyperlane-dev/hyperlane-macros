@@ -41,7 +41,7 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
                 })
             })
         }
-        ::inventory::submit! {
+        ::hyperlane::server_submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::Route(#path),
                 handler: ::hyperlane::HookHandler::Factory(#factory_fn_name),
