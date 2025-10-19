@@ -69,7 +69,7 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
 /// The resulting token stream after applying all the prologue hooks.
 pub(crate) fn prologue_macros_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let metas: Punctuated<Meta, Comma> = Punctuated::<Meta, Token![,]>::parse_terminated
-        .parse(attr.into())
+        .parse(attr)
         .expect("Failed to parse macro attributes");
     let mut current_stream: TokenStream = item;
     for meta in metas.iter().rev() {
@@ -93,7 +93,7 @@ pub(crate) fn prologue_macros_macro(attr: TokenStream, item: TokenStream) -> Tok
 /// The resulting token stream after applying all the epilogue hooks.
 pub(crate) fn epilogue_macros_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let metas: Punctuated<Meta, Comma> = Punctuated::<Meta, Token![,]>::parse_terminated
-        .parse(attr.into())
+        .parse(attr)
         .expect("Failed to parse macro attributes");
     let mut current_stream: TokenStream = item;
     for meta in metas.iter() {

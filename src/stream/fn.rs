@@ -81,7 +81,7 @@ pub(crate) fn http_from_stream_macro(attr: TokenStream, item: TokenStream) -> To
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
             let loop_stream: TokenStream2 =
-                generate_stream(&context, "http_from_stream", &data, stmts);
+                generate_stream(context, "http_from_stream", &data, stmts);
             quote! {
                 #(#attrs)*
                 #vis #sig {
@@ -126,7 +126,7 @@ pub(crate) fn ws_from_stream_macro(attr: TokenStream, item: TokenStream) -> Toke
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
             let loop_stream: TokenStream2 =
-                generate_stream(&context, "ws_from_stream", &data, stmts);
+                generate_stream(context, "ws_from_stream", &data, stmts);
             quote! {
                 #(#attrs)*
                 #vis #sig {
