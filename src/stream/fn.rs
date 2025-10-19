@@ -77,7 +77,7 @@ pub(crate) fn http_from_stream_macro(attr: TokenStream, item: TokenStream) -> To
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_self_from_method(sig).or_else(|_| parse_context_from_fn(sig)) {
+    match parse_context_from_signature(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
             let loop_stream: TokenStream2 =
@@ -122,7 +122,7 @@ pub(crate) fn ws_from_stream_macro(attr: TokenStream, item: TokenStream) -> Toke
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_self_from_method(sig).or_else(|_| parse_context_from_fn(sig)) {
+    match parse_context_from_signature(sig) {
         Ok(context) => {
             let stmts: &Vec<Stmt> = &block.stmts;
             let loop_stream: TokenStream2 =

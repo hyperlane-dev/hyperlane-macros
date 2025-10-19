@@ -839,6 +839,189 @@ impl ServerHook for Literals {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/inject/response_body")]
+struct InjectResponseBody;
+
+impl ServerHook for InjectResponseBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.response_body_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectResponseBody {
+    #[response_body("response body with ref self")]
+    async fn response_body_with_ref_self(&self, ctx: &Context) {}
+}
+
+#[route("/inject/post_method")]
+struct InjectPostMethod;
+
+impl ServerHook for InjectPostMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.post_method_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectPostMethod {
+    #[prologue_macros(post, response_body("post method with ref self"))]
+    async fn post_method_with_ref_self(&self, ctx: &Context) {}
+}
+
+#[route("/inject/send_flush")]
+struct InjectSendFlush;
+
+impl ServerHook for InjectSendFlush {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.send_and_flush_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectSendFlush {
+    #[epilogue_macros(send, flush)]
+    async fn send_and_flush_with_ref_self(&self, ctx: &Context) {}
+}
+
+#[route("/inject/request_body")]
+struct InjectRequestBody;
+
+impl ServerHook for InjectRequestBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.extract_request_body_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectRequestBody {
+    #[request_body(_raw_body)]
+    async fn extract_request_body_with_ref_self(&self, _ctx: &Context) {}
+}
+
+#[route("/inject/multiple_methods")]
+struct InjectMultipleMethods;
+
+impl ServerHook for InjectMultipleMethods {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.multiple_methods_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectMultipleMethods {
+    #[methods(get, post)]
+    async fn multiple_methods_with_ref_self(&self, ctx: &Context) {}
+}
+
+#[route("/inject/http_stream")]
+struct InjectHttpStream;
+
+impl ServerHook for InjectHttpStream {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.http_stream_handler_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectHttpStream {
+    #[http_from_stream(1024, _request)]
+    async fn http_stream_handler_with_ref_self(&self, _ctx: &Context) {}
+}
+
+#[route("/inject/ws_stream")]
+struct InjectWsStream;
+
+impl ServerHook for InjectWsStream {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.websocket_stream_handler_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectWsStream {
+    #[ws_from_stream(_request)]
+    async fn websocket_stream_handler_with_ref_self(&self, _ctx: &Context) {}
+}
+
+#[route("/inject/complex_post")]
+struct InjectComplexPost;
+
+impl ServerHook for InjectComplexPost {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.complex_post_handler_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectComplexPost {
+    #[prologue_macros(
+        post,
+        http,
+        request_body(raw_body),
+        response_status_code(201),
+        response_header(CONTENT_TYPE => APPLICATION_JSON),
+        response_body(&format!("Received: {raw_body:?}"))
+    )]
+    #[epilogue_macros(send, flush)]
+    async fn complex_post_handler_with_ref_self(&self, ctx: &Context) {}
+}
+
+#[response_body("standalone response body")]
+async fn standalone_response_body_handler(ctx: &Context) {}
+
+#[prologue_macros(get, response_body("standalone get handler"))]
+async fn standalone_get_handler(ctx: &Context) {}
+
+#[epilogue_macros(send, flush)]
+async fn standalone_send_and_flush_handler(ctx: &Context) {}
+
+#[request_body(_raw_body)]
+async fn standalone_request_body_extractor(ctx: &Context) {}
+
+#[methods(get, post)]
+async fn standalone_multiple_methods_handler(ctx: &Context) {}
+
+#[http_from_stream]
+async fn standalone_http_stream_handler(ctx: &Context) {}
+
+#[ws_from_stream]
+async fn standalone_websocket_stream_handler(ctx: &Context) {}
+
+#[prologue_macros(
+    get,
+    http,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => TEXT_PLAIN),
+    response_body("standalone complex handler")
+)]
+#[epilogue_macros(send, flush)]
+async fn standalone_complex_get_handler(ctx: &Context) {}
+
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]
 #[tokio::main]

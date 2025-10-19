@@ -19,7 +19,7 @@ fn inject_at_start(
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_self_from_method(sig) {
+    match parse_context_from_signature(sig) {
         Ok(context) => {
             let before_code: TokenStream2 = before_fn(context);
             let stmts: &Vec<Stmt> = &block.stmts;
@@ -48,7 +48,7 @@ fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStrea
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_self_from_method(sig) {
+    match parse_context_from_signature(sig) {
         Ok(context) => {
             let after_code: TokenStream2 = after_fn(context);
             let stmts: &Vec<Stmt> = &block.stmts;
@@ -96,6 +96,7 @@ pub(crate) fn inject(
 /// # Returns
 ///
 /// - `syn::Result<&Ident>` - Returns a `syn::Result` containing the context identifier if successful, or an error otherwise.
+#[allow(dead_code)]
 pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
     match sig.inputs.first() {
         Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
@@ -125,6 +126,7 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
 /// # Returns
 ///
 /// - `syn::Result<&Ident>` - Returns the context identifier from the second parameter.
+#[allow(dead_code)]
 pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
     match sig.inputs.first() {
         Some(FnArg::Receiver(_)) => match sig.inputs.iter().nth(1) {
@@ -147,6 +149,56 @@ pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
         _ => Err(syn::Error::new_spanned(
             &sig.inputs,
             "expected self as first argument for method",
+        )),
+    }
+}
+
+/// Parses context identifier from function signature, supporting both methods with self and functions without self.
+///
+/// This function handles two cases:
+/// 1. Methods with self (or &self, &mut self, etc.): Returns the second parameter as context
+/// 2. Functions without self: Returns the first parameter as context
+///
+/// # Arguments
+///
+/// - `&Signature` - The function signature to parse.
+///
+/// # Returns
+///
+/// - `syn::Result<&Ident>` - Returns the context identifier.
+pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<&Ident> {
+    match sig.inputs.first() {
+        Some(FnArg::Receiver(_)) => match sig.inputs.iter().nth(1) {
+            Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
+                Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
+                Pat::Wild(wild) => Err(syn::Error::new_spanned(
+                    wild,
+                    "The context argument cannot be anonymous `_`, please use a named identifier",
+                )),
+                _ => Err(syn::Error::new_spanned(
+                    &pat_type.pat,
+                    "expected identifier as second argument (context)",
+                )),
+            },
+            _ => Err(syn::Error::new_spanned(
+                &sig.inputs,
+                "expected context as second argument",
+            )),
+        },
+        Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
+            Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
+            Pat::Wild(wild) => Err(syn::Error::new_spanned(
+                wild,
+                "The context argument cannot be anonymous `_`, please use a named identifier",
+            )),
+            _ => Err(syn::Error::new_spanned(
+                &pat_type.pat,
+                "expected identifier as first argument (context)",
+            )),
+        },
+        _ => Err(syn::Error::new_spanned(
+            &sig.inputs,
+            "expected at least one argument",
         )),
     }
 }

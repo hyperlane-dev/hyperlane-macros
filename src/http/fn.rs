@@ -31,31 +31,14 @@ macro_rules! impl_http_method_macro {
     };
 }
 
-// Generates a handler that checks if the HTTP method is GET.
 impl_http_method_macro!(get_handler, "get");
-
-// Generates a handler that checks if the HTTP method is POST.
 impl_http_method_macro!(epilogue_handler, "post");
-
-// Generates a handler that checks if the HTTP method is PUT.
 impl_http_method_macro!(put_handler, "put");
-
-// Generates a handler that checks if the HTTP method is DELETE.
 impl_http_method_macro!(delete_handler, "delete");
-
-// Generates a handler that checks if the HTTP method is PATCH.
 impl_http_method_macro!(patch_handler, "patch");
-
-// Generates a handler that checks if the HTTP method is HEAD.
 impl_http_method_macro!(head_handler, "head");
-
-// Generates a handler that checks if the HTTP method is OPTIONS.
 impl_http_method_macro!(options_handler, "options");
-
-// Generates a handler that checks if the HTTP method is CONNECT.
 impl_http_method_macro!(connect_handler, "connect");
-
-// Generates a handler that checks if the HTTP method is TRACE.
 impl_http_method_macro!(trace_handler, "trace");
 
 /// Creates a method check function for HTTP request validation.
@@ -105,7 +88,7 @@ pub(crate) fn methods_macro(
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let sig: &Signature = &input_fn.sig;
-    match parse_self_from_method(sig) {
+    match parse_context_from_signature(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
                 let check_fn: Ident = Ident::new(&format!("is_{method}"), method.span());
