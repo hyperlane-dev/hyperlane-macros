@@ -20,14 +20,26 @@ use crate::*;
 pub(crate) fn response_middleware_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
-    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
-    let fn_name: &Ident = &input_fn.sig.ident;
+    let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
+    let struct_name: &Ident = &input_struct.ident;
+    let factory_fn_name: Ident = generate_factory_fn_name(
+        "__response_middleware_factory",
+        struct_name,
+        &attr_args.order,
+    );
     let gen_code: TokenStream2 = quote! {
-        #input_fn
+        #input_struct
+        #[inline]
+        #[allow(non_snake_case)]
+        fn #factory_fn_name() -> ::hyperlane::ServerHookHandler {
+            ::std::sync::Arc::new(|ctx: &::hyperlane::Context| {
+                ::std::boxed::Box::pin(#struct_name(ctx.clone()))
+            })
+        }
         inventory::submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::ResponseMiddleware(#order),
-                handler: |ctx: ::hyperlane::Context| Box::pin(#fn_name(ctx)),
+                handler: ::hyperlane::HookHandler::Factory(#factory_fn_name),
             }
         }
     };

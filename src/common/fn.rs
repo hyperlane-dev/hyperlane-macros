@@ -1,6 +1,6 @@
 use crate::*;
 
-/// Expands macro with code inserted before function body.
+/// Expands macro with code inserted before method body.
 ///
 /// # Arguments
 ///
@@ -19,7 +19,7 @@ fn inject_at_start(
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_context_from_fn(sig) {
+    match parse_self_from_method(sig) {
         Ok(context) => {
             let before_code: TokenStream2 = before_fn(context);
             let stmts: &Vec<Stmt> = &block.stmts;
@@ -36,19 +36,19 @@ fn inject_at_start(
     }
 }
 
-/// Expands macro with code inserted after function body.
+/// Expands macro with code inserted after method body.
 ///
 /// # Arguments
 ///
 /// - `TokenStream` - The input `TokenStream` to process.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that takes a context identifier and returns a `TokenStream` to be inserted at the end of the function.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that takes a context identifier and returns a `TokenStream` to be inserted at the end of the method.
 fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStream2) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
-    match parse_context_from_fn(sig) {
+    match parse_self_from_method(sig) {
         Ok(context) => {
             let after_code: TokenStream2 = after_fn(context);
             let stmts: &Vec<Stmt> = &block.stmts;
@@ -65,13 +65,13 @@ fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStrea
     }
 }
 
-/// Injects code into a function at a specified position.
+/// Injects code into a method at a specified position.
 ///
 /// # Arguments
 ///
 /// - `Position` - The position at which to inject the code (`Prologue` or `Epilogue`).
-/// - `TokenStream` - The input `TokenStream` of the function to modify.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the function's context identifier.
+/// - `TokenStream` - The input `TokenStream` of the method to modify.
+/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the method's context identifier.
 ///
 /// # Returns
 ///
@@ -112,6 +112,44 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
         _ => Err(syn::Error::new_spanned(
             &sig.inputs,
             "expected at least one argument",
+        )),
+    }
+}
+
+/// Parses self from method signature and returns the context identifier (second parameter).
+///
+/// # Arguments
+///
+/// - `&Signature` - The method signature to parse.
+///
+/// # Returns
+///
+/// - `syn::Result<&Ident>` - Returns the context identifier from the second parameter.
+pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
+    match sig.inputs.first() {
+        Some(FnArg::Receiver(_)) => {
+            // Get the second parameter (context)
+            match sig.inputs.iter().nth(1) {
+                Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
+                    Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
+                    Pat::Wild(wild) => Err(syn::Error::new_spanned(
+                        wild,
+                        "The context argument cannot be anonymous `_`, please use a named identifier",
+                    )),
+                    _ => Err(syn::Error::new_spanned(
+                        &pat_type.pat,
+                        "expected identifier as second argument (context)",
+                    )),
+                },
+                _ => Err(syn::Error::new_spanned(
+                    &sig.inputs,
+                    "expected context as second argument",
+                )),
+            }
+        }
+        _ => Err(syn::Error::new_spanned(
+            &sig.inputs,
+            "expected self as first argument for method",
         )),
     }
 }
@@ -171,4 +209,46 @@ pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
             ..
         })
     )
+}
+
+/// Generates a factory function name based on prefix, struct name, and optional order.
+///
+/// This function creates a valid Rust identifier for factory functions by:
+/// - Using only the prefix and struct name when order is None
+/// - Extracting the numeric value from order expression and appending it when order is Some
+///
+/// # Arguments
+///
+/// - `prefix` - The prefix for the factory function name (e.g., "__panic_hook_factory").
+/// - `struct_name` - The identifier of the struct.
+/// - `order_expr` - Optional expression representing the order value.
+///
+/// # Returns
+///
+/// - `Ident` - A valid Rust identifier for the factory function.
+pub(crate) fn generate_factory_fn_name(
+    prefix: &str,
+    struct_name: &Ident,
+    order_expr: &Option<Expr>,
+) -> Ident {
+    match order_expr {
+        None => Ident::new(&format!("{}_{}", prefix, struct_name), struct_name.span()),
+        Some(expr) => {
+            let order_suffix = match expr {
+                Expr::Lit(ExprLit {
+                    lit: Lit::Int(lit_int),
+                    ..
+                }) => lit_int.base10_digits().to_string(),
+                Expr::Lit(ExprLit {
+                    lit: Lit::Str(lit_str),
+                    ..
+                }) => lit_str.value(),
+                _ => "custom".to_string(),
+            };
+            Ident::new(
+                &format!("{}_{}_{}", prefix, struct_name, order_suffix),
+                struct_name.span(),
+            )
+        }
+    }
 }

@@ -105,7 +105,7 @@ pub(crate) fn methods_macro(
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
     let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let sig: &Signature = &input_fn.sig;
-    match parse_context_from_fn(sig) {
+    match parse_self_from_method(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
                 let check_fn: Ident = Ident::new(&format!("is_{}", method), method.span());
