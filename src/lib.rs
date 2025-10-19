@@ -396,6 +396,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[ws]
+///     #[ws_from_stream]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -896,9 +897,7 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[aborted]
-///     async fn handle(self, ctx: &Context) {
-///         // Handle aborted request logic
-///     }
+///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
@@ -1242,8 +1241,7 @@ pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         reject(ctx.get_request().await.is_ws()),
-///         response_header(STEP => "response_middleware_2")
+///         reject(ctx.get_request().await.is_ws())
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
@@ -1969,7 +1967,7 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Usage
 ///
-/// ```rust
+/// ```rust,no_run
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
@@ -2090,7 +2088,6 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_header(STEP => "response_middleware_1")]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```

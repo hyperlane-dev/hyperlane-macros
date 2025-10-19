@@ -420,6 +420,7 @@ impl ServerHook for Websocket1 {
     }
 
     #[ws]
+    #[ws_from_stream]
     async fn handle(self, ctx: &Context) {
         let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -436,10 +437,10 @@ impl ServerHook for Websocket2 {
     }
 
     #[ws]
-    #[ws_from_stream(1024)]
+    #[ws_from_stream(request)]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = ctx.get_request_body().await;
-        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+        let body: &RequestBody = &request.get_body();
+        let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
 }
@@ -453,9 +454,9 @@ impl ServerHook for Websocket3 {
     }
 
     #[ws]
-    #[ws_from_stream]
+    #[ws_from_stream(1024, request)]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = ctx.get_request_body().await;
+        let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
@@ -470,9 +471,9 @@ impl ServerHook for Websocket4 {
     }
 
     #[ws]
-    #[ws_from_stream(1024)]
+    #[ws_from_stream(request, 1024)]
     async fn handle(self, ctx: &Context) {
-        let body: RequestBody = ctx.get_request_body().await;
+        let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
         ctx.send_body_list_with_data(&body_list).await.unwrap();
     }
