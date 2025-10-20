@@ -1207,7 +1207,7 @@ impl InjectComplexPost {
     async fn test_with_bool_param(_a: bool, ctx: &Context) {}
 
     #[get]
-    async fn test_with_multiple_params(_a: bool, ctx: &Context, b: i32) {}
+    async fn test_with_multiple_params(_a: bool, ctx: &Context, _b: i32) {}
 }
 
 #[response_body("standalone response body")]
