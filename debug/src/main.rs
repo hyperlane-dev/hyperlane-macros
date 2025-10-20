@@ -991,6 +991,14 @@ impl InjectComplexPost {
     async fn complex_post_handler_with_ref_self(&self, ctx: &Context) {}
 }
 
+impl InjectComplexPost {
+    #[post]
+    async fn test_with_bool_param(_a: bool, ctx: &Context) {}
+
+    #[get]
+    async fn test_with_multiple_params(_a: bool, ctx: &Context, b: i32) {}
+}
+
 #[response_body("standalone response body")]
 async fn standalone_response_body_handler(ctx: &Context) {}
 
@@ -1021,6 +1029,9 @@ async fn standalone_websocket_stream_handler(ctx: &Context) {}
 )]
 #[epilogue_macros(send, flush)]
 async fn standalone_complex_get_handler(ctx: &Context) {}
+
+#[get]
+async fn standalone_get_handler_with_param(_a: bool, ctx: &Context) {}
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]

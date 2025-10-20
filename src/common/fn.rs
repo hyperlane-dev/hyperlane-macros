@@ -153,11 +153,45 @@ pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
     }
 }
 
-/// Parses context identifier from function signature, supporting both methods with self and functions without self.
+/// Checks if a type matches `::hyperlane::Context`.
 ///
-/// This function handles two cases:
-/// 1. Methods with self (or &self, &mut self, etc.): Returns the second parameter as context
-/// 2. Functions without self: Returns the first parameter as context
+/// This function checks if the given type is a reference to `::hyperlane::Context`.
+///
+/// # Arguments
+///
+/// - `&Type` - The type to check.
+///
+/// # Returns
+///
+/// - `bool` - Returns `true` if the type is `&::hyperlane::Context` or `&Context`, `false` otherwise.
+fn is_context_type(ty: &Type) -> bool {
+    if let Type::Reference(type_ref) = ty {
+        if let Type::Path(type_path) = &*type_ref.elem {
+            let path: &Path = &type_path.path;
+            if path.segments.len() >= 2 {
+                let segments: Vec<_> = path.segments.iter().collect();
+                if segments.len() >= 2 {
+                    let last_two: &[&PathSegment] = &segments[segments.len() - 2..];
+                    if last_two[0].ident == "hyperlane" && last_two[1].ident == "Context" {
+                        return true;
+                    }
+                }
+            }
+            if path.segments.len() == 1 && path.segments[0].ident == "Context" {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Parses context identifier from function signature by searching all parameters.
+///
+/// This function iterates through all function parameters and returns the first one
+/// that has type `::hyperlane::Context`. It supports:
+/// 1. Methods with self: Searches from the second parameter onwards
+/// 2. Functions without self: Searches from the first parameter onwards
+/// 3. Context parameter can be at any position
 ///
 /// # Arguments
 ///
@@ -167,40 +201,31 @@ pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
 ///
 /// - `syn::Result<&Ident>` - Returns the context identifier.
 pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<&Ident> {
-    match sig.inputs.first() {
-        Some(FnArg::Receiver(_)) => match sig.inputs.iter().nth(1) {
-            Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-                Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
-                Pat::Wild(wild) => Err(syn::Error::new_spanned(
-                    wild,
-                    "The context argument cannot be anonymous `_`, please use a named identifier",
-                )),
-                _ => Err(syn::Error::new_spanned(
-                    &pat_type.pat,
-                    "expected identifier as second argument (context)",
-                )),
-            },
-            _ => Err(syn::Error::new_spanned(
-                &sig.inputs,
-                "expected context as second argument",
-            )),
-        },
-        Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-            Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
-            Pat::Wild(wild) => Err(syn::Error::new_spanned(
-                wild,
-                "The context argument cannot be anonymous `_`, please use a named identifier",
-            )),
-            _ => Err(syn::Error::new_spanned(
-                &pat_type.pat,
-                "expected identifier as first argument (context)",
-            )),
-        },
-        _ => Err(syn::Error::new_spanned(
-            &sig.inputs,
-            "expected at least one argument",
-        )),
+    for arg in sig.inputs.iter() {
+        if let FnArg::Typed(pat_type) = arg {
+            if is_context_type(&pat_type.ty) {
+                match &*pat_type.pat {
+                    Pat::Ident(pat_ident) => return Ok(&pat_ident.ident),
+                    Pat::Wild(wild) => {
+                        return Err(syn::Error::new_spanned(
+                            wild,
+                            "The context argument cannot be anonymous `_`, please use a named identifier",
+                        ));
+                    }
+                    _ => {
+                        return Err(syn::Error::new_spanned(
+                            &pat_type.pat,
+                            "expected identifier for context parameter",
+                        ));
+                    }
+                }
+            }
+        }
     }
+    Err(syn::Error::new_spanned(
+        &sig.inputs,
+        "expected at least one parameter of type &::hyperlane::Context",
+    ))
 }
 
 /// Convert an optional expression into an `Option<isize>` token stream.
