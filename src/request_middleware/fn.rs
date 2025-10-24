@@ -22,28 +22,12 @@ pub(crate) fn request_middleware_macro(attr: TokenStream, item: TokenStream) -> 
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
     let struct_name: &Ident = &input_struct.ident;
-    let factory_fn_name: Ident = generate_factory_fn_name(
-        "__request_middleware_factory",
-        struct_name,
-        &attr_args.order,
-    );
     let gen_code: TokenStream2 = quote! {
         #input_struct
-        #[inline]
-        #[allow(non_snake_case)]
-        fn #factory_fn_name() -> ::hyperlane::ServerHookHandler {
-            ::std::sync::Arc::new(|ctx: &::hyperlane::Context| {
-                let ctx = ctx.clone();
-                ::std::boxed::Box::pin(async move {
-                    let hook = #struct_name::new(&ctx).await;
-                    hook.handle(&ctx).await;
-                })
-            })
-        }
         inventory::submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::RequestMiddleware(#order),
-                handler: ::hyperlane::HookHandler::Factory(#factory_fn_name),
+                handler: ::hyperlane::HookHandler::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
             }
         }
     };

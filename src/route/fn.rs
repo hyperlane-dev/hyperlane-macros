@@ -25,26 +25,12 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let path: &Expr = &route_attr.path;
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
     let struct_name: &Ident = &input_struct.ident;
-    let factory_fn_name: Ident = Ident::new(
-        &format!("__route_factory_{struct_name}"),
-        struct_name.span(),
-    );
     let gen_code: TokenStream2 = quote! {
         #input_struct
-        #[inline]
-        #[allow(non_snake_case)]
-        fn #factory_fn_name() -> ::hyperlane::ServerHookHandler {
-            ::std::sync::Arc::new(|ctx: &::hyperlane::Context| {
-                let ctx = ctx.clone();
-                ::std::boxed::Box::pin(async move {
-                    #struct_name::new(&ctx).await.handle(&ctx).await;
-                })
-            })
-        }
         ::hyperlane::server_submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::Route(#path),
-                handler: ::hyperlane::HookHandler::Factory(#factory_fn_name),
+                handler: ::hyperlane::HookHandler::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
             }
         }
     };
