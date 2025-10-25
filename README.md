@@ -774,8 +774,9 @@ impl ServerHook for RouteParam {
         Self
     }
 
-    #[response_body(&format!("route param: {request_route_param:?}"))]
+    #[response_body(&format!("route param: {request_route_param:?} {request_route_param1:?} {request_route_param2:?}"))]
     #[route_param("test" => request_route_param)]
+    #[route_param("test1" => request_route_param1, "test2" => request_route_param2)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -1243,6 +1244,101 @@ async fn standalone_complex_get_handler(ctx: &Context) {}
 
 #[get]
 async fn standalone_get_handler_with_param(_a: bool, ctx: &Context) {}
+
+#[request_body(body1, body2, body3)]
+async fn test_multi_request_body(ctx: &Context) {
+    println!("body1: {:?}, body2: {:?}, body3: {:?}", body1, body2, body3);
+}
+
+#[route("/test_multi_request_body_json")]
+#[derive(Debug, serde::Deserialize)]
+struct User {
+    name: String,
+}
+
+impl ServerHook for User {
+    async fn new(_ctx: &Context) -> Self {
+        Self {
+            name: String::from("test"),
+        }
+    }
+
+    #[prologue_macros(
+        request_body_json(user1: User, user2: User),
+        response_body(format!(
+            "user1: {:?}, user2: {:?}",
+            user1.unwrap().name,
+            user2.unwrap().name
+        )),
+        send
+    )]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[attribute("key1" => attr1: String, "key2" => attr2: i32)]
+async fn test_multi_attribute(ctx: &Context) {
+    println!("attr1: {:?}, attr2: {:?}", attr1, attr2);
+}
+
+#[attributes(attrs1, attrs2)]
+async fn test_multi_attributes(ctx: &Context) {
+    println!("attrs1: {:?}, attrs2: {:?}", attrs1, attrs2);
+}
+
+#[route_params(params1, params2)]
+async fn test_multi_route_params(ctx: &Context) {
+    println!("params1: {:?}, params2: {:?}", params1, params2);
+}
+
+#[request_querys(querys1, querys2)]
+async fn test_multi_request_querys(ctx: &Context) {
+    println!("querys1: {:?}, querys2: {:?}", querys1, querys2);
+}
+
+#[request_headers(headers1, headers2)]
+async fn test_multi_request_headers(ctx: &Context) {
+    println!("headers1: {:?}, headers2: {:?}", headers1, headers2);
+}
+
+#[request_cookies(cookies1, cookies2)]
+async fn test_multi_request_cookies(ctx: &Context) {
+    println!("cookies1: {:?}, cookies2: {:?}", cookies1, cookies2);
+}
+
+#[request_version(version1, version2)]
+async fn test_multi_request_version(ctx: &Context) {
+    println!("version1: {:?}, version2: {:?}", version1, version2);
+}
+
+#[request_path(path1, path2)]
+async fn test_multi_request_path(ctx: &Context) {
+    println!("path1: {:?}, path2: {:?}", path1, path2);
+}
+
+#[host("localhost", "127.0.0.1")]
+async fn test_multi_host(ctx: &Context) {
+    println!("Host check passed");
+}
+
+#[reject_host("badhost.com", "spam.com")]
+async fn test_multi_reject_host(ctx: &Context) {
+    println!("Reject host check passed");
+}
+
+#[referer("http://localhost", "http://127.0.0.1")]
+async fn test_multi_referer(ctx: &Context) {
+    println!("Referer check passed");
+}
+
+#[reject_referer("http://badsite.com", "http://spam.com")]
+async fn test_multi_reject_referer(ctx: &Context) {
+    println!("Reject referer check passed");
+}
+
+#[hyperlane(server1: Server, server2: Server)]
+async fn test_multi_hyperlane() {
+    println!("server1 and server2 initialized");
+}
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]

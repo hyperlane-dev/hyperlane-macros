@@ -17,26 +17,17 @@ pub(crate) fn request_body_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_body) = syn::parse::<MultiRequestBodyData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_body.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let body_param: RequestBodyData = parse_macro_input!(attr as RequestBodyData);
-        let variable: Ident = body_param.variable;
-        inject(position, item, |context| {
+    let multi_body: MultiRequestBodyData = parse_macro_input!(attr as MultiRequestBodyData);
+    inject(position, item, |context| {
+        let statements = multi_body.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -63,27 +54,18 @@ pub(crate) fn request_body_json_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_body_json) = syn::parse::<MultiRequestBodyJsonData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
-                quote! {
-                    let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let body_param: RequestBodyJsonData = parse_macro_input!(attr as RequestBodyJsonData);
-        let variable: Ident = body_param.variable;
-        let type_name: Type = body_param.type_name;
-        inject(position, item, |context| {
+    let multi_body_json: MultiRequestBodyJsonData =
+        parse_macro_input!(attr as MultiRequestBodyJsonData);
+    inject(position, item, |context| {
+        let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
                 let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -110,28 +92,20 @@ pub(crate) fn attribute_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_attr) = syn::parse::<MultiAttributeData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_attr.params.iter().map(|(key_name, variable, type_name)| {
+    let multi_attr: MultiAttributeData = parse_macro_input!(attr as MultiAttributeData);
+    inject(position, item, |context| {
+        let statements = multi_attr
+            .params
+            .iter()
+            .map(|(key_name, variable, type_name)| {
                 quote! {
                     let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
                 }
             });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let attribute: AttributeData = parse_macro_input!(attr as AttributeData);
-        let variable: Ident = attribute.variable;
-        let type_name: Type = attribute.type_name;
-        let key_name: Expr = attribute.key_name;
-        inject(position, item, |context| {
-            quote! {
-                let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
-            }
-        })
-    }
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -158,26 +132,17 @@ pub(crate) fn attributes_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_attrs) = syn::parse::<MultiAttributesData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_attrs.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let attributes: AttributesData = parse_macro_input!(attr as AttributesData);
-        let variable: Ident = attributes.variable;
-        inject(position, item, |context| {
+    let multi_attrs: MultiAttributesData = parse_macro_input!(attr as MultiAttributesData);
+    inject(position, item, |context| {
+        let statements = multi_attrs.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -204,27 +169,17 @@ pub(crate) fn route_param_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_param) = syn::parse::<MultiRouteParamData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_param.params.iter().map(|(key_name, variable)| {
-                quote! {
-                    let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let route_param: RouteParamData = parse_macro_input!(attr as RouteParamData);
-        let variable: Ident = route_param.variable;
-        let key_name: Expr = route_param.key_name;
-        inject(position, item, |context| {
+    let multi_param: MultiRouteParamData = parse_macro_input!(attr as MultiRouteParamData);
+    inject(position, item, |context| {
+        let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -251,26 +206,17 @@ pub(crate) fn route_params_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_route_params) = syn::parse::<MultiRouteParamsData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_route_params.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let route_params: RouteParamsData = parse_macro_input!(attr as RouteParamsData);
-        let variable: Ident = route_params.variable;
-        inject(position, item, |context| {
+    let multi_route_params: MultiRouteParamsData = parse_macro_input!(attr as MultiRouteParamsData);
+    inject(position, item, |context| {
+        let statements = multi_route_params.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -297,27 +243,17 @@ pub(crate) fn request_query_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_query) = syn::parse::<MultiQueryData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_query.params.iter().map(|(key_name, variable)| {
-                quote! {
-                    let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let request_query: QueryData = parse_macro_input!(attr as QueryData);
-        let variable: Ident = request_query.variable;
-        let key_name: Expr = request_query.key_name;
-        inject(position, item, |context| {
+    let multi_query: MultiQueryData = parse_macro_input!(attr as MultiQueryData);
+    inject(position, item, |context| {
+        let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -344,26 +280,17 @@ pub(crate) fn request_querys_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_querys) = syn::parse::<MultiQuerysData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_querys.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let request_query: QuerysData = parse_macro_input!(attr as QuerysData);
-        let variable: Ident = request_query.variable;
-        inject(position, item, |context| {
+    let multi_querys: MultiQuerysData = parse_macro_input!(attr as MultiQuerysData);
+    inject(position, item, |context| {
+        let statements = multi_querys.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -390,27 +317,17 @@ pub(crate) fn request_header_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_header) = syn::parse::<MultiHeaderData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_header.params.iter().map(|(key_name, variable)| {
-                quote! {
-                    let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let request_header: HeaderData = parse_macro_input!(attr as HeaderData);
-        let variable: Ident = request_header.variable;
-        let key_name: Expr = request_header.key_name;
-        inject(position, item, |context| {
+    let multi_header: MultiHeaderData = parse_macro_input!(attr as MultiHeaderData);
+    inject(position, item, |context| {
+        let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -437,26 +354,17 @@ pub(crate) fn request_headers_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_headers) = syn::parse::<MultiHeadersData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_headers.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let request_headers: HeadersData = parse_macro_input!(attr as HeadersData);
-        let variable: Ident = request_headers.variable;
-        inject(position, item, |context| {
+    let multi_headers: MultiHeadersData = parse_macro_input!(attr as MultiHeadersData);
+    inject(position, item, |context| {
+        let statements = multi_headers.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -483,27 +391,17 @@ pub(crate) fn request_cookie_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_cookie) = syn::parse::<MultiCookieData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
-                quote! {
-                    let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key_name).await;
-                }
-            });
+    let multi_cookie: MultiCookieData = parse_macro_input!(attr as MultiCookieData);
+    inject(position, item, |context| {
+        let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
-                #(#statements)*
+                let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key_name).await;
             }
-        })
-    } else {
-        let cookie_data: CookieData = parse_macro_input!(attr as CookieData);
-        let variable: Ident = cookie_data.variable;
-        let key: Expr = cookie_data.key_name;
-        inject(position, item, |context| {
-            quote! {
-                let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key).await;
-            }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -530,26 +428,17 @@ pub(crate) fn request_cookies_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_cookies) = syn::parse::<MultiCookiesData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_cookies.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let cookies_data: CookiesData = parse_macro_input!(attr as CookiesData);
-        let variable: Ident = cookies_data.variable;
-        inject(position, item, |context| {
+    let multi_cookies: MultiCookiesData = parse_macro_input!(attr as MultiCookiesData);
+    inject(position, item, |context| {
+        let statements = multi_cookies.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -576,26 +465,18 @@ pub(crate) fn request_version_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_version) = syn::parse::<MultiRequestVersionData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_version.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let version_data: RequestVersionData = parse_macro_input!(attr as RequestVersionData);
-        let variable: Ident = version_data.variable;
-        inject(position, item, |context| {
+    let multi_version: MultiRequestVersionData =
+        parse_macro_input!(attr as MultiRequestVersionData);
+    inject(position, item, |context| {
+        let statements = multi_version.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -622,26 +503,17 @@ pub(crate) fn request_path_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_path) = syn::parse::<MultiRequestPathData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_path.variables.iter().map(|variable| {
-                quote! {
-                    let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let path_data: RequestPathData = parse_macro_input!(attr as RequestPathData);
-        let variable: Ident = path_data.variable;
-        inject(position, item, |context| {
+    let multi_path: MultiRequestPathData = parse_macro_input!(attr as MultiRequestPathData);
+    inject(position, item, |context| {
+        let statements = multi_path.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {

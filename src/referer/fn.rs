@@ -17,28 +17,9 @@ pub(crate) fn referer_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_referer) = syn::parse::<MultiRefererData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_referer.referer_values.iter().map(|referer_value| {
-                quote! {
-                    let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
-                    if let Some(referer_header) = referer {
-                        if referer_header != #referer_value {
-                            return;
-                        }
-                    } else {
-                        return;
-                    }
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let referer_data: RefererData = parse_macro_input!(attr as RefererData);
-        let referer_value: Expr = referer_data.referer_value;
-        inject(position, item, |context| {
+    let multi_referer: MultiRefererData = parse_macro_input!(attr as MultiRefererData);
+    inject(position, item, |context| {
+        let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
                 let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
                 if let Some(referer_header) = referer {
@@ -49,8 +30,11 @@ pub(crate) fn referer_macro(
                     return;
                 }
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
@@ -77,26 +61,9 @@ pub(crate) fn reject_referer_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    if let Ok(multi_referer) = syn::parse::<MultiRefererData>(attr.clone()) {
-        inject(position, item, |context| {
-            let statements = multi_referer.referer_values.iter().map(|referer_value| {
-                quote! {
-                    let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
-                    if let Some(referer_header) = referer {
-                        if referer_header == #referer_value {
-                            return;
-                        }
-                    }
-                }
-            });
-            quote! {
-                #(#statements)*
-            }
-        })
-    } else {
-        let referer_data: RefererData = parse_macro_input!(attr as RefererData);
-        let referer_value: Expr = referer_data.referer_value;
-        inject(position, item, |context| {
+    let multi_referer: MultiRefererData = parse_macro_input!(attr as MultiRefererData);
+    inject(position, item, |context| {
+        let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
                 let referer: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(REFERER).await;
                 if let Some(referer_header) = referer {
@@ -105,8 +72,11 @@ pub(crate) fn reject_referer_macro(
                     }
                 }
             }
-        })
-    }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
 }
 
 inventory::submit! {
