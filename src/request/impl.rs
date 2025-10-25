@@ -124,6 +124,37 @@ impl Parse for RouteParamData {
     }
 }
 
+/// Implementation of Parse trait for MultiRouteParamData.
+///
+/// Parses multiple route parameter key-variable pairs from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRouteParamData>` - Parsed MultiRouteParamData or error.
+impl Parse for MultiRouteParamData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Expr, Ident)> = Vec::new();
+        loop {
+            let key_name: Expr = input.parse()?;
+            input.parse::<Token![=>]>()?;
+            let variable: Ident = input.parse()?;
+            params.push((key_name, variable));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRouteParamData { params })
+    }
+}
+
 /// Implementation of Parse trait for RouteParamsData.
 ///
 /// Parses route parameters variable from input stream.
@@ -159,6 +190,37 @@ impl Parse for QueryData {
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         Ok(QueryData { key_name, variable })
+    }
+}
+
+/// Implementation of Parse trait for MultiQueryData.
+///
+/// Parses multiple query parameter key-variable pairs from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiQueryData>` - Parsed MultiQueryData or error.
+impl Parse for MultiQueryData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Expr, Ident)> = Vec::new();
+        loop {
+            let key_name: Expr = input.parse()?;
+            input.parse::<Token![=>]>()?;
+            let variable: Ident = input.parse()?;
+            params.push((key_name, variable));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiQueryData { params })
     }
 }
 
@@ -200,6 +262,37 @@ impl Parse for HeaderData {
     }
 }
 
+/// Implementation of Parse trait for MultiHeaderData.
+///
+/// Parses multiple header key-variable pairs from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiHeaderData>` - Parsed MultiHeaderData or error.
+impl Parse for MultiHeaderData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Expr, Ident)> = Vec::new();
+        loop {
+            let key_name: Expr = input.parse()?;
+            input.parse::<Token![=>]>()?;
+            let variable: Ident = input.parse()?;
+            params.push((key_name, variable));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiHeaderData { params })
+    }
+}
+
 /// Implementation of Parse trait for HeadersData.
 ///
 /// Parses headers variable from input stream.
@@ -235,6 +328,37 @@ impl Parse for CookieData {
         input.parse::<Token![=>]>()?;
         let variable: Ident = input.parse()?;
         Ok(CookieData { variable, key_name })
+    }
+}
+
+/// Implementation of Parse trait for MultiCookieData.
+///
+/// Parses multiple cookie key-variable pairs from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiCookieData>` - Parsed MultiCookieData or error.
+impl Parse for MultiCookieData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Expr, Ident)> = Vec::new();
+        loop {
+            let key_name: Expr = input.parse()?;
+            input.parse::<Token![=>]>()?;
+            let variable: Ident = input.parse()?;
+            params.push((key_name, variable));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiCookieData { params })
     }
 }
 

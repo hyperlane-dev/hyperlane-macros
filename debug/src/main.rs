@@ -563,8 +563,9 @@ impl ServerHook for RouteParam {
         Self
     }
 
-    #[response_body(&format!("route param: {request_route_param:?}"))]
+    #[response_body(&format!("route param: {request_route_param:?} {request_route_param1:?} {request_route_param2:?}"))]
     #[route_param("test" => request_route_param)]
+    #[route_param("test1" => request_route_param1, "test2" => request_route_param2)]
     async fn handle(self, ctx: &Context) {}
 }
 

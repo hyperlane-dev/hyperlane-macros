@@ -56,6 +56,14 @@ pub(crate) struct RouteParamData {
     pub(crate) key_name: Expr,
 }
 
+/// Container for multiple route parameters data.
+///
+/// Used to store parsed multiple route parameter key-variable pairs from macro input.
+pub(crate) struct MultiRouteParamData {
+    /// Vector of route parameter key-variable pairs.
+    pub(crate) params: Vec<(Expr, Ident)>,
+}
+
 /// Container for route parameters data.
 ///
 /// Used to store parsed route parameters variable from macro input.
@@ -72,6 +80,14 @@ pub(crate) struct QueryData {
     pub(crate) variable: Ident,
     /// The query parameter key name.
     pub(crate) key_name: Expr,
+}
+
+/// Container for multiple query parameters data.
+///
+/// Used to store parsed multiple query parameter key-variable pairs from macro input.
+pub(crate) struct MultiQueryData {
+    /// Vector of query parameter key-variable pairs.
+    pub(crate) params: Vec<(Expr, Ident)>,
 }
 
 /// Container for query parameters data.
@@ -92,6 +108,14 @@ pub(crate) struct HeaderData {
     pub(crate) key_name: Expr,
 }
 
+/// Container for multiple request headers data.
+///
+/// Used to store parsed multiple header key-variable pairs from macro input.
+pub(crate) struct MultiHeaderData {
+    /// Vector of header key-variable pairs.
+    pub(crate) params: Vec<(Expr, Ident)>,
+}
+
 /// Container for request headers data.
 ///
 /// Used to store parsed headers variable from macro input.
@@ -108,6 +132,14 @@ pub(crate) struct CookieData {
     pub(crate) variable: Ident,
     /// The cookie key name.
     pub(crate) key_name: Expr,
+}
+
+/// Container for multiple request cookies data.
+///
+/// Used to store parsed multiple cookie key-variable pairs from macro input.
+pub(crate) struct MultiCookieData {
+    /// Vector of cookie key-variable pairs.
+    pub(crate) params: Vec<(Expr, Ident)>,
 }
 
 /// Container for request cookies data.

@@ -132,6 +132,7 @@ inventory::submit! {
 }
 
 /// Gets route parameter by key and assigns to specified variable.
+/// Supports both single and multiple route parameter extraction.
 ///
 /// # Arguments
 ///
@@ -147,14 +148,27 @@ pub(crate) fn route_param_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let route_param: RouteParamData = parse_macro_input!(attr as RouteParamData);
-    let variable: Ident = route_param.variable;
-    let key_name: Expr = route_param.key_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
-        }
-    })
+    if let Ok(multi_param) = syn::parse::<MultiRouteParamData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_param.params.iter().map(|(key_name, variable)| {
+                quote! {
+                    let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let route_param: RouteParamData = parse_macro_input!(attr as RouteParamData);
+        let variable: Ident = route_param.variable;
+        let key_name: Expr = route_param.key_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -197,6 +211,7 @@ inventory::submit! {
 }
 
 /// Gets request query parameter by key and assigns to specified variable.
+/// Supports both single and multiple parameter extraction.
 ///
 /// # Arguments
 ///
@@ -212,14 +227,27 @@ pub(crate) fn request_query_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let request_query: QueryData = parse_macro_input!(attr as QueryData);
-    let variable: Ident = request_query.variable;
-    let key_name: Expr = request_query.key_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
-        }
-    })
+    if let Ok(multi_query) = syn::parse::<MultiQueryData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_query.params.iter().map(|(key_name, variable)| {
+                quote! {
+                    let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let request_query: QueryData = parse_macro_input!(attr as QueryData);
+        let variable: Ident = request_query.variable;
+        let key_name: Expr = request_query.key_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -262,6 +290,7 @@ inventory::submit! {
 }
 
 /// Gets request header by key and assigns to specified variable.
+/// Supports both single and multiple header extraction.
 ///
 /// # Arguments
 ///
@@ -277,14 +306,27 @@ pub(crate) fn request_header_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let request_header: HeaderData = parse_macro_input!(attr as HeaderData);
-    let variable: Ident = request_header.variable;
-    let key_name: Expr = request_header.key_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
-        }
-    })
+    if let Ok(multi_header) = syn::parse::<MultiHeaderData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_header.params.iter().map(|(key_name, variable)| {
+                quote! {
+                    let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let request_header: HeaderData = parse_macro_input!(attr as HeaderData);
+        let variable: Ident = request_header.variable;
+        let key_name: Expr = request_header.key_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -327,6 +369,7 @@ inventory::submit! {
 }
 
 /// Gets request cookie by key and assigns to specified variable.
+/// Supports both single and multiple cookie extraction.
 ///
 /// # Arguments
 ///
@@ -342,14 +385,27 @@ pub(crate) fn request_cookie_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let cookie_data: CookieData = parse_macro_input!(attr as CookieData);
-    let variable: Ident = cookie_data.variable;
-    let key: Expr = cookie_data.key_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key).await;
-        }
-    })
+    if let Ok(multi_cookie) = syn::parse::<MultiCookieData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
+                quote! {
+                    let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key_name).await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let cookie_data: CookieData = parse_macro_input!(attr as CookieData);
+        let variable: Ident = cookie_data.variable;
+        let key: Expr = cookie_data.key_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key).await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
