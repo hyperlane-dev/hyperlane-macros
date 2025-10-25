@@ -11,3 +11,11 @@ pub(crate) struct HyperlaneAttr {
     /// The type name of the component to initialize.
     pub(crate) type_name: Ident,
 }
+
+/// Represents multiple attributes for the Hyperlane macro.
+///
+/// Used to store parsed multiple variable-type pairs from macro input.
+pub(crate) struct MultiHyperlaneAttr {
+    /// Vector of variable-type pairs.
+    pub(crate) params: Vec<(Ident, Ident)>,
+}

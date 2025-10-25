@@ -16,6 +16,14 @@ pub(crate) struct RequestBodyData {
     pub(crate) variable: Ident,
 }
 
+/// Container for multiple request body data.
+///
+/// Used to store parsed multiple request body variables from macro input.
+pub(crate) struct MultiRequestBodyData {
+    /// Vector of request body variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
 /// Container for JSON request body data.
 ///
 /// Used to store parsed JSON request body variable and type from macro input.
@@ -24,6 +32,14 @@ pub(crate) struct RequestBodyJsonData {
     pub(crate) variable: Ident,
     /// The type to parse the JSON into.
     pub(crate) type_name: Type,
+}
+
+/// Container for multiple JSON request body data.
+///
+/// Used to store parsed multiple JSON request body variable-type pairs from macro input.
+pub(crate) struct MultiRequestBodyJsonData {
+    /// Vector of JSON request body variable-type pairs.
+    pub(crate) params: Vec<(Ident, Type)>,
 }
 
 /// Container for request attribute data.
@@ -38,12 +54,28 @@ pub(crate) struct AttributeData {
     pub(crate) key_name: Expr,
 }
 
+/// Container for multiple request attributes data.
+///
+/// Used to store parsed multiple attribute key-variable-type tuples from macro input.
+pub(crate) struct MultiAttributeData {
+    /// Vector of attribute key-variable-type tuples.
+    pub(crate) params: Vec<(Expr, Ident, Type)>,
+}
+
 /// Container for request attributes data.
 ///
 /// Used to store parsed attributes variable from macro input.
 pub(crate) struct AttributesData {
     /// The variable name to store all attributes.
     pub(crate) variable: Ident,
+}
+
+/// Container for multiple request attributes data.
+///
+/// Used to store parsed multiple attributes variables from macro input.
+pub(crate) struct MultiAttributesData {
+    /// Vector of attributes variables.
+    pub(crate) variables: Vec<Ident>,
 }
 
 /// Container for route parameter data.
@@ -72,6 +104,14 @@ pub(crate) struct RouteParamsData {
     pub(crate) variable: Ident,
 }
 
+/// Container for multiple route parameters data.
+///
+/// Used to store parsed multiple route parameters variables from macro input.
+pub(crate) struct MultiRouteParamsData {
+    /// Vector of route parameters variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
 /// Container for query parameter data.
 ///
 /// Used to store parsed query parameter key and variable from macro input.
@@ -96,6 +136,14 @@ pub(crate) struct MultiQueryData {
 pub(crate) struct QuerysData {
     /// The variable name to store all query parameters.
     pub(crate) variable: Ident,
+}
+
+/// Container for multiple query parameters data.
+///
+/// Used to store parsed multiple query parameters variables from macro input.
+pub(crate) struct MultiQuerysData {
+    /// Vector of query parameters variables.
+    pub(crate) variables: Vec<Ident>,
 }
 
 /// Container for request header data.
@@ -124,6 +172,14 @@ pub(crate) struct HeadersData {
     pub(crate) variable: Ident,
 }
 
+/// Container for multiple request headers data.
+///
+/// Used to store parsed multiple headers variables from macro input.
+pub(crate) struct MultiHeadersData {
+    /// Vector of headers variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
 /// Container for request cookie data.
 ///
 /// Used to store parsed cookie key and variable from macro input.
@@ -150,6 +206,14 @@ pub(crate) struct CookiesData {
     pub(crate) variable: Ident,
 }
 
+/// Container for multiple request cookies data.
+///
+/// Used to store parsed multiple cookies variables from macro input.
+pub(crate) struct MultiCookiesData {
+    /// Vector of cookies variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
 /// Container for request version data.
 ///
 /// Used to store parsed request version variable from macro input.
@@ -158,10 +222,26 @@ pub(crate) struct RequestVersionData {
     pub(crate) variable: Ident,
 }
 
+/// Container for multiple request version data.
+///
+/// Used to store parsed multiple request version variables from macro input.
+pub(crate) struct MultiRequestVersionData {
+    /// Vector of request version variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
 /// Container for request path data.
 ///
 /// Used to store parsed request path variable from macro input.
 pub(crate) struct RequestPathData {
     /// The variable name to store the request path.
     pub(crate) variable: Ident,
+}
+
+/// Container for multiple request path data.
+///
+/// Used to store parsed multiple request path variables from macro input.
+pub(crate) struct MultiRequestPathData {
+    /// Vector of request path variables.
+    pub(crate) variables: Vec<Ident>,
 }

@@ -1,6 +1,7 @@
 use crate::*;
 
 /// Gets raw request body and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -16,13 +17,26 @@ pub(crate) fn request_body_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let body_param: RequestBodyData = parse_macro_input!(attr as RequestBodyData);
-    let variable: Ident = body_param.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
-        }
-    })
+    if let Ok(multi_body) = syn::parse::<MultiRequestBodyData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_body.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let body_param: RequestBodyData = parse_macro_input!(attr as RequestBodyData);
+        let variable: Ident = body_param.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -33,6 +47,7 @@ inventory::submit! {
 }
 
 /// Parses request body as JSON and assigns to specified variable.
+/// Supports both single and multiple variable-type pair extraction.
 ///
 /// # Arguments
 ///
@@ -48,14 +63,27 @@ pub(crate) fn request_body_json_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let body_param: RequestBodyJsonData = parse_macro_input!(attr as RequestBodyJsonData);
-    let variable: Ident = body_param.variable;
-    let type_name: Type = body_param.type_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
-        }
-    })
+    if let Ok(multi_body_json) = syn::parse::<MultiRequestBodyJsonData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
+                quote! {
+                    let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let body_param: RequestBodyJsonData = parse_macro_input!(attr as RequestBodyJsonData);
+        let variable: Ident = body_param.variable;
+        let type_name: Type = body_param.type_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -66,6 +94,7 @@ inventory::submit! {
 }
 
 /// Gets request attribute by key and assigns to specified variable.
+/// Supports both single and multiple attribute extraction.
 ///
 /// # Arguments
 ///
@@ -81,15 +110,28 @@ pub(crate) fn attribute_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let attribute: AttributeData = parse_macro_input!(attr as AttributeData);
-    let variable: Ident = attribute.variable;
-    let type_name: Type = attribute.type_name;
-    let key_name: Expr = attribute.key_name;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
-        }
-    })
+    if let Ok(multi_attr) = syn::parse::<MultiAttributeData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_attr.params.iter().map(|(key_name, variable, type_name)| {
+                quote! {
+                    let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let attribute: AttributeData = parse_macro_input!(attr as AttributeData);
+        let variable: Ident = attribute.variable;
+        let type_name: Type = attribute.type_name;
+        let key_name: Expr = attribute.key_name;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -100,6 +142,7 @@ inventory::submit! {
 }
 
 /// Gets all request attributes and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -115,13 +158,26 @@ pub(crate) fn attributes_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let attributes: AttributesData = parse_macro_input!(attr as AttributesData);
-    let variable: Ident = attributes.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
-        }
-    })
+    if let Ok(multi_attrs) = syn::parse::<MultiAttributesData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_attrs.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let attributes: AttributesData = parse_macro_input!(attr as AttributesData);
+        let variable: Ident = attributes.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -179,6 +235,7 @@ inventory::submit! {
 }
 
 /// Gets all route parameters and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -194,13 +251,26 @@ pub(crate) fn route_params_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let route_params: RouteParamsData = parse_macro_input!(attr as RouteParamsData);
-    let variable: Ident = route_params.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
-        }
-    })
+    if let Ok(multi_route_params) = syn::parse::<MultiRouteParamsData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_route_params.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let route_params: RouteParamsData = parse_macro_input!(attr as RouteParamsData);
+        let variable: Ident = route_params.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -258,6 +328,7 @@ inventory::submit! {
 }
 
 /// Gets all request query parameters and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -273,13 +344,26 @@ pub(crate) fn request_querys_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let request_query: QuerysData = parse_macro_input!(attr as QuerysData);
-    let variable: Ident = request_query.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
-        }
-    })
+    if let Ok(multi_querys) = syn::parse::<MultiQuerysData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_querys.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let request_query: QuerysData = parse_macro_input!(attr as QuerysData);
+        let variable: Ident = request_query.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -337,6 +421,7 @@ inventory::submit! {
 }
 
 /// Gets all request headers and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -352,13 +437,26 @@ pub(crate) fn request_headers_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let request_headers: HeadersData = parse_macro_input!(attr as HeadersData);
-    let variable: Ident = request_headers.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
-        }
-    })
+    if let Ok(multi_headers) = syn::parse::<MultiHeadersData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_headers.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let request_headers: HeadersData = parse_macro_input!(attr as HeadersData);
+        let variable: Ident = request_headers.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -416,6 +514,7 @@ inventory::submit! {
 }
 
 /// Gets all request cookies and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -431,13 +530,26 @@ pub(crate) fn request_cookies_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let cookies_data: CookiesData = parse_macro_input!(attr as CookiesData);
-    let variable: Ident = cookies_data.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
-        }
-    })
+    if let Ok(multi_cookies) = syn::parse::<MultiCookiesData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_cookies.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let cookies_data: CookiesData = parse_macro_input!(attr as CookiesData);
+        let variable: Ident = cookies_data.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -448,6 +560,7 @@ inventory::submit! {
 }
 
 /// Gets request version and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -463,13 +576,26 @@ pub(crate) fn request_version_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let version_data: RequestVersionData = parse_macro_input!(attr as RequestVersionData);
-    let variable: Ident = version_data.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
-        }
-    })
+    if let Ok(multi_version) = syn::parse::<MultiRequestVersionData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_version.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let version_data: RequestVersionData = parse_macro_input!(attr as RequestVersionData);
+        let variable: Ident = version_data.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {
@@ -480,6 +606,7 @@ inventory::submit! {
 }
 
 /// Gets request path and assigns to specified variable.
+/// Supports both single and multiple variable extraction.
 ///
 /// # Arguments
 ///
@@ -495,13 +622,26 @@ pub(crate) fn request_path_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let path_data: RequestPathData = parse_macro_input!(attr as RequestPathData);
-    let variable: Ident = path_data.variable;
-    inject(position, item, |context| {
-        quote! {
-            let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
-        }
-    })
+    if let Ok(multi_path) = syn::parse::<MultiRequestPathData>(attr.clone()) {
+        inject(position, item, |context| {
+            let statements = multi_path.variables.iter().map(|variable| {
+                quote! {
+                    let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
+                }
+            });
+            quote! {
+                #(#statements)*
+            }
+        })
+    } else {
+        let path_data: RequestPathData = parse_macro_input!(attr as RequestPathData);
+        let variable: Ident = path_data.variable;
+        inject(position, item, |context| {
+            quote! {
+                let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
+            }
+        })
+    }
 }
 
 inventory::submit! {

@@ -37,6 +37,35 @@ impl Parse for RequestBodyData {
     }
 }
 
+/// Implementation of Parse trait for MultiRequestBodyData.
+///
+/// Parses multiple request body variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRequestBodyData>` - Parsed MultiRequestBodyData or error.
+impl Parse for MultiRequestBodyData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRequestBodyData { variables })
+    }
+}
+
 /// Implementation of Parse trait for RequestBodyJsonData.
 ///
 /// Parses request body JSON variable and type from input stream.
@@ -57,6 +86,37 @@ impl Parse for RequestBodyJsonData {
             variable,
             type_name,
         })
+    }
+}
+
+/// Implementation of Parse trait for MultiRequestBodyJsonData.
+///
+/// Parses multiple request body JSON variable-type pairs from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRequestBodyJsonData>` - Parsed MultiRequestBodyJsonData or error.
+impl Parse for MultiRequestBodyJsonData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Ident, Type)> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            input.parse::<Token![:]>()?;
+            let type_name: Type = input.parse()?;
+            params.push((variable, type_name));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRequestBodyJsonData { params })
     }
 }
 
@@ -86,6 +146,39 @@ impl Parse for AttributeData {
     }
 }
 
+/// Implementation of Parse trait for MultiAttributeData.
+///
+/// Parses multiple attribute key-variable-type tuples from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiAttributeData>` - Parsed MultiAttributeData or error.
+impl Parse for MultiAttributeData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut params: Vec<(Expr, Ident, Type)> = Vec::new();
+        loop {
+            let key_name: Expr = input.parse()?;
+            input.parse::<Token![=>]>()?;
+            let variable: Ident = input.parse()?;
+            input.parse::<Token![:]>()?;
+            let type_name: Type = input.parse()?;
+            params.push((key_name, variable, type_name));
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiAttributeData { params })
+    }
+}
+
 /// Implementation of Parse trait for AttributesData.
 ///
 /// Parses attributes variable from input stream.
@@ -101,6 +194,35 @@ impl Parse for AttributesData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variable: Ident = input.parse()?;
         Ok(AttributesData { variable })
+    }
+}
+
+/// Implementation of Parse trait for MultiAttributesData.
+///
+/// Parses multiple attributes variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiAttributesData>` - Parsed MultiAttributesData or error.
+impl Parse for MultiAttributesData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiAttributesData { variables })
     }
 }
 
@@ -173,6 +295,35 @@ impl Parse for RouteParamsData {
     }
 }
 
+/// Implementation of Parse trait for MultiRouteParamsData.
+///
+/// Parses multiple route parameters variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRouteParamsData>` - Parsed MultiRouteParamsData or error.
+impl Parse for MultiRouteParamsData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRouteParamsData { variables })
+    }
+}
+
 /// Implementation of Parse trait for QueryData.
 ///
 /// Parses query parameter key and variable from input stream.
@@ -239,6 +390,35 @@ impl Parse for QuerysData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variable: Ident = input.parse()?;
         Ok(QuerysData { variable })
+    }
+}
+
+/// Implementation of Parse trait for MultiQuerysData.
+///
+/// Parses multiple query parameters variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiQuerysData>` - Parsed MultiQuerysData or error.
+impl Parse for MultiQuerysData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiQuerysData { variables })
     }
 }
 
@@ -311,6 +491,35 @@ impl Parse for HeadersData {
     }
 }
 
+/// Implementation of Parse trait for MultiHeadersData.
+///
+/// Parses multiple headers variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiHeadersData>` - Parsed MultiHeadersData or error.
+impl Parse for MultiHeadersData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiHeadersData { variables })
+    }
+}
+
 /// Implementation of Parse trait for CookieData.
 ///
 /// Parses cookie key and variable from input stream.
@@ -380,6 +589,35 @@ impl Parse for CookiesData {
     }
 }
 
+/// Implementation of Parse trait for MultiCookiesData.
+///
+/// Parses multiple cookies variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiCookiesData>` - Parsed MultiCookiesData or error.
+impl Parse for MultiCookiesData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiCookiesData { variables })
+    }
+}
+
 /// Implementation of Parse trait for RequestVersionData.
 ///
 /// Parses request version variable from input stream.
@@ -398,6 +636,35 @@ impl Parse for RequestVersionData {
     }
 }
 
+/// Implementation of Parse trait for MultiRequestVersionData.
+///
+/// Parses multiple request version variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRequestVersionData>` - Parsed MultiRequestVersionData or error.
+impl Parse for MultiRequestVersionData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRequestVersionData { variables })
+    }
+}
+
 /// Implementation of Parse trait for RequestPathData.
 ///
 /// Parses request path variable from input stream.
@@ -413,5 +680,34 @@ impl Parse for RequestPathData {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variable: Ident = input.parse()?;
         Ok(RequestPathData { variable })
+    }
+}
+
+/// Implementation of Parse trait for MultiRequestPathData.
+///
+/// Parses multiple request path variables from input stream.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRequestPathData>` - Parsed MultiRequestPathData or error.
+impl Parse for MultiRequestPathData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRequestPathData { variables })
     }
 }
