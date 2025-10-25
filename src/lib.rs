@@ -1816,8 +1816,28 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// async fn standalone_request_body_handler(ctx: &Context) {}
 /// ```
 ///
-/// The macro accepts only a variable name. The variable will be available
-/// in the function scope as a `RequestBody` type.
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_body")]
+/// struct MultiBody;
+///
+/// impl ServerHook for MultiBody {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("bodies: {body1:?}, {body2:?}"))]
+///     #[request_body(body1, body2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts one or more variable names separated by commas.
+/// Each variable will be available in the function scope as a `RequestBody` type.
 #[proc_macro_attribute]
 pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_macro(attr, item, Position::Prologue)
@@ -1863,8 +1883,39 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// async fn standalone_request_body_json_handler(ctx: &Context) {}
 /// ```
 ///
-/// The macro accepts a variable name and type in the format `variable_name: Type`.
-/// The variable will be available in the function scope as a `Result<Type, JsonError>`.
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+/// use serde::{Deserialize, Serialize};
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct User {
+///     name: String,
+/// }
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct Config {
+///     debug: bool,
+/// }
+///
+/// #[route("/multi_json")]
+/// struct MultiJson;
+///
+/// impl ServerHook for MultiJson {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("user: {user:?}, config: {config:?}"))]
+///     #[request_body_json(user: User, config: Config)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts one or more `variable_name: Type` pairs separated by commas.
+/// Each variable will be available in the function scope as a `Result<Type, JsonError>`.
 #[proc_macro_attribute]
 pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_json_macro(attr, item, Position::Prologue)
@@ -1914,6 +1965,28 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a key-to-variable mapping in the format `key => variable_name: Type`.
 /// The variable will be available as an `Option<Type>` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_attr")]
+/// struct MultiAttr;
+///
+/// impl ServerHook for MultiAttr {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("attrs: {attr1:?}, {attr2:?}"))]
+///     #[attribute("key1" => attr1: String, "key2" => attr2: i32)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple `key => variable_name: Type` tuples separated by commas.
 #[proc_macro_attribute]
 pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
     attribute_macro(attr, item, Position::Prologue)
@@ -1954,6 +2027,28 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a variable name that will contain a HashMap of all attributes.
 /// The variable will be available as a HashMap in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_attrs")]
+/// struct MultiAttrs;
+///
+/// impl ServerHook for MultiAttrs {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("attrs1: {attrs1:?}, attrs2: {attrs2:?}"))]
+///     #[attributes(attrs1, attrs2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
 pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
     attributes_macro(attr, item, Position::Prologue)
@@ -1994,6 +2089,28 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
 /// The variable will be available as an `Option<String>` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_param/:id/:name")]
+/// struct MultiParam;
+///
+/// impl ServerHook for MultiParam {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("id: {id:?}, name: {name:?}"))]
+///     #[route_param("id" => id, "name" => name)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple `"key" => variable_name` pairs separated by commas.
 #[proc_macro_attribute]
 pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_param_macro(attr, item, Position::Prologue)
@@ -2034,6 +2151,28 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a variable name that will contain all route parameters.
 /// The variable will be available as a collection in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_params/:id")]
+/// struct MultiParams;
+///
+/// impl ServerHook for MultiParams {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("params1: {params1:?}, params2: {params2:?}"))]
+///     #[route_params(params1, params2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
 pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_params_macro(attr, item, Position::Prologue)
@@ -2077,6 +2216,8 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
 /// The variable will be available as an `Option<String>` in the function scope.
+///
+/// Supports multiple parameters: `#[request_query("k1" => v1, "k2" => v2)]`
 #[proc_macro_attribute]
 pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_query_macro(attr, item, Position::Prologue)
@@ -2120,6 +2261,8 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts a variable name that will contain all request query parameters.
 /// The variable will be available as a collection in the function scope.
+///
+/// Supports multiple parameters: `#[request_querys(querys1, querys2)]`
 #[proc_macro_attribute]
 pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_querys_macro(attr, item, Position::Prologue)

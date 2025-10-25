@@ -30,6 +30,7 @@ cargo add hyperlane-macros
 
 - `#[hyperlane(server: Server)]` - Creates a new `Server` instance with the specified variable name and type, and automatically registers other hooks and routes defined within the crate.
 - `#[hyperlane(config: ServerConfig)]` - Creates a new `ServerConfig` instance with the specified variable name and type.
+- `#[hyperlane(var1: Type1, var2: Type2, ...)]` - Supports multiple instance initialization in a single call
 
 ### HTTP Method Macros
 
@@ -97,65 +98,83 @@ cargo add hyperlane-macros
 ### Request Body Macros
 
 - `#[request_body(variable_name)]` - Extract raw request body into specified variable with RequestBody type
+- `#[request_body(var1, var2, ...)]` - Supports multiple request body variables
 - `#[request_body_json(variable_name: type)]` - Parse request body as JSON into specified variable and type
+- `#[request_body_json(var1: Type1, var2: Type2, ...)]` - Supports multiple JSON body parsing
 
 ### Attribute Macros
 
 - `#[attribute(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
+- `#[attribute("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
 
 ### Attributes Macros
 
 - `#[attributes(variable_name)]` - Get all attributes as a HashMap for comprehensive attribute access
+- `#[attributes(var1, var2, ...)]` - Supports multiple attribute collections
 
 ### Route Param Macros
 
 - `#[route_param(key => variable_name)]` - Extract a specific route parameter by key into a variable
+- `#[route_param("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
 
 ### Route Params Macros
 
 - `#[route_params(variable_name)]` - Get all route parameters as a collection
+- `#[route_params(var1, var2, ...)]` - Supports multiple route parameter collections
 
 ### Request Query Macros
 
 - `#[request_query(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
+- `#[request_query("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
 
 ### Request Querys Macros
 
 - `#[request_querys(variable_name)]` - Get all query parameters as a collection
+- `#[request_querys(var1, var2, ...)]` - Supports multiple query parameter collections
 
 ### Request Header Macros
 
 - `#[request_header(key => variable_name)]` - Extract a specific HTTP header by name from the request
+- `#[request_header(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
 
 ### Request Headers Macros
 
 - `#[request_headers(variable_name)]` - Get all HTTP headers as a collection
+- `#[request_headers(var1, var2, ...)]` - Supports multiple header collections
 
 ### Request Cookie Macros
 
 - `#[request_cookie(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
+- `#[request_cookie("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
 
 ### Request Cookies Macros
 
 - `#[request_cookies(variable_name)]` - Get all cookies as a raw string from the cookie header
+- `#[request_cookies(var1, var2, ...)]` - Supports multiple cookie collections
 
 ### Request Version Macros
 
 - `#[request_version(variable_name)]` - Extract the HTTP request version into a variable
+- `#[request_version(var1, var2, ...)]` - Supports multiple request version variables
 
 ### Request Path Macros
 
 - `#[request_path(variable_name)]` - Extract the HTTP request path into a variable
+- `#[request_path(var1, var2, ...)]` - Supports multiple request path variables
 
 ### Host Macros
 
 - `#[host("hostname")]` - Restrict function execution to requests with a specific host header value
+- `#[host("host1", "host2", ...)]` - Supports multiple host checks
 - `#[reject_host("hostname")]` - Reject requests that match a specific host header value
+- `#[reject_host("host1", "host2", ...)]` - Supports multiple host rejections
 
 ### Referer Macros
 
 - `#[referer("url")]` - Restrict function execution to requests with a specific referer header value
+- `#[referer("url1", "url2", ...)]` - Supports multiple referer checks
 - `#[reject_referer("url")]` - Reject requests that match a specific referer header value
+- `#[reject_referer("url1", "url2", ...)]` - Supports multiple referer rejections
 
 ### Hook Macros
 
@@ -200,6 +219,7 @@ cargo add hyperlane-macros
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
 - **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`)
+- **Multi-parameter support** Most data extraction macros support multiple parameters in a single call (e.g., `#[request_body(var1, var2)]`, `#[request_query("k1" => v1, "k2" => v2)]`). This reduces macro repetition and improves code readability.
 
 ### Best Practice Warning
 
