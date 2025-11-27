@@ -780,8 +780,8 @@ impl ServerHook for Cookie {
         Self
     }
 
-    #[response_body(&format!("Session cookie: {session_cookie1_opt:?}, {session_cookie2_opt:?}"))]
-    #[request_cookie("test1" => session_cookie1_opt, "test2" => session_cookie2_opt)]
+    #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
+    #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
     async fn handle(self, ctx: &Context) {}
 }
 

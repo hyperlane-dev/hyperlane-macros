@@ -2374,19 +2374,19 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Session cookie: {session_cookie1_opt:?}, {session_cookie2_opt:?}"))]
-///     #[request_cookie("test1" => session_cookie1_opt, "test2" => session_cookie2_opt)]
+///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
+///     #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl Cookie {
-///     #[response_body(&format!("Session cookie: {session_cookie1_opt:?}, {session_cookie2_opt:?}"))]
-///     #[request_cookie("test1" => session_cookie1_opt, "test2" => session_cookie2_opt)]
+///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
+///     #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn request_cookie_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[response_body(&format!("Session cookie: {session_cookie1_opt:?}, {session_cookie2_opt:?}"))]
-/// #[request_cookie("test1" => session_cookie1_opt, "test2" => session_cookie2_opt)]
+/// #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
+/// #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 /// async fn standalone_request_cookie_handler(ctx: &Context) {}
 /// ```
 ///
