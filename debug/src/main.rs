@@ -1139,7 +1139,7 @@ async fn main() {
     let server_control_hook_2: ServerControlHook = server_control_hook_1.clone();
     tokio::spawn(async move {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        server_control_hook_1.shutdown().await;
+        server_control_hook_2.shutdown().await;
     });
-    server_control_hook_2.wait().await;
+    server_control_hook_1.wait().await;
 }
