@@ -1135,11 +1135,11 @@ async fn test_multi_hyperlane() {
 async fn main() {
     config.disable_nodelay().await;
     server.config(config).await;
-    let server_hook: ServerControlHook = server.run().await.unwrap_or_default();
-    let server_hook_clone: ServerControlHook = server_hook.clone();
+    let server_control_hook_1: ServerControlHook = server.run().await.unwrap_or_default();
+    let server_control_hook_2: ServerControlHook = server_control_hook_1.clone();
     tokio::spawn(async move {
         tokio::time::sleep(std::time::Duration::from_secs(60)).await;
-        server_hook.shutdown().await;
+        server_control_hook_1.shutdown().await;
     });
-    server_hook_clone.wait().await;
+    server_control_hook_2.wait().await;
 }

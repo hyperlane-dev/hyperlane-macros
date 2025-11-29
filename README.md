@@ -1366,8 +1366,8 @@ async fn test_multi_hyperlane() {
 async fn main() {
     config.disable_nodelay().await;
     server.config(config).await;
-    let server_hook: ServerControlHook = server.run().await.unwrap_or_default();
-    server_hook.wait().await;
+    let server_control_hook: ServerControlHook = server.run().await.unwrap_or_default();
+    server_control_hook.wait().await;
 }
 ```
 
