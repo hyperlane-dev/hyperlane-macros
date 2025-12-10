@@ -72,7 +72,6 @@ cargo add hyperlane-macros
 
 - `#[send]` - Send complete response (headers and body) after function execution
 - `#[send_body]` - Send only response body after function execution
-- `#[send_with_data("data")]` - Send complete response with specified data after function execution
 - `#[send_body_with_data("data")]` - Send only response body with specified data after function execution
 
 ### Flush Macros

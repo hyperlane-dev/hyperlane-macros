@@ -50,38 +50,6 @@ inventory::submit! {
     }
 }
 
-/// Sends the response with both headers and body with specified data.
-///
-/// # Arguments
-///
-/// - `attr` - The attribute token stream containing the data to send.
-/// - `item` - The input token stream to process.
-/// - `position` - The position to inject the code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with send operation.
-pub(crate) fn send_with_data_macro(
-    attr: TokenStream,
-    item: TokenStream,
-    position: Position,
-) -> TokenStream {
-    let send_data: SendData = parse_macro_input!(attr as SendData);
-    let data: Expr = send_data.data;
-    inject(position, item, |context| {
-        quote! {
-            let _ = #context.send_with_data(#data).await;
-        }
-    })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "send_with_data",
-        handler: Handler::WithAttrPosition(send_with_data_macro),
-    }
-}
-
 /// Sends only the response body with specified data.
 ///
 /// # Arguments

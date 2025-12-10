@@ -874,45 +874,6 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_macro(item, Position::Epilogue)
 }
 
-/// Sends the complete response with data after function execution.
-///
-/// This attribute macro ensures that the response (request headers and body) is automatically sent
-/// to the client after the function completes execution, with the specified data.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_with_data")]
-/// struct SendWithData;
-///
-/// impl ServerHook for SendWithData {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_with_data("Hello, World!"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl SendWithData {
-///     #[send_with_data("Hello, World!")]
-///     async fn send_with_data_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[send_with_data("data")]
-/// async fn standalone_send_with_data_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro accepts data to send and should be applied to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn send_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_with_data_macro(attr, item, Position::Epilogue)
-}
-
 /// Flushes the response stream after function execution.
 ///
 /// This attribute macro ensures that the response stream is flushed to guarantee immediate

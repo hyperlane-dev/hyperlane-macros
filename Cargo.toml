@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-macros"
-version = "10.6.18"
+version = "10.6.19"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
