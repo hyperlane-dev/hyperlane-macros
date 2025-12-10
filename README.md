@@ -72,10 +72,7 @@ cargo add hyperlane-macros
 
 - `#[send]` - Send complete response (headers and body) after function execution
 - `#[send_body]` - Send only response body after function execution
-- `#[send_once]` - Send complete response exactly once after function execution
-- `#[send_body_once]` - Send response body exactly once after function execution
 - `#[send_with_data("data")]` - Send complete response with specified data after function execution
-- `#[send_once_with_data("data")]` - Send complete response exactly once with specified data after function execution
 - `#[send_body_with_data("data")]` - Send only response body with specified data after function execution
 
 ### Flush Macros
@@ -626,7 +623,7 @@ impl ServerHook for Get {
         Self
     }
 
-    #[prologue_macros(ws, get, response_body("get"), send_body_once)]
+    #[prologue_macros(ws, get, response_body("get"), send_body)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -638,7 +635,7 @@ impl ServerHook for Post {
         Self
     }
 
-    #[prologue_macros(post, response_body("post"), send_once)]
+    #[prologue_macros(post, response_body("post"), send)]
     async fn handle(self, ctx: &Context) {}
 }
 

@@ -395,7 +395,7 @@ impl ServerHook for Get {
         Self
     }
 
-    #[prologue_macros(ws, get, response_body("get"), send_body_once)]
+    #[prologue_macros(ws, get, response_body("get"), send_body)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -407,7 +407,7 @@ impl ServerHook for Post {
         Self
     }
 
-    #[prologue_macros(post, response_body("post"), send_once)]
+    #[prologue_macros(post, response_body("post"), send)]
     async fn handle(self, ctx: &Context) {}
 }
 

@@ -913,123 +913,6 @@ pub fn send_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_with_data_macro(attr, item, Position::Epilogue)
 }
 
-/// Sends the complete response exactly once after function execution.
-///
-/// This attribute macro ensures that the response is sent exactly once to the client,
-/// preventing multiple response transmissions for single-use scenarios.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_once")]
-/// struct SendOnceTest;
-///
-/// impl ServerHook for SendOnceTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_once)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl SendOnceTest {
-///     #[send_once]
-///     async fn send_once_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[send_once]
-/// async fn standalone_send_once_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn send_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_once_macro(item, Position::Epilogue)
-}
-
-/// Sends only the response body exactly once after function execution.
-///
-/// This attribute macro ensures that the response body is sent exactly once to the client,
-/// preventing multiple body transmissions for single-use scenarios.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_body_once")]
-/// struct SendBodyOnceTest;
-///
-/// impl ServerHook for SendBodyOnceTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_body_once)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl SendBodyOnceTest {
-///     #[send_body_once]
-///     async fn send_body_once_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[send_body_once]
-/// async fn standalone_send_body_once_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn send_body_once(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_once_macro(item, Position::Epilogue)
-}
-
-/// Sends the complete response exactly once with data after function execution.
-///
-/// This attribute macro ensures that the response is sent exactly once to the client,
-/// preventing multiple response transmissions for single-use scenarios, with the specified data.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_once_with_data")]
-/// struct SendOnceWithData;
-///
-/// impl ServerHook for SendOnceWithData {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_once_with_data("One-time response"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl SendOnceWithData {
-///     #[send_once_with_data("One-time response")]
-///     async fn send_once_with_data_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[send_once_with_data("data")]
-/// async fn standalone_send_once_with_data_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro accepts data to send and should be applied to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn send_once_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_once_with_data_macro(attr, item, Position::Epilogue)
-}
-
 /// Flushes the response stream after function execution.
 ///
 /// This attribute macro ensures that the response stream is flushed to guarantee immediate
@@ -2713,7 +2596,7 @@ pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(post, response_body("post"), send_once)]
+///     #[prologue_macros(post, response_body("post"), send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
