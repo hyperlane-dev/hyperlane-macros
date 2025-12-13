@@ -165,21 +165,21 @@ pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
 ///
 /// - `bool` - Returns `true` if the type is `&::hyperlane::Context` or `&Context`, `false` otherwise.
 fn is_context_type(ty: &Type) -> bool {
-    if let Type::Reference(type_ref) = ty {
-        if let Type::Path(type_path) = &*type_ref.elem {
-            let path: &Path = &type_path.path;
-            if path.segments.len() >= 2 {
-                let segments: Vec<_> = path.segments.iter().collect();
-                if segments.len() >= 2 {
-                    let last_two: &[&PathSegment] = &segments[segments.len() - 2..];
-                    if last_two[0].ident == "hyperlane" && last_two[1].ident == "Context" {
-                        return true;
-                    }
+    if let Type::Reference(type_ref) = ty
+        && let Type::Path(type_path) = &*type_ref.elem
+    {
+        let path: &Path = &type_path.path;
+        if path.segments.len() >= 2 {
+            let segments: Vec<_> = path.segments.iter().collect();
+            if segments.len() >= 2 {
+                let last_two: &[&PathSegment] = &segments[segments.len() - 2..];
+                if last_two[0].ident == "hyperlane" && last_two[1].ident == "Context" {
+                    return true;
                 }
             }
-            if path.segments.len() == 1 && path.segments[0].ident == "Context" {
-                return true;
-            }
+        }
+        if path.segments.len() == 1 && path.segments[0].ident == "Context" {
+            return true;
         }
     }
     false
@@ -202,22 +202,22 @@ fn is_context_type(ty: &Type) -> bool {
 /// - `syn::Result<&Ident>` - Returns the context identifier.
 pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<&Ident> {
     for arg in sig.inputs.iter() {
-        if let FnArg::Typed(pat_type) = arg {
-            if is_context_type(&pat_type.ty) {
-                match &*pat_type.pat {
-                    Pat::Ident(pat_ident) => return Ok(&pat_ident.ident),
-                    Pat::Wild(wild) => {
-                        return Err(syn::Error::new_spanned(
-                            wild,
-                            "The context argument cannot be anonymous `_`, please use a named identifier",
-                        ));
-                    }
-                    _ => {
-                        return Err(syn::Error::new_spanned(
-                            &pat_type.pat,
-                            "expected identifier for context parameter",
-                        ));
-                    }
+        if let FnArg::Typed(pat_type) = arg
+            && is_context_type(&pat_type.ty)
+        {
+            match &*pat_type.pat {
+                Pat::Ident(pat_ident) => return Ok(&pat_ident.ident),
+                Pat::Wild(wild) => {
+                    return Err(syn::Error::new_spanned(
+                        wild,
+                        "The context argument cannot be anonymous `_`, please use a named identifier",
+                    ));
+                }
+                _ => {
+                    return Err(syn::Error::new_spanned(
+                        &pat_type.pat,
+                        "expected identifier for context parameter",
+                    ));
                 }
             }
         }
