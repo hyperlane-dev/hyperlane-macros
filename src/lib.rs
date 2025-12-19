@@ -49,6 +49,7 @@ pub(crate) use route::*;
 pub(crate) use send::*;
 pub(crate) use stream::*;
 
+pub(crate) use ::hyperlane::inventory;
 pub(crate) use proc_macro::TokenStream;
 pub(crate) use proc_macro2::TokenStream as TokenStream2;
 pub(crate) use quote::quote;

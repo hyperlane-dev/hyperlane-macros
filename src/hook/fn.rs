@@ -24,7 +24,7 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let struct_name: &Ident = &input_struct.ident;
     let gen_code: TokenStream2 = quote! {
         #input_struct
-        inventory::submit! {
+        ::hyperlane::inventory::submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::PanicHook(#order),
                 handler: ::hyperlane::HookHandler::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
