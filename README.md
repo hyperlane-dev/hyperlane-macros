@@ -100,6 +100,8 @@ cargo add hyperlane-macros
 
 ### Attribute Macros
 
+- `#[attribute_option(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
+- `#[attribute_option("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
 - `#[attribute(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
 - `#[attribute("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
 
@@ -110,6 +112,8 @@ cargo add hyperlane-macros
 
 ### Route Param Macros
 
+- `#[route_param_option(key => variable_name)]` - Extract a specific route parameter by key into a variable
+- `#[route_param_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
 - `#[route_param(key => variable_name)]` - Extract a specific route parameter by key into a variable
 - `#[route_param("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
 
@@ -120,6 +124,8 @@ cargo add hyperlane-macros
 
 ### Request Query Macros
 
+- `#[request_query_option(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
+- `#[request_query_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
 - `#[request_query(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
 - `#[request_query("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
 
@@ -130,6 +136,8 @@ cargo add hyperlane-macros
 
 ### Request Header Macros
 
+- `#[request_header_option(key => variable_name)]` - Extract a specific HTTP header by name from the request
+- `#[request_header_option(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
 - `#[request_header(key => variable_name)]` - Extract a specific HTTP header by name from the request
 - `#[request_header(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
 
@@ -140,6 +148,8 @@ cargo add hyperlane-macros
 
 ### Request Cookie Macros
 
+- `#[request_cookie_option(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
+- `#[request_cookie_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
 - `#[request_cookie(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
 - `#[request_cookie("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
 
@@ -782,6 +792,20 @@ impl ServerHook for RouteParams {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/route_param_option/:test")]
+struct RouteParamOption;
+
+impl ServerHook for RouteParamOption {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[response_body(&format!("route param: {request_route_param_option1:?} {request_route_param_option2:?} {request_route_param_option3:?}"))]
+    #[route_param_option("test1" => request_route_param_option1)]
+    #[route_param_option("test2" => request_route_param_option2, "test3" => request_route_param_option3)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/route_param/:test")]
 struct RouteParam;
 
@@ -790,9 +814,9 @@ impl ServerHook for RouteParam {
         Self
     }
 
-    #[response_body(&format!("route param: {request_route_param:?} {request_route_param1:?} {request_route_param2:?}"))]
-    #[route_param("test" => request_route_param)]
-    #[route_param("test1" => request_route_param1, "test2" => request_route_param2)]
+    #[response_body(&format!("route param: {request_route_param1} {request_route_param2} {request_route_param3}"))]
+    #[route_param("test1" => request_route_param1)]
+    #[route_param("test2" => request_route_param2, "test3" => request_route_param3)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -814,6 +838,28 @@ impl ServerHook for Host {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/request_query_option")]
+struct RequestQueryOption;
+
+impl ServerHook for RequestQueryOption {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[epilogue_macros(
+        request_query_option("test" => request_query_option),
+        response_body(&format!("request query: {request_query_option:?}")),
+        send,
+        http_from_stream(1024)
+    )]
+    #[prologue_macros(
+        request_query_option("test" => request_query_option),
+        response_body(&format!("request query: {request_query_option:?}")),
+        send
+    )]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/request_query")]
 struct RequestQuery;
 
@@ -823,14 +869,36 @@ impl ServerHook for RequestQuery {
     }
 
     #[epilogue_macros(
-        request_query("test" => request_query_option),
-        response_body(&format!("request query: {request_query_option:?}")),
+        request_query("test" => request_query),
+        response_body(&format!("request query: {request_query}")),
         send,
         http_from_stream(1024)
     )]
     #[prologue_macros(
-        request_query("test" => request_query_option),
-        response_body(&format!("request query: {request_query_option:?}")),
+        request_query("test" => request_query),
+        response_body(&format!("request query: {request_query}")),
+        send
+    )]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/request_header_option")]
+struct RequestHeaderOption;
+
+impl ServerHook for RequestHeaderOption {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[epilogue_macros(
+        request_header_option(HOST => request_header_option),
+        response_body(&format!("request header: {request_header_option:?}")),
+        send,
+        http_from_stream(_request)
+    )]
+    #[prologue_macros(
+        request_header_option(HOST => request_header_option),
+        response_body(&format!("request header: {request_header_option:?}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}
@@ -845,14 +913,14 @@ impl ServerHook for RequestHeader {
     }
 
     #[epilogue_macros(
-        request_header(HOST => request_header_option),
-        response_body(&format!("request header: {request_header_option:?}")),
+        request_header(HOST => request_header),
+        response_body(&format!("request header: {request_header}")),
         send,
         http_from_stream(_request)
     )]
     #[prologue_macros(
-        request_header(HOST => request_header_option),
-        response_body(&format!("request header: {request_header_option:?}")),
+        request_header(HOST => request_header),
+        response_body(&format!("request header: {request_header}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}
@@ -930,6 +998,19 @@ impl ServerHook for RejectHost {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/attribute_option")]
+struct AttributeOption;
+
+impl ServerHook for AttributeOption {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
+    #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/attribute")]
 struct Attribute;
 
@@ -938,8 +1019,8 @@ impl ServerHook for Attribute {
         Self
     }
 
-    #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
-    #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+    #[response_body(&format!("request attribute: {request_attribute:?}"))]
+    #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -999,7 +1080,20 @@ impl ServerHook for Cookies {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[route("/cookie")]
+#[route("/request_cookie_option")]
+struct CookieOption;
+
+impl ServerHook for CookieOption {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
+    #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/request_cookie")]
 struct Cookie;
 
 impl ServerHook for Cookie {
@@ -1007,8 +1101,8 @@ impl ServerHook for Cookie {
         Self
     }
 
-    #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-    #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+    #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
+    #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
     async fn handle(self, ctx: &Context) {}
 }
 

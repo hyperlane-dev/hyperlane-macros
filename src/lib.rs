@@ -1760,10 +1760,81 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts one or more `variable_name: Type` pairs separated by commas.
-/// Each variable will be available in the function scope as a `Result<Type, JsonError>`.
+/// Each variable will be available in the function scope as a `ResultJsonError<Type>`.
 #[proc_macro_attribute]
 pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_json_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts a specific attribute value into a variable.
+///
+/// This attribute macro retrieves a specific attribute by key and makes it available
+/// as a typed variable from the request context.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+/// use serde::{Deserialize, Serialize};
+///
+/// const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct TestData {
+///     name: String,
+///     age: u32,
+/// }
+///
+/// #[route("/attribute_option")]
+/// struct Attribute;
+///
+/// impl ServerHook for Attribute {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
+///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Attribute {
+///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     async fn attribute_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+/// async fn standalone_attribute_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a key-to-variable mapping in the format `key => variable_name: Type`.
+/// The variable will be available as an `Option<Type>` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_attr")]
+/// struct MultiAttr;
+///
+/// impl ServerHook for MultiAttr {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("attrs: {attr1:?}, {attr2:?}"))]
+///     #[attribute_option("key1" => attr1: String, "key2" => attr2: i32)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple `key => variable_name: Type` tuples separated by commas.
+#[proc_macro_attribute]
+pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    attribute_option_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific attribute value into a variable.
@@ -1794,22 +1865,22 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
-///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     #[response_body(&format!("request attribute: {request_attribute:?}"))]
+///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl Attribute {
-///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
 ///     async fn attribute_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[attribute(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+/// #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
 /// async fn standalone_attribute_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `key => variable_name: Type`.
-/// The variable will be available as an `Option<Type>` in the function scope.
+/// The variable will be available as an `Type` in the function scope.
 ///
 /// # Multi-Parameter Usage
 ///
@@ -1825,7 +1896,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("attrs: {attr1:?}, {attr2:?}"))]
+///     #[response_body(&format!("attrs: {attr1}, {attr2}"))]
 ///     #[attribute("key1" => attr1: String, "key2" => attr2: i32)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
@@ -1837,10 +1908,10 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
     attribute_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts all attributes into a HashMap variable.
+/// Extracts all attributes into a ThreadSafeAttributeStore variable.
 ///
 /// This attribute macro retrieves all available attributes from the request context
-/// and makes them available as a HashMap for comprehensive attribute access.
+/// and makes them available as a ThreadSafeAttributeStore for comprehensive attribute access.
 ///
 /// # Usage
 ///
@@ -1910,6 +1981,68 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/route_param_option/:test")]
+/// struct RouteParam;
+///
+/// impl ServerHook for RouteParam {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("route param: {request_route_param:?}"))]
+///     #[route_param_option("test" => request_route_param)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RouteParam {
+///     #[route_param_option("test" => request_route_param)]
+///     async fn route_param_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[route_param_option("test" => request_route_param)]
+/// async fn standalone_route_param_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
+/// The variable will be available as an `OptionString` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/multi_param/:id/:name")]
+/// struct MultiParam;
+///
+/// impl ServerHook for MultiParam {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("id: {id:?}, name: {name:?}"))]
+///     #[route_param_option("id" => id, "name" => name)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple `"key" => variable_name` pairs separated by commas.
+#[proc_macro_attribute]
+pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    route_param_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts a specific route parameter into a variable.
+///
+/// This attribute macro retrieves a specific route parameter by key and makes it
+/// available as a variable. Route parameters are extracted from the URL path segments.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[route("/route_param/:test")]
 /// struct RouteParam;
 ///
@@ -1933,7 +2066,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
-/// The variable will be available as an `Option<String>` in the function scope.
+/// The variable will be available as an `String` in the function scope.
 ///
 /// # Multi-Parameter Usage
 ///
@@ -1995,7 +2128,7 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a variable name that will contain all route parameters.
-/// The variable will be available as a collection in the function scope.
+/// The variable will be available as a RouteParams type in the function scope.
 ///
 /// # Multi-Parameter Usage
 ///
@@ -2034,6 +2167,51 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/request_query_option")]
+/// struct RequestQuery;
+///
+/// impl ServerHook for RequestQuery {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         request_query_option("test" => request_query_option),
+///         response_body(&format!("request query: {request_query_option:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RequestQuery {
+///     #[request_query_option("test" => request_query_option)]
+///     async fn request_query_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[request_query_option("test" => request_query_option)]
+/// async fn standalone_request_query_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
+/// The variable will be available as an `OptionRequestQuerysValue` in the function scope.
+///
+/// Supports multiple parameters: `#[request_query_option("k1" => v1, "k2" => v2)]`
+#[proc_macro_attribute]
+pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_query_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts a specific request query parameter into a variable.
+///
+/// This attribute macro retrieves a specific request query parameter by key and makes it
+/// available as a variable. Query parameters are extracted from the URL request query string.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[route("/request_query")]
 /// struct RequestQuery;
 ///
@@ -2043,24 +2221,24 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         request_query("test" => request_query_option),
-///         response_body(&format!("request query: {request_query_option:?}")),
+///         request_query("test" => request_query),
+///         response_body(&format!("request query: {request_query}")),
 ///         send
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl RequestQuery {
-///     #[request_query("test" => request_query_option)]
+///     #[request_query("test" => request_query)]
 ///     async fn request_query_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[request_query("test" => request_query_option)]
+/// #[request_query("test" => request_query)]
 /// async fn standalone_request_query_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
-/// The variable will be available as an `Option<String>` in the function scope.
+/// The variable will be available as an `RequestQuerysValue` in the function scope.
 ///
 /// Supports multiple parameters: `#[request_query("k1" => v1, "k2" => v2)]`
 #[proc_macro_attribute]
@@ -2068,10 +2246,10 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_query_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts all request query parameters into a collection variable.
+/// Extracts all request query parameters into a RequestQuerys variable.
 ///
 /// This attribute macro retrieves all available request query parameters from the URL request query string
-/// and makes them available as a collection for comprehensive request query parameter access.
+/// and makes them available as a RequestQuerys for comprehensive request query parameter access.
 ///
 /// # Usage
 ///
@@ -2124,6 +2302,49 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/request_header_option")]
+/// struct RequestHeader;
+///
+/// impl ServerHook for RequestHeader {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         request_header_option(HOST => request_header_option),
+///         response_body(&format!("request header: {request_header_option:?}")),
+///         send
+///     )]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RequestHeader {
+///     #[request_header_option(HOST => request_header_option)]
+///     async fn request_header_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[request_header_option(HOST => request_header_option)]
+/// async fn standalone_request_header_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
+/// or `"Header-Name" => variable_name`. The variable will be available as an `OptionRequestHeadersValueItem`.
+#[proc_macro_attribute]
+pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_header_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts a specific HTTP request header into a variable.
+///
+/// This attribute macro retrieves a specific HTTP request header by name and makes it
+/// available as a variable. Header values are extracted from the request request headers collection.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
 /// #[route("/request_header")]
 /// struct RequestHeader;
 ///
@@ -2133,24 +2354,24 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         request_header(HOST => request_header_option),
-///         response_body(&format!("request header: {request_header_option:?}")),
+///         request_header(HOST => request_header),
+///         response_body(&format!("request header: {request_header}")),
 ///         send
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl RequestHeader {
-///     #[request_header(HOST => request_header_option)]
+///     #[request_header(HOST => request_header)]
 ///     async fn request_header_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[request_header(HOST => request_header_option)]
+/// #[request_header(HOST => request_header)]
 /// async fn standalone_request_header_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
-/// or `"Header-Name" => variable_name`. The variable will be available as an `Option<String>`.
+/// or `"Header-Name" => variable_name`. The variable will be available as an `RequestHeadersValueItem`.
 #[proc_macro_attribute]
 pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_header_macro(attr, item, Position::Prologue)
@@ -2193,7 +2414,7 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a variable name that will contain all HTTP request headers.
-/// The variable will be available as a collection in the function scope.
+/// The variable will be available as a RequestHeaders type in the function scope.
 #[proc_macro_attribute]
 pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_headers_macro(attr, item, Position::Prologue)
@@ -2220,22 +2441,65 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-///     #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl Cookie {
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-///     #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn request_cookie_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
 /// #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-/// #[request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+/// #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 /// async fn standalone_request_cookie_handler(ctx: &Context) {}
 /// ```
 ///
 /// For specific cookie extraction, the variable will be available as `Option<String>`.
+/// For all cookies extraction, the variable will be available as `String`.
+#[proc_macro_attribute]
+pub fn request_cookie_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_cookie_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts a specific cookie value or all cookies into a variable.
+///
+/// This attribute macro supports two syntaxes:
+/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key
+/// 2. `cookie(variable_name)` - Extract all cookies as a raw string
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/cookie")]
+/// struct Cookie;
+///
+/// impl ServerHook for Cookie {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
+///     #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Cookie {
+///     #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
+///     #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
+///     async fn request_cookie_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
+/// #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
+/// async fn standalone_request_cookie_handler(ctx: &Context) {}
+/// ```
+///
+/// For specific cookie extraction, the variable will be available as `String`.
 /// For all cookies extraction, the variable will be available as `String`.
 #[proc_macro_attribute]
 pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -2275,8 +2539,8 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// async fn standalone_request_cookies_handler(ctx: &Context) {}
 /// ```
 ///
-/// The macro accepts a variable name that will contain the Cookie header value.
-/// The variable will be available as a String in the function scope.
+/// The macro accepts a variable name that will contain all cookies.
+/// The variable will be available as a Cookies type in the function scope.
 #[proc_macro_attribute]
 pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_cookies_macro(attr, item, Position::Prologue)

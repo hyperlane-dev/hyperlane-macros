@@ -87,7 +87,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with attribute extraction.
-pub(crate) fn attribute_macro(
+pub(crate) fn attribute_option_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -100,6 +100,46 @@ pub(crate) fn attribute_macro(
             .map(|(key_name, variable, type_name)| {
                 quote! {
                     let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
+                }
+            });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "attribute_option",
+        handler: Handler::WithAttrPosition(attribute_option_macro),
+    }
+}
+
+/// Gets request attribute by key and assigns to specified variable.
+/// Supports both single and multiple attribute extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with attribute extraction.
+pub(crate) fn attribute_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_attr: MultiAttributeData = parse_macro_input!(attr as MultiAttributeData);
+    inject(position, item, |context| {
+        let statements = multi_attr
+            .params
+            .iter()
+            .map(|(key_name, variable, type_name)| {
+                quote! {
+                    let #variable: #type_name = #context.get_attribute(&#key_name).await;
                 }
             });
         quote! {
@@ -164,7 +204,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with route param extraction.
-pub(crate) fn route_param_macro(
+pub(crate) fn route_param_option_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -174,6 +214,43 @@ pub(crate) fn route_param_macro(
         let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionString = #context.try_get_route_param(#key_name).await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "route_param_option",
+        handler: Handler::WithAttrPosition(route_param_option_macro),
+    }
+}
+
+/// Gets route parameter by key and assigns to specified variable.
+/// Supports both single and multiple route parameter extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with route param extraction.
+pub(crate) fn route_param_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_param: MultiRouteParamData = parse_macro_input!(attr as MultiRouteParamData);
+    inject(position, item, |context| {
+        let statements = multi_param.params.iter().map(|(key_name, variable)| {
+            quote! {
+                let #variable: String = #context.get_route_param(#key_name).await;
             }
         });
         quote! {
@@ -238,7 +315,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with query param extraction.
-pub(crate) fn request_query_macro(
+pub(crate) fn request_query_option_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -248,6 +325,43 @@ pub(crate) fn request_query_macro(
         let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionRequestQuerysValue = #context.try_get_request_query(#key_name).await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_query_option",
+        handler: Handler::WithAttrPosition(request_query_option_macro),
+    }
+}
+
+/// Gets request query parameter by key and assigns to specified variable.
+/// Supports both single and multiple parameter extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with query param extraction.
+pub(crate) fn request_query_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_query: MultiQueryData = parse_macro_input!(attr as MultiQueryData);
+    inject(position, item, |context| {
+        let statements = multi_query.params.iter().map(|(key_name, variable)| {
+            quote! {
+                let #variable: ::hyperlane::RequestQuerysValue = #context.get_request_query(#key_name).await;
             }
         });
         quote! {
@@ -312,7 +426,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with header extraction.
-pub(crate) fn request_header_macro(
+pub(crate) fn request_header_option_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -322,6 +436,43 @@ pub(crate) fn request_header_macro(
         let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::OptionRequestHeadersValueItem = #context.try_get_request_header_back(#key_name).await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_header_option",
+        handler: Handler::WithAttrPosition(request_header_option_macro),
+    }
+}
+
+/// Gets request header by key and assigns to specified variable.
+/// Supports both single and multiple header extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with header extraction.
+pub(crate) fn request_header_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_header: MultiHeaderData = parse_macro_input!(attr as MultiHeaderData);
+    inject(position, item, |context| {
+        let statements = multi_header.params.iter().map(|(key_name, variable)| {
+            quote! {
+                let #variable: ::hyperlane::RequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
             }
         });
         quote! {
@@ -386,6 +537,43 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with cookie extraction.
+pub(crate) fn request_cookie_option_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_cookie: MultiCookieData = parse_macro_input!(attr as MultiCookieData);
+    inject(position, item, |context| {
+        let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
+            quote! {
+                let #variable: ::hyperlane::OptionCookieValue = #context.try_get_request_cookie(#key_name).await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_cookie_option",
+        handler: Handler::WithAttrPosition(request_cookie_option_macro),
+    }
+}
+
+/// Gets request cookie by key and assigns to specified variable.
+/// Supports both single and multiple cookie extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with cookie extraction.
 pub(crate) fn request_cookie_macro(
     attr: TokenStream,
     item: TokenStream,
@@ -395,7 +583,7 @@ pub(crate) fn request_cookie_macro(
     inject(position, item, |context| {
         let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: ::hyperlane::OptionCookiesValue = #context.try_get_request_cookie(#key_name).await;
+                let #variable: ::hyperlane::CookieValue = #context.get_request_cookie(#key_name).await;
             }
         });
         quote! {

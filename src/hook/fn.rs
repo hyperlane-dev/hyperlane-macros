@@ -27,7 +27,7 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
         ::hyperlane::inventory::submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::PanicHook(#order),
-                handler: ::hyperlane::HookHandler::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
+                handler: ::hyperlane::HookHandlerSpec::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
             }
         }
     };

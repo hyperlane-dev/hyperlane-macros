@@ -27,7 +27,7 @@ pub(crate) fn request_middleware_macro(attr: TokenStream, item: TokenStream) -> 
         ::hyperlane::inventory::submit! {
             ::hyperlane::HookMacro {
                 hook_type: ::hyperlane::HookType::RequestMiddleware(#order),
-                handler: ::hyperlane::HookHandler::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
+                handler: ::hyperlane::HookHandlerSpec::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
             }
         }
     };
