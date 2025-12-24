@@ -1024,6 +1024,19 @@ impl ServerHook for Attribute {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/request_body_json_result")]
+struct RequestBodyJsonResult;
+
+impl ServerHook for RequestBodyJsonResult {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[response_body(&format!("request data: {request_data_result:?}"))]
+    #[request_body_json_result(request_data_result: TestData)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/request_body_json")]
 struct RequestBodyJson;
 
@@ -1377,8 +1390,8 @@ impl ServerHook for User {
         request_body_json(user1: User, user2: User),
         response_body(format!(
             "user1: {:?}, user2: {:?}",
-            user1.unwrap().name,
-            user2.unwrap().name
+            user1.name,
+            user2.name
         )),
         send
     )]

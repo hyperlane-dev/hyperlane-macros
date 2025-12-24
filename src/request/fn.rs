@@ -49,6 +49,44 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with JSON parsing.
+pub(crate) fn request_body_json_result_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_body_json: MultiRequestBodyJsonData =
+        parse_macro_input!(attr as MultiRequestBodyJsonData);
+    inject(position, item, |context| {
+        let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
+            quote! {
+                let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.try_get_request_body_json::<#type_name>().await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_body_json_result",
+        handler: Handler::WithAttrPosition(request_body_json_macro),
+    }
+}
+
+/// Parses request body as JSON and assigns to specified variable.
+/// Supports both single and multiple variable-type pair extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with JSON parsing.
 pub(crate) fn request_body_json_macro(
     attr: TokenStream,
     item: TokenStream,
@@ -59,7 +97,7 @@ pub(crate) fn request_body_json_macro(
     inject(position, item, |context| {
         let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
-                let #variable: ::hyperlane::ResultJsonError<#type_name> = #context.get_request_body_json::<#type_name>().await;
+                let #variable: #type_name = #context.get_request_body_json::<#type_name>().await;
             }
         });
         quote! {

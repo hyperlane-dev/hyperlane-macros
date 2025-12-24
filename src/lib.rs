@@ -553,10 +553,10 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// const CUSTOM_STATUS_CODE: i32 = 200;
 ///
-/// #[route("/response")]
-/// struct Response;
+/// #[route("/response_status_code")]
+/// struct ResponseStatusCode;
 ///
-/// impl ServerHook for Response {
+/// impl ServerHook for ResponseStatusCode {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -565,7 +565,7 @@ pub fn http(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl Response {
+/// impl ResponseStatusCode {
 ///     #[response_status_code(CUSTOM_STATUS_CODE)]
 ///     async fn response_status_code_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -594,10 +594,10 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 ///
 /// const CUSTOM_REASON: &str = "Accepted";
 ///
-/// #[route("/response")]
-/// struct Response;
+/// #[route("/response_reason")]
+/// struct ResponseReason;
 ///
-/// impl ServerHook for Response {
+/// impl ServerHook for ResponseReason {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -606,7 +606,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl Response {
+/// impl ResponseReason {
 ///     #[response_reason_phrase(CUSTOM_REASON)]
 ///     async fn response_reason_phrase_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -637,10 +637,10 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// const CUSTOM_HEADER_NAME: &str = "X-Custom-Header";
 /// const CUSTOM_HEADER_VALUE: &str = "custom-value";
 ///
-/// #[route("/response")]
-/// struct Response;
+/// #[route("/response_header")]
+/// struct ResponseHeader;
 ///
-/// impl ServerHook for Response {
+/// impl ServerHook for ResponseHeader {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -649,7 +649,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl Response {
+/// impl ResponseHeader {
 ///     #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
 ///     async fn response_header_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -693,10 +693,10 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// const RESPONSE_DATA: &str = "{\"status\": \"success\"}";
 ///
-/// #[route("/response")]
-/// struct Response;
+/// #[route("/response_body")]
+/// struct ResponseBody;
 ///
-/// impl ServerHook for Response {
+/// impl ServerHook for ResponseBody {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -705,7 +705,7 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl Response {
+/// impl ResponseBody {
 ///     #[response_body(&RESPONSE_DATA)]
 ///     async fn response_body_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -731,10 +731,10 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/unknown_method")]
-/// struct UnknownMethod;
+/// #[route("/clear_response_headers")]
+/// struct ClearResponseHeaders;
 ///
-/// impl ServerHook for UnknownMethod {
+/// impl ServerHook for ClearResponseHeaders {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -742,12 +742,12 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     #[prologue_macros(
 ///         clear_response_headers,
 ///         filter(ctx.get_request().await.is_unknown_method()),
-///         response_body("unknown_method")
+///         response_body("clear_response_headers")
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl UnknownMethod {
+/// impl ClearResponseHeaders {
 ///     #[clear_response_headers]
 ///     async fn clear_response_headers_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -1688,10 +1688,90 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_macro(attr, item, Position::Prologue)
 }
 
-/// Parses the request body as JSON into a specified variable and type.
+/// Parses the request body as JSON into a specified variable and type with panic on parsing failure.
 ///
 /// This attribute macro extracts and deserializes the request body content as JSON into a variable
 /// with the specified type. The body content is parsed as JSON using serde.
+/// If the request body does not exist or JSON parsing fails, the function will panic with an error message.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+/// use serde::{Deserialize, Serialize};
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct TestData {
+///     name: String,
+///     age: u32,
+/// }
+///
+/// #[route("/request_body_json_result")]
+/// struct RequestBodyJson;
+///
+/// impl ServerHook for RequestBodyJson {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("request data: {request_data_result:?}"))]
+///     #[request_body_json_result(request_data_result: TestData)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RequestBodyJson {
+///     #[request_body_json_result(request_data_result: TestData)]
+///     async fn request_body_json_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[request_body_json_result(request_data_result: TestData)]
+/// async fn standalone_request_body_json_handler(ctx: &Context) {}
+/// ```
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+/// use serde::{Deserialize, Serialize};
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct User {
+///     name: String,
+/// }
+///
+/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// struct Config {
+///     debug: bool,
+/// }
+///
+/// #[route("/request_body_json_result")]
+/// struct TestData;
+///
+/// impl ServerHook for TestData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("user: {user:?}, config: {config:?}"))]
+///     #[request_body_json_result(user: User, config: Config)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts one or more `variable_name: Type` pairs separated by commas.
+/// Each variable will be available in the function scope as a `ResultJsonError<Type>`.
+#[proc_macro_attribute]
+pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_body_json_result_macro(attr, item, Position::Prologue)
+}
+
+/// Parses the request body as JSON into a specified variable and type with panic on parsing failure.
+///
+/// This attribute macro extracts and deserializes the request body content as JSON into a variable
+/// with the specified type. The body content is parsed as JSON using serde.
+/// If the request body does not exist or JSON parsing fails, the function will panic with an error message.
 ///
 /// # Usage
 ///
@@ -1745,10 +1825,10 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     debug: bool,
 /// }
 ///
-/// #[route("/multi_json")]
-/// struct MultiJson;
+/// #[route("/request_body_json")]
+/// struct TestData;
 ///
-/// impl ServerHook for MultiJson {
+/// impl ServerHook for TestData {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -1761,15 +1841,20 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro accepts one or more `variable_name: Type` pairs separated by commas.
 /// Each variable will be available in the function scope as a `ResultJsonError<Type>`.
+///
+/// # Panics
+///
+/// This macro will panic if the request body does not exist or JSON parsing fails.
 #[proc_macro_attribute]
 pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_json_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific attribute value into a variable.
+/// Extracts a specific attribute value into a variable wrapped in Option type.
 ///
 /// This attribute macro retrieves a specific attribute by key and makes it available
-/// as a typed variable from the request context.
+/// as a typed Option variable from the request context. The extracted value is wrapped
+/// in an Option type to safely handle cases where the attribute may not exist.
 ///
 /// # Usage
 ///
@@ -1817,7 +1902,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/multi_attr")]
+/// #[route("/attribute_option")]
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
@@ -1837,10 +1922,11 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
     attribute_option_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific attribute value into a variable.
+/// Extracts a specific attribute value into a variable with panic on missing value.
 ///
 /// This attribute macro retrieves a specific attribute by key and makes it available
-/// as a typed variable from the request context.
+/// as a typed variable from the request context. If the attribute does not exist,
+/// the function will panic with an error message indicating the missing attribute.
 ///
 /// # Usage
 ///
@@ -1888,7 +1974,7 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/multi_attr")]
+/// #[route("/attribute")]
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
@@ -1903,6 +1989,10 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts multiple `key => variable_name: Type` tuples separated by commas.
+///
+/// # Panics
+///
+/// This macro will panic if the requested attribute does not exist in the request context.
 #[proc_macro_attribute]
 pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
     attribute_macro(attr, item, Position::Prologue)
@@ -1970,10 +2060,11 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
     attributes_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific route parameter into a variable.
+/// Extracts a specific route parameter into a variable wrapped in Option type.
 ///
 /// This attribute macro retrieves a specific route parameter by key and makes it
-/// available as a variable. Route parameters are extracted from the URL path segments.
+/// available as an Option variable. Route parameters are extracted from the URL path segments
+/// and wrapped in an Option type to safely handle cases where the parameter may not exist.
 ///
 /// # Usage
 ///
@@ -2032,10 +2123,11 @@ pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_param_option_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific route parameter into a variable.
+/// Extracts a specific route parameter into a variable with panic on missing value.
 ///
 /// This attribute macro retrieves a specific route parameter by key and makes it
 /// available as a variable. Route parameters are extracted from the URL path segments.
+/// If the requested route parameter does not exist, the function will panic with an error message.
 ///
 /// # Usage
 ///
@@ -2068,6 +2160,7 @@ pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
 /// The variable will be available as an `String` in the function scope.
 ///
+///
 /// # Multi-Parameter Usage
 ///
 /// ```rust
@@ -2089,6 +2182,10 @@ pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts multiple `"key" => variable_name` pairs separated by commas.
+///
+/// # Panics
+///
+/// This macro will panic if the requested route parameter does not exist in the URL path.
 #[proc_macro_attribute]
 pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_param_macro(attr, item, Position::Prologue)
@@ -2156,10 +2253,11 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
     route_params_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific request query parameter into a variable.
+/// Extracts a specific request query parameter into a variable wrapped in Option type.
 ///
 /// This attribute macro retrieves a specific request query parameter by key and makes it
-/// available as a variable. Query parameters are extracted from the URL request query string.
+/// available as an Option variable. Query parameters are extracted from the URL request query string
+/// and wrapped in an Option type to safely handle cases where the parameter may not exist.
 ///
 /// # Usage
 ///
@@ -2201,10 +2299,11 @@ pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream
     request_query_option_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific request query parameter into a variable.
+/// Extracts a specific request query parameter into a variable with panic on missing value.
 ///
 /// This attribute macro retrieves a specific request query parameter by key and makes it
 /// available as a variable. Query parameters are extracted from the URL request query string.
+/// If the requested query parameter does not exist, the function will panic with an error message.
 ///
 /// # Usage
 ///
@@ -2241,6 +2340,10 @@ pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream
 /// The variable will be available as an `RequestQuerysValue` in the function scope.
 ///
 /// Supports multiple parameters: `#[request_query("k1" => v1, "k2" => v2)]`
+///
+/// # Panics
+///
+/// This macro will panic if the requested query parameter does not exist in the URL query string.
 #[proc_macro_attribute]
 pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_query_macro(attr, item, Position::Prologue)
@@ -2291,10 +2394,11 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_querys_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific HTTP request header into a variable.
+/// Extracts a specific HTTP request header into a variable wrapped in Option type.
 ///
 /// This attribute macro retrieves a specific HTTP request header by name and makes it
-/// available as a variable. Header values are extracted from the request request headers collection.
+/// available as an Option variable. Header values are extracted from the request request headers collection
+/// and wrapped in an Option type to safely handle cases where the header may not exist.
 ///
 /// # Usage
 ///
@@ -2334,10 +2438,11 @@ pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStrea
     request_header_option_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific HTTP request header into a variable.
+/// Extracts a specific HTTP request header into a variable with panic on missing value.
 ///
 /// This attribute macro retrieves a specific HTTP request header by name and makes it
 /// available as a variable. Header values are extracted from the request request headers collection.
+/// If the requested header does not exist, the function will panic with an error message.
 ///
 /// # Usage
 ///
@@ -2420,11 +2525,11 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_headers_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific cookie value or all cookies into a variable.
+/// Extracts a specific cookie value or all cookies into a variable wrapped in Option type.
 ///
 /// This attribute macro supports two syntaxes:
-/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key
-/// 2. `cookie(variable_name)` - Extract all cookies as a raw string
+/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key, wrapped in Option
+/// 2. `cookie(variable_name)` - Extract all cookies as a raw string, wrapped in Option
 ///
 /// # Usage
 ///
@@ -2463,11 +2568,11 @@ pub fn request_cookie_option(attr: TokenStream, item: TokenStream) -> TokenStrea
     request_cookie_option_macro(attr, item, Position::Prologue)
 }
 
-/// Extracts a specific cookie value or all cookies into a variable.
+/// Extracts a specific cookie value or all cookies into a variable with panic on missing value.
 ///
 /// This attribute macro supports two syntaxes:
-/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key
-/// 2. `cookie(variable_name)` - Extract all cookies as a raw string
+/// 1. `cookie(key => variable_name)` - Extract a specific cookie value by key, panics if missing
+/// 2. `cookie(variable_name)` - Extract all cookies as a raw string, panics if missing
 ///
 /// # Usage
 ///
@@ -2501,6 +2606,10 @@ pub fn request_cookie_option(attr: TokenStream, item: TokenStream) -> TokenStrea
 ///
 /// For specific cookie extraction, the variable will be available as `String`.
 /// For all cookies extraction, the variable will be available as `String`.
+///
+/// # Panics
+///
+/// This macro will panic if the requested cookie does not exist in the HTTP request headers.
 #[proc_macro_attribute]
 pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_cookie_macro(attr, item, Position::Prologue)
@@ -2814,15 +2923,15 @@ pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/post")]
-/// struct Post;
+/// #[route("/prologue_macros")]
+/// struct PrologueMacros;
 ///
-/// impl ServerHook for Post {
+/// impl ServerHook for PrologueMacros {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(post, response_body("post"), send)]
+///     #[prologue_macros(post, response_body("prologue_macros"), send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -2913,14 +3022,15 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// # Examples
 ///
 /// Using no parameters (default buffer size):
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws1")]
-/// struct Websocket1;
+/// #[route("/ws")]
+/// struct Websocket;
 ///
-/// impl ServerHook for Websocket1 {
+/// impl ServerHook for Websocket {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -2936,14 +3046,15 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// ```
 ///
 /// Using only buffer size:
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws5")]
-/// struct Websocket5;
+/// #[route("/ws")]
+/// struct Websocket;
 ///
-/// impl ServerHook for Websocket5 {
+/// impl ServerHook for Websocket {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -2959,14 +3070,15 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// ```
 ///
 /// Using variable name to store request data:
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws2")]
-/// struct Websocket2;
+/// #[route("/ws")]
+/// struct Websocket;
 ///
-/// impl ServerHook for Websocket2 {
+/// impl ServerHook for Websocket {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -2982,14 +3094,15 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// ```
 ///
 /// Using buffer size and variable name:
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws3")]
-/// struct Websocket3;
+/// #[route("/ws")]
+/// struct Websocket;
 ///
-/// impl ServerHook for Websocket3 {
+/// impl ServerHook for Websocket {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -3005,14 +3118,15 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// ```
 ///
 /// Using variable name and buffer size (reversed order):
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws4")]
-/// struct Websocket4;
+/// #[route("/ws")]
+/// struct Websocket;
 ///
-/// impl ServerHook for Websocket4 {
+/// impl ServerHook for Websocket {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -3026,7 +3140,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///     }
 /// }
 ///
-/// impl Websocket4 {
+/// impl Websocket {
 ///     #[ws_from_stream(request)]
 ///     async fn ws_from_stream_with_ref_self(&self, ctx: &Context) {}
 /// }
@@ -3061,14 +3175,15 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// # Examples
 ///
 /// Using with epilogue_macros:
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_query")]
-/// struct RequestQuery;
+/// #[route("/http_from_stream")]
+/// struct HttpFromStreamTest;
 ///
-/// impl ServerHook for RequestQuery {
+/// impl ServerHook for HttpFromStreamTest {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
@@ -3084,6 +3199,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// Using with variable name:
+///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
