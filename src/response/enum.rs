@@ -1,7 +1,7 @@
 /// Defines operations that can be performed on response headers.
 pub(crate) enum HeaderOperation {
-    /// Sets an existing header value, keeping the original if not present.
+    /// Sets an existing header value, replacing it if it already exists.
     Set,
-    /// Add a new header value, overwriting any existing value.
+    /// Adds a new header value, keeping any existing values with the same key.
     Add,
 }

@@ -2,13 +2,13 @@ use crate::*;
 
 /// Registers a response middleware.
 ///
-/// This macro takes a function as input and registers it as a response middleware.
-/// The registered function will be called after the main request handler but before the response is sent.
+/// This macro takes a struct as input and registers it as a response middleware.
+/// The registered struct will be used to create handlers that are called after the main request handler but before the response is sent.
 ///
 /// # Arguments
 ///
 /// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
-/// - `TokenStream` - The input token stream representing the function to be registered as a middleware.
+/// - `TokenStream` - The input token stream representing the struct to be registered as a middleware.
 ///
 /// # Note
 ///

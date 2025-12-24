@@ -2,7 +2,7 @@ use crate::*;
 
 /// Rejects requests based on a boolean condition.
 ///
-/// The function continues execution only if the provided code block returns `false`.
+/// The function returns early if the provided code block returns `true`.
 ///
 /// # Arguments
 ///

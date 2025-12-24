@@ -36,7 +36,7 @@ inventory::submit! {
     }
 }
 
-/// Reject requests not matching the specified host.
+/// Rejects requests matching the specified host.
 /// Supports both single and multiple host value checks.
 ///
 /// # Arguments
@@ -47,7 +47,7 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with inverse host filter.
+/// - `TokenStream` - The expanded token stream with host rejection filter.
 pub(crate) fn reject_host_macro(
     attr: TokenStream,
     item: TokenStream,

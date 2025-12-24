@@ -3,23 +3,23 @@ use crate::*;
 /// Internal implementation for the `route` attribute macro.
 ///
 /// This function processes the route attribute and generates code to register
-/// the decorated function as a route handler in the inventory system.
+/// the decorated struct as a route handler in the inventory system.
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream containing route parameters (path and optional server)
-/// - `TokenStream` - The function token stream being decorated
+/// - `TokenStream` - The attribute token stream containing route parameters (path)
+/// - `TokenStream` - The struct token stream being decorated
 ///
 /// # Returns
 ///
-/// A `TokenStream` containing the original function and inventory registration code
+/// A `TokenStream` containing the original struct and inventory registration code
 ///
 /// # Generated Code
 ///
 /// The macro generates:
-/// - The original function unchanged
+/// - The original struct unchanged
 /// - An `inventory::submit!` block that registers a `HookMacro` instance
-/// - A handler closure that wraps the function in `Box::pin` for async execution
+/// - A handler factory that creates boxed handlers for the struct
 pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_attr: RouteAttr = parse_macro_input!(attr as RouteAttr);
     let path: &Expr = &route_attr.path;

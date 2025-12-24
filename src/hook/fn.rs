@@ -2,13 +2,13 @@ use crate::*;
 
 /// Registers a panic hook.
 ///
-/// This macro takes a function as input and registers it as a panic hook.
-/// The registered function will be called when a panic occurs within the application.
+/// This macro takes a struct as input and registers it as a panic hook.
+/// The registered struct will be used to create handlers when a panic occurs within the application.
 ///
 /// # Arguments
 ///
 /// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
-/// - `TokenStream` - The input `TokenStream` representing the function to be registered as a hook.
+/// - `TokenStream` - The input `TokenStream` representing the struct to be registered as a hook.
 ///
 /// # Note
 ///

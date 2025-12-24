@@ -44,7 +44,7 @@ inventory::submit! {
     }
 }
 
-/// Reject requests not matching the specified Referer header.
+/// Rejects requests matching the specified Referer header.
 /// Supports both single and multiple referer value checks.
 ///
 /// # Arguments
@@ -55,7 +55,7 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with inverse Referer filter.
+/// - `TokenStream` - The expanded token stream with Referer rejection filter.
 pub(crate) fn reject_referer_macro(
     attr: TokenStream,
     item: TokenStream,
