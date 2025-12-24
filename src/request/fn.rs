@@ -71,7 +71,7 @@ pub(crate) fn request_body_json_result_macro(
 inventory::submit! {
     InjectableMacro {
         name: "request_body_json_result",
-        handler: Handler::WithAttrPosition(request_body_json_macro),
+        handler: Handler::WithAttrPosition(request_body_json_result_macro),
     }
 }
 

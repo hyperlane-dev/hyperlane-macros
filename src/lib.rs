@@ -2477,6 +2477,10 @@ pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStrea
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
 /// or `"Header-Name" => variable_name`. The variable will be available as an `RequestHeadersValueItem`.
+///
+/// # Panics
+///
+/// This macro will panic if the requested header does not exist in the HTTP request headers.
 #[proc_macro_attribute]
 pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_header_macro(attr, item, Position::Prologue)
