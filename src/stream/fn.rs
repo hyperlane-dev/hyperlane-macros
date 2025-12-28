@@ -11,7 +11,7 @@ use syn::Ident;
 ///
 /// - `&Ident` - The context identifier to use for stream access
 /// - `&str` - The stream method to call (e.g., "http_from_stream" or "ws_from_stream")
-/// - `&FromStreamData` - The FromStreamData containing buffer size and variable name
+/// - `&FromStreamData` - The FromStreamData containing request config and variable name
 /// - `&[Stmt]` - The statements to execute when data is successfully read
 ///
 /// # Returns
@@ -24,31 +24,31 @@ pub(crate) fn generate_stream(
     stmts: &[Stmt],
 ) -> TokenStream2 {
     let method_ident: Ident = Ident::new(stream_method, proc_macro2::Span::call_site());
-    match (data.buffer.clone(), data.variable_name.clone()) {
-        (Some(buffer), Some(variable_name)) => {
+    match (data.request_config.clone(), data.variable_name.clone()) {
+        (Some(request_config), Some(variable_name)) => {
             quote! {
-                while let Ok(#variable_name) = #context.#method_ident(#buffer).await {
+                while let Ok(#variable_name) = #context.#method_ident(#request_config).await {
                     #(#stmts)*
                 }
             }
         }
-        (Some(buffer), None) => {
+        (Some(request_config), None) => {
             quote! {
-                while #context.#method_ident(#buffer).await.is_ok() {
+                while #context.#method_ident(#request_config).await.is_ok() {
                     #(#stmts)*
                 }
             }
         }
         (None, Some(variable_name)) => {
             quote! {
-                while let Ok(#variable_name) = #context.#method_ident(::hyperlane::DEFAULT_BUFFER_SIZE).await {
+                while let Ok(#variable_name) = #context.#method_ident(::hyperlane::RequestConfig::default()).await {
                     #(#stmts)*
                 }
             }
         }
         (None, None) => {
             quote! {
-                while #context.#method_ident(::hyperlane::DEFAULT_BUFFER_SIZE).await.is_ok() {
+                while #context.#method_ident(::hyperlane::RequestConfig::default()).await.is_ok() {
                     #(#stmts)*
                 }
             }
@@ -64,7 +64,7 @@ pub(crate) fn generate_stream(
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute containing the buffer and variable name.
+/// - `TokenStream` - The attribute containing the request config and variable name.
 /// - `TokenStream` - The input token stream to process.
 ///
 /// # Returns
@@ -109,7 +109,7 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `attr` - The attribute containing the buffer and variable name.
+/// - `attr` - The attribute containing the request config and variable name.
 /// - `item` - The input token stream to process.
 ///
 /// # Returns

@@ -783,7 +783,7 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 ///
 ///     #[epilogue_macros(
 ///         response_status_code(200),
-///         response_version(HttpVersion::HTTP1_1),
+///         response_version(HttpVersion::Http1_1),
 ///         response_header(SERVER => HYPERLANE)
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
@@ -1761,7 +1761,7 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts one or more `variable_name: Type` pairs separated by commas.
-/// Each variable will be available in the function scope as a `ResultJsonError<Type>`.
+/// Each variable will be available in the function scope as a `Result<Type, serde_json::Error>`.
 #[proc_macro_attribute]
 pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_body_json_result_macro(attr, item, Position::Prologue)
@@ -1840,7 +1840,7 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// ```
 ///
 /// The macro accepts one or more `variable_name: Type` pairs separated by commas.
-/// Each variable will be available in the function scope as a `ResultJsonError<Type>`.
+/// Each variable will be available in the function scope as a `Result<Type, serde_json::Error>`.
 ///
 /// # Panics
 ///
@@ -2095,7 +2095,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
-/// The variable will be available as an `OptionString` in the function scope.
+/// The variable will be available as an `Option<String>` in the function scope.
 ///
 /// # Multi-Parameter Usage
 ///
@@ -2291,7 +2291,7 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
-/// The variable will be available as an `OptionRequestQuerysValue` in the function scope.
+/// The variable will be available as an `Option<RequestQuerysValue>` in the function scope.
 ///
 /// Supports multiple parameters: `#[request_query_option("k1" => v1, "k2" => v2)]`
 #[proc_macro_attribute]
@@ -2432,7 +2432,7 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
-/// or `"Header-Name" => variable_name`. The variable will be available as an `OptionRequestHeadersValueItem`.
+/// or `"Header-Name" => variable_name`. The variable will be available as an `Option<RequestHeadersValueItem>`.
 #[proc_macro_attribute]
 pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_header_option_macro(attr, item, Position::Prologue)
@@ -2828,7 +2828,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 ///     #[epilogue_macros(
 ///         response_status_code(200),
-///         response_version(HttpVersion::HTTP1_1),
+///         response_version(HttpVersion::Http1_1),
 ///         response_header(SERVER => HYPERLANE)
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
@@ -3049,7 +3049,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 /// ```
 ///
-/// Using only buffer size:
+/// Using only request config:
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -3064,7 +3064,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(1024)]
+///     #[ws_from_stream(RequestConfig::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -3097,7 +3097,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 /// ```
 ///
-/// Using buffer size and variable name:
+/// Using request config and variable name:
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -3112,7 +3112,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(1024, request)]
+///     #[ws_from_stream(RequestConfig::default(), request)]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -3121,7 +3121,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// }
 /// ```
 ///
-/// Using variable name and buffer size (reversed order):
+/// Using variable name and request config (reversed order):
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -3136,7 +3136,7 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(request, 1024)]
+///     #[ws_from_stream(request, RequestConfig::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -3196,7 +3196,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         request_query("test" => request_query_option),
 ///         response_body(&format!("request query: {request_query_option:?}")),
 ///         send,
-///         http_from_stream(1024)
+///         http_from_stream(RequestConfig::default())
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }

@@ -40,7 +40,7 @@ impl ServerHook for RequestMiddleware {
 
     #[epilogue_macros(
         response_status_code(200),
-        response_version(HttpVersion::HTTP1_1),
+        response_version(HttpVersion::Http1_1),
         response_header(SERVER => HYPERLANE),
         response_header(CONNECTION => KEEP_ALIVE),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
@@ -81,7 +81,7 @@ impl ServerHook for ConnectedHook {
 
     #[response_status_code(200)]
     #[response_header(SERVER => HYPERLANE)]
-    #[response_version(HttpVersion::HTTP1_1)]
+    #[response_version(HttpVersion::Http1_1)]
     #[response_header(ACCESS_CONTROL_ALLOW_ORIGIN => WILDCARD_ANY)]
     #[response_header(STEP => "connected_hook")]
     async fn handle(self, ctx: &Context) {}
@@ -454,7 +454,7 @@ impl ServerHook for Websocket3 {
     }
 
     #[ws]
-    #[ws_from_stream(1024, request)]
+    #[ws_from_stream(RequestConfig::default(), request)]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
@@ -471,7 +471,7 @@ impl ServerHook for Websocket4 {
     }
 
     #[ws]
-    #[ws_from_stream(request, 1024)]
+    #[ws_from_stream(request, RequestConfig::default())]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
@@ -488,7 +488,7 @@ impl ServerHook for Websocket5 {
     }
 
     #[ws]
-    #[ws_from_stream(1024)]
+    #[ws_from_stream(RequestConfig::default())]
     async fn handle(self, ctx: &Context) {
         let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -613,7 +613,7 @@ impl ServerHook for RequestQueryOption {
         request_query_option("test" => request_query_option),
         response_body(&format!("request query: {request_query_option:?}")),
         send,
-        http_from_stream(1024)
+        http_from_stream(RequestConfig::default())
     )]
     #[prologue_macros(
         request_query_option("test" => request_query_option),
@@ -635,7 +635,7 @@ impl ServerHook for RequestQuery {
         request_query("test" => request_query),
         response_body(&format!("request query: {request_query}")),
         send,
-        http_from_stream(1024)
+        http_from_stream(RequestConfig::default())
     )]
     #[prologue_macros(
         request_query("test" => request_query),
@@ -701,7 +701,7 @@ impl ServerHook for RequestQuerys {
         request_querys(request_querys),
         response_body(&format!("request querys: {request_querys:?}")),
         send,
-        http_from_stream(1024, _request)
+        http_from_stream(RequestConfig::default(), _request)
     )]
     #[prologue_macros(
         request_querys(request_querys),
@@ -723,7 +723,7 @@ impl ServerHook for RequestHeaders {
         request_headers(request_headers),
         response_body(&format!("request headers: {request_headers:?}")),
         send,
-        http_from_stream(_request, 1024)
+        http_from_stream(_request, RequestConfig::default())
     )]
     #[prologue_macros(
         request_headers(request_headers),
@@ -1041,7 +1041,7 @@ impl ServerHook for InjectHttpStream {
 }
 
 impl InjectHttpStream {
-    #[http_from_stream(1024, _request)]
+    #[http_from_stream(RequestConfig::default(), _request)]
     async fn http_stream_handler_with_ref_self(&self, _ctx: &Context) {}
 }
 
