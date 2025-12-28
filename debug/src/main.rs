@@ -26,7 +26,12 @@ impl ServerHook for PanicHook {
         Self
     }
 
-    #[epilogue_macros(response_body("panic_hook"), send)]
+    #[epilogue_macros(
+        response_version(HttpVersion::Http1_1),
+        response_status_code(500),
+        response_body("panic_hook"),
+        send
+    )]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -39,8 +44,8 @@ impl ServerHook for RequestMiddleware {
     }
 
     #[epilogue_macros(
-        response_status_code(200),
         response_version(HttpVersion::Http1_1),
+        response_status_code(200),
         response_header(SERVER => HYPERLANE),
         response_header(CONNECTION => KEEP_ALIVE),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
