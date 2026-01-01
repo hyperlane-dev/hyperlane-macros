@@ -1,6 +1,6 @@
 use crate::*;
 
-/// Sends the response with both headers and body.
+/// Tries to send the response with both headers and body.
 ///
 /// # Arguments
 ///
@@ -9,23 +9,23 @@ use crate::*;
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with send operation.
-pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
+/// - `TokenStream` - The expanded token stream with try send operation.
+pub(crate) fn try_send_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            let _ = #context.send().await;
+            let _ = #context.try_send().await;
         }
     })
 }
 
 inventory::submit! {
     InjectableMacro {
-        name: "send",
-        handler: Handler::NoAttrPosition(send_macro),
+        name: "try_send",
+        handler: Handler::NoAttrPosition(try_send_macro),
     }
 }
 
-/// Sends only the response body.
+/// Tries to send only the response body.
 ///
 /// # Arguments
 ///
@@ -34,23 +34,23 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with body send operation.
-pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStream {
+/// - `TokenStream` - The expanded token stream with body try send operation.
+pub(crate) fn try_send_body_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            let _ = #context.send_body().await;
+            let _ = #context.try_send_body().await;
         }
     })
 }
 
 inventory::submit! {
     InjectableMacro {
-        name: "send_body",
-        handler: Handler::NoAttrPosition(send_body_macro),
+        name: "try_send_body",
+        handler: Handler::NoAttrPosition(try_send_body_macro),
     }
 }
 
-/// Sends only the response body with specified data.
+/// Tries to send only the response body with specified data.
 ///
 /// # Arguments
 ///
@@ -60,8 +60,8 @@ inventory::submit! {
 ///
 /// # Returns
 ///
-/// - `TokenStream` - The expanded token stream with body send operation.
-pub(crate) fn send_body_with_data_macro(
+/// - `TokenStream` - The expanded token stream with body try send operation.
+pub(crate) fn try_send_body_with_data_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -70,14 +70,14 @@ pub(crate) fn send_body_with_data_macro(
     let data: Expr = send_data.data;
     inject(position, item, |context| {
         quote! {
-            let _ = #context.send_body_with_data(#data).await;
+            let _ = #context.try_send_body_with_data(#data).await;
         }
     })
 }
 
 inventory::submit! {
     InjectableMacro {
-        name: "send_body_with_data",
-        handler: Handler::WithAttrPosition(send_body_with_data_macro),
+        name: "try_send_body_with_data",
+        handler: Handler::WithAttrPosition(try_send_body_with_data_macro),
     }
 }

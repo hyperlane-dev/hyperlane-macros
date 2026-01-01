@@ -116,7 +116,7 @@ impl ServerHook for ResponseMiddleware2 {
         reject(ctx.get_request().await.is_ws()),
         response_header(STEP => "response_middleware_2")
     )]
-    #[epilogue_macros(send, flush)]
+    #[epilogue_macros(try_send, flush)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -132,7 +132,7 @@ impl ServerHook for ResponseMiddleware3 {
         ws,
         response_header(STEP => "response_middleware_3")
     )]
-    #[epilogue_macros(send_body, flush)]
+    #[epilogue_macros(try_send_body, flush)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -400,7 +400,7 @@ impl ServerHook for Get {
         Self
     }
 
-    #[prologue_macros(ws, get, response_body("get"), send_body)]
+    #[prologue_macros(ws, get, response_body("get"), try_send_body)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -412,7 +412,7 @@ impl ServerHook for Post {
         Self
     }
 
-    #[prologue_macros(post, response_body("post"), send)]
+    #[prologue_macros(post, response_body("post"), try_send)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -992,7 +992,7 @@ impl ServerHook for InjectSendFlush {
 }
 
 impl InjectSendFlush {
-    #[epilogue_macros(send, flush)]
+    #[epilogue_macros(try_send, flush)]
     async fn send_and_flush_with_ref_self(&self, ctx: &Context) {}
 }
 
@@ -1090,7 +1090,7 @@ impl InjectComplexPost {
         response_header(CONTENT_TYPE => APPLICATION_JSON),
         response_body(&format!("Received: {raw_body:?}"))
     )]
-    #[epilogue_macros(send, flush)]
+    #[epilogue_macros(try_send, flush)]
     async fn complex_post_handler_with_ref_self(&self, ctx: &Context) {}
 }
 
@@ -1108,7 +1108,7 @@ async fn standalone_response_body_handler(ctx: &Context) {}
 #[prologue_macros(get, response_body("standalone get handler"))]
 async fn standalone_get_handler(ctx: &Context) {}
 
-#[epilogue_macros(send, flush)]
+#[epilogue_macros(try_send, flush)]
 async fn standalone_send_and_flush_handler(ctx: &Context) {}
 
 #[request_body(_raw_body)]
@@ -1130,7 +1130,7 @@ async fn standalone_websocket_stream_handler(ctx: &Context) {}
     response_header(CONTENT_TYPE => TEXT_PLAIN),
     response_body("standalone complex handler")
 )]
-#[epilogue_macros(send, flush)]
+#[epilogue_macros(try_send, flush)]
 async fn standalone_complex_get_handler(ctx: &Context) {}
 
 #[get]
@@ -1161,7 +1161,7 @@ impl ServerHook for User {
             user1.name,
             user2.name
         )),
-        send
+        try_send
     )]
     async fn handle(self, ctx: &Context) {}
 }

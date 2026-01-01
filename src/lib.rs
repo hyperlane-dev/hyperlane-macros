@@ -797,9 +797,9 @@ pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_version_macro(attr, item, Position::Prologue)
 }
 
-/// Automatically sends the complete response after function execution.
+/// Automatically tries to send the complete response after function execution.
 ///
-/// This attribute macro ensures that the response (request headers and body) is automatically sent
+/// This attribute macro ensures that the response (request headers and body) is automatically tried to be sent
 /// to the client after the function completes execution.
 ///
 /// # Usage
@@ -808,37 +808,37 @@ pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/send")]
-/// struct SendTest;
+/// #[route("/try_send")]
+/// struct TrySendTest;
 ///
-/// impl ServerHook for SendTest {
+/// impl ServerHook for TrySendTest {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(send)]
+///     #[epilogue_macros(try_send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl SendTest {
-///     #[send]
-///     async fn send_with_ref_self(&self, ctx: &Context) {}
+/// impl TrySendTest {
+///     #[try_send]
+///     async fn try_send_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[send]
-/// async fn standalone_send_handler(ctx: &Context) {}
+/// #[try_send]
+/// async fn standalone_try_send_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&Context` parameter.
 #[proc_macro_attribute]
-pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_macro(item, Position::Epilogue)
+pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_macro(item, Position::Epilogue)
 }
 
-/// Automatically sends only the response body after function execution.
+/// Automatically tries to send only the response body after function execution.
 ///
-/// This attribute macro ensures that only the response body is automatically sent
+/// This attribute macro ensures that only the response body is automatically tried to be sent
 /// to the client after the function completes, handling request headers separately.
 ///
 /// # Usage
@@ -847,32 +847,32 @@ pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/send_body")]
-/// struct SendBodyTest;
+/// #[route("/try_send_body")]
+/// struct TrySendBodyTest;
 ///
-/// impl ServerHook for SendBodyTest {
+/// impl ServerHook for TrySendBodyTest {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(send_body)]
+///     #[epilogue_macros(try_send_body)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// impl SendBodyTest {
-///     #[send_body]
-///     async fn send_body_with_ref_self(&self, ctx: &Context) {}
+/// impl TrySendBodyTest {
+///     #[try_send_body]
+///     async fn try_send_body_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[send_body]
-/// async fn standalone_send_body_handler(ctx: &Context) {}
+/// #[try_send_body]
+/// async fn standalone_try_send_body_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&Context` parameter.
 #[proc_macro_attribute]
-pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_macro(item, Position::Epilogue)
+pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_body_macro(item, Position::Epilogue)
 }
 
 /// Flushes the response stream after function execution.
@@ -2963,7 +2963,7 @@ pub fn prologue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(send, flush)]
+///     #[epilogue_macros(try_send, flush)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -2972,9 +2972,9 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_macros_macro(attr, item)
 }
 
-/// Sends only the response body with data after function execution.
+/// Tries to send only the response body with data after function execution.
 ///
-/// This attribute macro ensures that only the response body is automatically sent
+/// This attribute macro ensures that only the response body is automatically tried to be sent
 /// to the client after the function completes, handling request headers separately,
 /// with the specified data.
 ///
@@ -2984,15 +2984,15 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/send_body_with_data")]
-/// struct SendBodyWithData;
+/// #[route("/try_send_body_with_data")]
+/// struct TrySendBodyWithData;
 ///
-/// impl ServerHook for SendBodyWithData {
+/// impl ServerHook for TrySendBodyWithData {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(send_body_with_data("Response body content"))]
+///     #[epilogue_macros(try_send_body_with_data("Response body content"))]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -3000,8 +3000,8 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts data to send and should be applied to async functions
 /// that accept a `&Context` parameter.
 #[proc_macro_attribute]
-pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_with_data_macro(attr, item, Position::Epilogue)
+pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_body_with_data_macro(attr, item, Position::Epilogue)
 }
 
 /// Wraps function body with WebSocket stream processing.

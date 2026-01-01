@@ -70,9 +70,9 @@ cargo add hyperlane-macros
 
 ### Send Operation Macros
 
-- `#[send]` - Send complete response (headers and body) after function execution
-- `#[send_body]` - Send only response body after function execution
-- `#[send_body_with_data("data")]` - Send only response body with specified data after function execution
+- `#[try_send]` - Try to send complete response (headers and body) after function execution
+- `#[try_send_body]` - Try to send only response body after function execution
+- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution
 
 ### Flush Macros
 
@@ -353,7 +353,7 @@ impl ServerHook for ResponseMiddleware2 {
         reject(ctx.get_request().await.is_ws()),
         response_header(STEP => "response_middleware_2")
     )]
-    #[epilogue_macros(send, flush)]
+    #[epilogue_macros(try_send, flush)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -369,7 +369,7 @@ impl ServerHook for ResponseMiddleware3 {
         ws,
         response_header(STEP => "response_middleware_3")
     )]
-    #[epilogue_macros(send_body, flush)]
+    #[epilogue_macros(try_send_body, flush)]
     async fn handle(self, ctx: &Context) {}
 }
 
