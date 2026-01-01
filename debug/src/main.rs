@@ -1227,6 +1227,60 @@ impl ServerHook for TestTryFlush {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/test/aborted")]
+struct TestAborted;
+
+impl ServerHook for TestAborted {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test aborted operation")
+    )]
+    #[epilogue_macros(aborted)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/closed")]
+struct TestClosed;
+
+impl ServerHook for TestClosed {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test closed operation")
+    )]
+    #[epilogue_macros(closed)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/flush")]
+struct TestFlush;
+
+impl ServerHook for TestFlush {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test flush operation")
+    )]
+    #[epilogue_macros(flush)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[response_body("standalone response body")]
 async fn standalone_response_body_handler(ctx: &Context) {}
 
@@ -1247,6 +1301,21 @@ async fn standalone_http_stream_handler(ctx: &Context) {}
 
 #[ws_from_stream]
 async fn standalone_websocket_stream_handler(ctx: &Context) {}
+
+#[aborted]
+async fn standalone_aborted_handler(ctx: &Context) {}
+
+#[closed]
+async fn standalone_closed_handler(ctx: &Context) {}
+
+#[flush]
+async fn standalone_flush_handler(ctx: &Context) {}
+
+#[try_flush]
+async fn standalone_try_flush_handler(ctx: &Context) {}
+
+#[ws]
+async fn standalone_ws_handler(ctx: &Context) {}
 
 #[prologue_macros(
     get,
