@@ -1405,7 +1405,7 @@ async fn test_multi_host(ctx: &Context) {
     println!("Host check passed");
 }
 
-#[reject_host("badhost.com", "spam.com")]
+#[reject_host("localhost", "127.0.0.1")]
 async fn test_multi_reject_host(ctx: &Context) {
     println!("Reject host check passed");
 }
@@ -1415,7 +1415,7 @@ async fn test_multi_referer(ctx: &Context) {
     println!("Referer check passed");
 }
 
-#[reject_referer("http://badsite.com", "http://spam.com")]
+#[reject_referer("http://localhost", "http://127.0.0.1")]
 async fn test_multi_reject_referer(ctx: &Context) {
     println!("Reject referer check passed");
 }
