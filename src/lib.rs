@@ -3128,7 +3128,7 @@ pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Automatically sends the complete response after function execution.
 ///
 /// This attribute macro ensures that the response (request headers and body) is automatically sent
-/// to the client after the function completes execution. **This will panic on failure.**
+/// to the client after the function completes execution.
 ///
 /// # Usage
 ///
@@ -3159,6 +3159,10 @@ pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&Context` parameter.
+///
+/// # Panics
+///
+/// This macro will panic if the send operation fails.
 #[proc_macro_attribute]
 pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_macro(item, Position::Epilogue)
@@ -3207,7 +3211,6 @@ pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This attribute macro ensures that only the response body is automatically sent
 /// to the client after the function completes, handling request headers separately.
-/// **This will panic on failure.**
 ///
 /// # Usage
 ///
@@ -3238,6 +3241,10 @@ pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&Context` parameter.
+///
+/// # Panics
+///
+/// This macro will panic if the send body operation fails.
 #[proc_macro_attribute]
 pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_macro(item, Position::Epilogue)
@@ -3279,7 +3286,7 @@ pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStr
 ///
 /// This attribute macro ensures that only the response body is automatically sent
 /// to the client after the function completes, handling request headers separately,
-/// with the specified data. **This will panic on failure.**
+/// with the specified data.
 ///
 /// # Usage
 ///
@@ -3302,9 +3309,52 @@ pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStr
 ///
 /// The macro accepts data to send and should be applied to async functions
 /// that accept a `&Context` parameter.
+///
+/// # Panics
+///
+/// This macro will panic if the send body with data operation fails.
 #[proc_macro_attribute]
 pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_with_data_macro(attr, item, Position::Epilogue)
+}
+
+/// Tries to flush the response stream after function execution.
+///
+/// This attribute macro ensures that the response stream is tried to be flushed to guarantee immediate
+/// data transmission, forcing any buffered response data to be sent to the client. This will not panic on failure.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/try_flush")]
+/// struct TryFlushTest;
+///
+/// impl ServerHook for TryFlushTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(try_flush)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl TryFlushTest {
+///     #[try_flush]
+///     async fn try_flush_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[try_flush]
+/// async fn standalone_try_flush_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn try_flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_flush_macro(item, Position::Prologue)
 }
 
 /// Flushes the response stream after function execution.
@@ -3341,6 +3391,10 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&Context` parameter.
+///
+/// # Panics
+///
+/// This macro will panic if the flush operation fails.
 #[proc_macro_attribute]
 pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
     flush_macro(item, Position::Prologue)

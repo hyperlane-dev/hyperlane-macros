@@ -71,15 +71,17 @@ cargo add hyperlane-macros
 ### Send Operation Macros
 
 - `#[try_send]` - Try to send complete response (headers and body) after function execution (returns Result)
-- `#[try_send_body]` - Try to send only response body after function execution (returns Result)
-- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution (returns Result)
 - `#[send]` - Send complete response (headers and body) after function execution (**panics on failure**)
+- `#[try_send_body]` - Try to send only response body after function execution (returns Result)
 - `#[send_body]` - Send only response body after function execution (**panics on failure**)
+- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution (returns Result)
+
 - `#[send_body_with_data("data")]` - Send only response body with specified data after function execution (**panics on failure**)
 
 ### Flush Macros
 
-- `#[flush]` - Flush response stream after function execution to ensure immediate data transmission
+- `#[try_flush]` - Try to flush response stream after function execution to ensure immediate data transmission (returns Result)
+- `#[flush]` - Flush response stream after function execution to ensure immediate data transmission (**panics on failure**)
 
 ### Aborted Macros
 
@@ -1236,6 +1238,149 @@ impl InjectSendFlush {
     async fn send_and_flush_with_ref_self(&self, ctx: &Context) {}
 }
 
+#[route("/inject/try_send_try_flush")]
+struct InjectTrySendTryFlush;
+
+impl ServerHook for InjectTrySendTryFlush {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    async fn handle(self, ctx: &Context) {
+        self.try_send_and_try_flush_with_ref_self(ctx).await;
+    }
+}
+
+impl InjectTrySendTryFlush {
+    #[epilogue_macros(try_send, try_flush)]
+    async fn try_send_and_try_flush_with_ref_self(&self, ctx: &Context) {}
+}
+
+// Test routes for send operations
+#[route("/test/send")]
+struct TestSend;
+
+impl ServerHook for TestSend {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test send operation")
+    )]
+    #[epilogue_macros(send)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/send_body")]
+struct TestSendBody;
+
+impl ServerHook for TestSendBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test send body operation")
+    )]
+    #[epilogue_macros(send_body)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/send_body_with_data")]
+struct TestSendBodyWithData;
+
+impl ServerHook for TestSendBodyWithData {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN)
+    )]
+    #[epilogue_macros(send_body_with_data("Custom data from send_body_with_data"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send")]
+struct TestTrySend;
+
+impl ServerHook for TestTrySend {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try send operation")
+    )]
+    #[epilogue_macros(try_send)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send_body")]
+struct TestTrySendBody;
+
+impl ServerHook for TestTrySendBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try send body operation")
+    )]
+    #[epilogue_macros(try_send_body)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send_body_with_data")]
+struct TestTrySendBodyWithData;
+
+impl ServerHook for TestTrySendBodyWithData {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN)
+    )]
+    #[epilogue_macros(try_send_body_with_data("Custom data from try_send_body_with_data"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_flush")]
+struct TestTryFlush;
+
+impl ServerHook for TestTryFlush {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try flush operation")
+    )]
+    #[epilogue_macros(try_flush)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/inject/request_body")]
 struct InjectRequestBody;
 
@@ -1350,6 +1495,9 @@ async fn standalone_get_handler(ctx: &Context) {}
 
 #[epilogue_macros(send, flush)]
 async fn standalone_send_and_flush_handler(ctx: &Context) {}
+
+#[epilogue_macros(try_send, try_flush)]
+async fn standalone_try_send_and_try_flush_handler(ctx: &Context) {}
 
 #[request_body(_raw_body)]
 async fn standalone_request_body_extractor(ctx: &Context) {}
@@ -1470,6 +1618,15 @@ async fn test_multi_reject_referer(ctx: &Context) {
 async fn test_multi_hyperlane() {
     println!("server1 and server2 initialized");
 }
+
+// Test endpoints for send operations
+// - GET /test/send - Tests the send macro (panics on failure)
+// - GET /test/send_body - Tests the send_body macro (panics on failure)
+// - GET /test/send_body_with_data - Tests the send_body_with_data macro (panics on failure)
+// - GET /test/try_send - Tests the try_send macro (returns Result)
+// - GET /test/try_send_body - Tests the try_send_body macro (returns Result)
+// - GET /test/try_send_body_with_data - Tests the try_send_body_with_data macro (returns Result)
+// - GET /test/try_flush - Tests the try_flush macro (returns Result)
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]

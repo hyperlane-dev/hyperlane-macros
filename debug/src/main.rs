@@ -1102,6 +1102,131 @@ impl InjectComplexPost {
     async fn test_with_multiple_params(_a: bool, ctx: &Context, _b: i32) {}
 }
 
+// Test routes for send operations
+#[route("/test/send")]
+struct TestSend;
+
+impl ServerHook for TestSend {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test send operation")
+    )]
+    #[epilogue_macros(send)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/send_body")]
+struct TestSendBody;
+
+impl ServerHook for TestSendBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test send body operation")
+    )]
+    #[epilogue_macros(send_body)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/send_body_with_data")]
+struct TestSendBodyWithData;
+
+impl ServerHook for TestSendBodyWithData {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN)
+    )]
+    #[epilogue_macros(send_body_with_data("Custom data from send_body_with_data"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send")]
+struct TestTrySend;
+
+impl ServerHook for TestTrySend {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try send operation")
+    )]
+    #[epilogue_macros(try_send)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send_body")]
+struct TestTrySendBody;
+
+impl ServerHook for TestTrySendBody {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try send body operation")
+    )]
+    #[epilogue_macros(try_send_body)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_send_body_with_data")]
+struct TestTrySendBodyWithData;
+
+impl ServerHook for TestTrySendBodyWithData {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN)
+    )]
+    #[epilogue_macros(try_send_body_with_data("Custom data from try_send_body_with_data"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/test/try_flush")]
+struct TestTryFlush;
+
+impl ServerHook for TestTryFlush {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(
+        get,
+        response_status_code(200),
+        response_header(CONTENT_TYPE => TEXT_PLAIN),
+        response_body("Test try flush operation")
+    )]
+    #[epilogue_macros(try_flush)]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[response_body("standalone response body")]
 async fn standalone_response_body_handler(ctx: &Context) {}
 
