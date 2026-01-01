@@ -3243,45 +3243,6 @@ pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_macro(item, Position::Epilogue)
 }
 
-/// Flushes the response stream after function execution.
-///
-/// This attribute macro ensures that the response stream is flushed to guarantee immediate
-/// data transmission, forcing any buffered response data to be sent to the client.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/flush")]
-/// struct FlushTest;
-///
-/// impl ServerHook for FlushTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(flush)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl FlushTest {
-///     #[flush]
-///     async fn flush_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[flush]
-/// async fn standalone_flush_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    flush_macro(item, Position::Prologue)
-}
-
 /// Tries to send only the response body with data after function execution.
 ///
 /// This attribute macro ensures that only the response body is automatically tried to be sent
@@ -3344,4 +3305,43 @@ pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStr
 #[proc_macro_attribute]
 pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
     send_body_with_data_macro(attr, item, Position::Epilogue)
+}
+
+/// Flushes the response stream after function execution.
+///
+/// This attribute macro ensures that the response stream is flushed to guarantee immediate
+/// data transmission, forcing any buffered response data to be sent to the client.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/flush")]
+/// struct FlushTest;
+///
+/// impl ServerHook for FlushTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(flush)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl FlushTest {
+///     #[flush]
+///     async fn flush_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[flush]
+/// async fn standalone_flush_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    flush_macro(item, Position::Prologue)
 }
