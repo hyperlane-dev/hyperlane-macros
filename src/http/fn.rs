@@ -32,7 +32,7 @@ macro_rules! impl_http_method_macro {
 }
 
 impl_http_method_macro!(get_handler, "get");
-impl_http_method_macro!(epilogue_handler, "post");
+impl_http_method_macro!(post_handler, "post");
 impl_http_method_macro!(put_handler, "put");
 impl_http_method_macro!(delete_handler, "delete");
 impl_http_method_macro!(patch_handler, "patch");

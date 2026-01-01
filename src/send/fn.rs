@@ -38,8 +38,7 @@ inventory::submit! {
 pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            #context.send().await.unwrap();
-            return ();
+            #context.send().await;
         }
     })
 }
@@ -89,8 +88,7 @@ inventory::submit! {
 pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            #context.send_body().await.unwrap();
-            return ();
+            #context.send_body().await;
         }
     })
 }
@@ -154,8 +152,7 @@ pub(crate) fn send_body_with_data_macro(
     let data: Expr = send_data.data;
     inject(position, item, |context| {
         quote! {
-            #context.send_body_with_data(#data).await.unwrap();
-            return ();
+            #context.send_body_with_data(#data).await;
         }
     })
 }

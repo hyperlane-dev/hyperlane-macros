@@ -103,7 +103,7 @@ inventory::collect!(InjectableMacro);
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 /// ```
@@ -127,7 +127,7 @@ inventory::collect!(InjectableMacro);
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 /// ```
@@ -151,7 +151,7 @@ inventory::collect!(InjectableMacro);
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = &request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 /// ```
@@ -175,7 +175,7 @@ inventory::collect!(InjectableMacro);
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 /// ```
@@ -199,7 +199,7 @@ inventory::collect!(InjectableMacro);
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 ///
@@ -369,7 +369,7 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// that accept a `&Context` parameter.
 #[proc_macro_attribute]
 pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    epilogue_handler(item, Position::Prologue)
+    post_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP PUT requests only.
@@ -712,7 +712,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
 ///
