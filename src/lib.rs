@@ -63,6 +63,237 @@ pub(crate) use syn::{
 
 inventory::collect!(InjectableMacro);
 
+/// Wraps function body with WebSocket stream processing.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from a WebSocket stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from a WebSocket stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// # Arguments
+///
+/// - `TokenStream`: The buffer to read from the WebSocket stream.
+/// - `TokenStream`: The function item to be modified
+///
+/// # Returns
+///
+/// Returns a TokenStream containing the modified function with WebSocket stream processing logic.
+///
+/// # Examples
+///
+/// Using no parameters (default buffer size):
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using only request config:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(RequestConfig::default())]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using variable name to store request data:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(request)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: &RequestBody = &request.get_body();
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using request config and variable name:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(RequestConfig::default(), request)]
+///     async fn handle(self, ctx: &Context) {
+///         let body: &RequestBody = request.get_body();
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+/// ```
+///
+/// Using variable name and request config (reversed order):
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws]
+///     #[ws_from_stream(request, RequestConfig::default())]
+///     async fn handle(self, ctx: &Context) {
+///         let body: &RequestBody = request.get_body();
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await.unwrap();
+///     }
+/// }
+///
+/// impl Websocket {
+///     #[ws_from_stream(request)]
+///     async fn ws_from_stream_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[ws_from_stream]
+/// async fn standalone_ws_from_stream_handler(ctx: &Context) {}
+/// ```
+#[proc_macro_attribute]
+pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
+    ws_from_stream_macro(attr, item)
+}
+
+/// Wraps function body with HTTP stream processing.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from an HTTP stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// This attribute macro generates code that wraps the function body with a check to see if
+/// data can be read from an HTTP stream. The function body is only executed
+/// if data is successfully read from the stream.
+///
+/// # Arguments
+///
+/// - `TokenStream`: The buffer to read from the HTTP stream.
+/// - `TokenStream`: The function item to be modified
+///
+/// # Returns
+///
+/// Returns a TokenStream containing the modified function with HTTP stream processing logic.
+///
+/// # Examples
+///
+/// Using with epilogue_macros:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http_from_stream")]
+/// struct HttpFromStreamTest;
+///
+/// impl ServerHook for HttpFromStreamTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(
+///         request_query("test" => request_query_option),
+///         response_body(&format!("request query: {request_query_option:?}")),
+///         send,
+///         http_from_stream(RequestConfig::default())
+///     )]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// Using with variable name:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http_from_stream")]
+/// struct HttpFromStreamTest;
+///
+/// impl ServerHook for HttpFromStreamTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(
+///         http_from_stream(_request)
+///     )]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl HttpFromStreamTest {
+///     #[http_from_stream(_request)]
+///     async fn http_from_stream_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http_from_stream]
+/// async fn standalone_http_from_stream_handler(ctx: &Context) {}
+/// ```
+#[proc_macro_attribute]
+pub fn http_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
+    http_from_stream_macro(attr, item)
+}
+
 /// Restricts function execution to HTTP GET requests only.
 ///
 /// This attribute macro ensures the decorated function only executes when the incoming request
@@ -795,123 +1026,6 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 #[proc_macro_attribute]
 pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_version_macro(attr, item, Position::Prologue)
-}
-
-/// Automatically tries to send the complete response after function execution.
-///
-/// This attribute macro ensures that the response (request headers and body) is automatically tried to be sent
-/// to the client after the function completes execution.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/try_send")]
-/// struct TrySendTest;
-///
-/// impl ServerHook for TrySendTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(try_send)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl TrySendTest {
-///     #[try_send]
-///     async fn try_send_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[try_send]
-/// async fn standalone_try_send_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    try_send_macro(item, Position::Epilogue)
-}
-
-/// Automatically tries to send only the response body after function execution.
-///
-/// This attribute macro ensures that only the response body is automatically tried to be sent
-/// to the client after the function completes, handling request headers separately.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/try_send_body")]
-/// struct TrySendBodyTest;
-///
-/// impl ServerHook for TrySendBodyTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(try_send_body)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl TrySendBodyTest {
-///     #[try_send_body]
-///     async fn try_send_body_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[try_send_body]
-/// async fn standalone_try_send_body_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    try_send_body_macro(item, Position::Epilogue)
-}
-
-/// Flushes the response stream after function execution.
-///
-/// This attribute macro ensures that the response stream is flushed to guarantee immediate
-/// data transmission, forcing any buffered response data to be sent to the client.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/flush")]
-/// struct FlushTest;
-///
-/// impl ServerHook for FlushTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(flush)]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl FlushTest {
-///     #[flush]
-///     async fn flush_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[flush]
-/// async fn standalone_flush_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    flush_macro(item, Position::Prologue)
 }
 
 /// Handles aborted request scenarios.
@@ -2972,6 +3086,202 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_macros_macro(attr, item)
 }
 
+/// Automatically tries to send the complete response after function execution.
+///
+/// This attribute macro ensures that the response (request headers and body) is automatically tried to be sent
+/// to the client after the function completes execution.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/try_send")]
+/// struct TrySendTest;
+///
+/// impl ServerHook for TrySendTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(try_send)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl TrySendTest {
+///     #[try_send]
+///     async fn try_send_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[try_send]
+/// async fn standalone_try_send_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_macro(item, Position::Epilogue)
+}
+
+/// Automatically sends the complete response after function execution.
+///
+/// This attribute macro ensures that the response (request headers and body) is automatically sent
+/// to the client after the function completes execution. **This will panic on failure.**
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/send")]
+/// struct SendTest;
+///
+/// impl ServerHook for SendTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl SendTest {
+///     #[send]
+///     async fn send_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[send]
+/// async fn standalone_send_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_macro(item, Position::Epilogue)
+}
+
+/// Automatically tries to send only the response body after function execution.
+///
+/// This attribute macro ensures that only the response body is automatically tried to be sent
+/// to the client after the function completes, handling request headers separately.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/try_send_body")]
+/// struct TrySendBodyTest;
+///
+/// impl ServerHook for TrySendBodyTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(try_send_body)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl TrySendBodyTest {
+///     #[try_send_body]
+///     async fn try_send_body_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[try_send_body]
+/// async fn standalone_try_send_body_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_body_macro(item, Position::Epilogue)
+}
+
+/// Automatically sends only the response body after function execution.
+///
+/// This attribute macro ensures that only the response body is automatically sent
+/// to the client after the function completes, handling request headers separately.
+/// **This will panic on failure.**
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/send_body")]
+/// struct SendBodyTest;
+///
+/// impl ServerHook for SendBodyTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send_body)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl SendBodyTest {
+///     #[send_body]
+///     async fn send_body_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[send_body]
+/// async fn standalone_send_body_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_body_macro(item, Position::Epilogue)
+}
+
+/// Flushes the response stream after function execution.
+///
+/// This attribute macro ensures that the response stream is flushed to guarantee immediate
+/// data transmission, forcing any buffered response data to be sent to the client.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/flush")]
+/// struct FlushTest;
+///
+/// impl ServerHook for FlushTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(flush)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl FlushTest {
+///     #[flush]
+///     async fn flush_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[flush]
+/// async fn standalone_flush_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    flush_macro(item, Position::Prologue)
+}
+
 /// Tries to send only the response body with data after function execution.
 ///
 /// This attribute macro ensures that only the response body is automatically tried to be sent
@@ -3004,233 +3314,34 @@ pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStr
     try_send_body_with_data_macro(attr, item, Position::Epilogue)
 }
 
-/// Wraps function body with WebSocket stream processing.
+/// Sends only the response body with data after function execution.
 ///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from a WebSocket stream. The function body is only executed
-/// if data is successfully read from the stream.
+/// This attribute macro ensures that only the response body is automatically sent
+/// to the client after the function completes, handling request headers separately,
+/// with the specified data. **This will panic on failure.**
 ///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from a WebSocket stream. The function body is only executed
-/// if data is successfully read from the stream.
-///
-/// # Arguments
-///
-/// - `TokenStream`: The buffer to read from the WebSocket stream.
-/// - `TokenStream`: The function item to be modified
-///
-/// # Returns
-///
-/// Returns a TokenStream containing the modified function with WebSocket stream processing logic.
-///
-/// # Examples
-///
-/// Using no parameters (default buffer size):
+/// # Usage
 ///
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws")]
-/// struct Websocket;
+/// #[route("/send_body_with_data")]
+/// struct SendBodyWithData;
 ///
-/// impl ServerHook for Websocket {
+/// impl ServerHook for SendBodyWithData {
 ///     async fn new(_ctx: &Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[ws]
-///     #[ws_from_stream]
-///     async fn handle(self, ctx: &Context) {
-///         let body: RequestBody = ctx.get_request_body().await;
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
-///     }
-/// }
-/// ```
-///
-/// Using only request config:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws]
-///     #[ws_from_stream(RequestConfig::default())]
-///     async fn handle(self, ctx: &Context) {
-///         let body: RequestBody = ctx.get_request_body().await;
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
-///     }
-/// }
-/// ```
-///
-/// Using variable name to store request data:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws]
-///     #[ws_from_stream(request)]
-///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = &request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
-///     }
-/// }
-/// ```
-///
-/// Using request config and variable name:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws]
-///     #[ws_from_stream(RequestConfig::default(), request)]
-///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
-///     }
-/// }
-/// ```
-///
-/// Using variable name and request config (reversed order):
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws]
-///     #[ws_from_stream(request, RequestConfig::default())]
-///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await.unwrap();
-///     }
-/// }
-///
-/// impl Websocket {
-///     #[ws_from_stream(request)]
-///     async fn ws_from_stream_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[ws_from_stream]
-/// async fn standalone_ws_from_stream_handler(ctx: &Context) {}
-/// ```
-#[proc_macro_attribute]
-pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
-    ws_from_stream_macro(attr, item)
-}
-
-/// Wraps function body with HTTP stream processing.
-///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from an HTTP stream. The function body is only executed
-/// if data is successfully read from the stream.
-///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from an HTTP stream. The function body is only executed
-/// if data is successfully read from the stream.
-///
-/// # Arguments
-///
-/// - `TokenStream`: The buffer to read from the HTTP stream.
-/// - `TokenStream`: The function item to be modified
-///
-/// # Returns
-///
-/// Returns a TokenStream containing the modified function with HTTP stream processing logic.
-///
-/// # Examples
-///
-/// Using with epilogue_macros:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http_from_stream")]
-/// struct HttpFromStreamTest;
-///
-/// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(
-///         request_query("test" => request_query_option),
-///         response_body(&format!("request query: {request_query_option:?}")),
-///         send,
-///         http_from_stream(RequestConfig::default())
-///     )]
+///     #[epilogue_macros(send_body_with_data("Response body content"))]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
-/// Using with variable name:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http_from_stream")]
-/// struct HttpFromStreamTest;
-///
-/// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(
-///         http_from_stream(_request)
-///     )]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl HttpFromStreamTest {
-///     #[http_from_stream(_request)]
-///     async fn http_from_stream_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http_from_stream]
-/// async fn standalone_http_from_stream_handler(ctx: &Context) {}
-/// ```
+/// The macro accepts data to send and should be applied to async functions
+/// that accept a `&Context` parameter.
 #[proc_macro_attribute]
-pub fn http_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
-    http_from_stream_macro(attr, item)
+pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_body_with_data_macro(attr, item, Position::Epilogue)
 }

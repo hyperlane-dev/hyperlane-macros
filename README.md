@@ -70,9 +70,12 @@ cargo add hyperlane-macros
 
 ### Send Operation Macros
 
-- `#[try_send]` - Try to send complete response (headers and body) after function execution
-- `#[try_send_body]` - Try to send only response body after function execution
-- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution
+- `#[try_send]` - Try to send complete response (headers and body) after function execution (returns Result)
+- `#[try_send_body]` - Try to send only response body after function execution (returns Result)
+- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution (returns Result)
+- `#[send]` - Send complete response (headers and body) after function execution (**panics on failure**)
+- `#[send_body]` - Send only response body after function execution (**panics on failure**)
+- `#[send_body_with_data("data")]` - Send only response body with specified data after function execution (**panics on failure**)
 
 ### Flush Macros
 
