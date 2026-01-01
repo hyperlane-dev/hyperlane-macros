@@ -1102,7 +1102,6 @@ impl InjectComplexPost {
     async fn test_with_multiple_params(_a: bool, ctx: &Context, _b: i32) {}
 }
 
-// Test routes for send operations
 #[route("/test/send")]
 struct TestSend;
 
@@ -1424,6 +1423,209 @@ async fn test_multi_reject_referer(ctx: &Context) {
 async fn test_multi_hyperlane() {
     println!("server1 and server2 initialized");
 }
+
+#[response_status_code(200)]
+async fn standalone_response_status_code_handler(_ctx: &Context) {}
+
+#[response_reason_phrase("Custom Reason")]
+async fn standalone_response_reason_phrase_handler(_ctx: &Context) {}
+
+#[response_header(CONTENT_TYPE => APPLICATION_JSON)]
+async fn standalone_response_header_handler(_ctx: &Context) {}
+
+#[response_header("X-Custom-Header", "custom-value")]
+async fn standalone_response_header_with_comma_handler(_ctx: &Context) {}
+
+#[response_version(HttpVersion::Http1_1)]
+async fn standalone_response_version_handler(_ctx: &Context) {}
+
+#[connect]
+async fn standalone_connect_handler(_ctx: &Context) {}
+
+#[delete]
+async fn standalone_delete_handler(_ctx: &Context) {}
+
+#[head]
+async fn standalone_head_handler(_ctx: &Context) {}
+
+#[options]
+async fn standalone_options_handler(_ctx: &Context) {}
+
+#[patch]
+async fn standalone_patch_handler(_ctx: &Context) {}
+
+#[put]
+async fn standalone_put_handler(_ctx: &Context) {}
+
+#[h2c]
+async fn standalone_h2c_handler(_ctx: &Context) {}
+
+#[http0_9]
+async fn standalone_http0_9_handler(_ctx: &Context) {}
+
+#[http1_0]
+async fn standalone_http1_0_handler(_ctx: &Context) {}
+
+#[http1_1]
+async fn standalone_http1_1_handler(_ctx: &Context) {}
+
+#[http1_1_or_higher]
+async fn standalone_http1_1_or_higher_handler(_ctx: &Context) {}
+
+#[http3]
+async fn standalone_http3_handler(_ctx: &Context) {}
+
+#[tls]
+async fn standalone_tls_handler(_ctx: &Context) {}
+
+#[methods(get, post, put)]
+async fn standalone_methods_multiple_handler(_ctx: &Context) {}
+
+#[filter(_ctx.get_request().await.is_get())]
+async fn standalone_filter_handler(_ctx: &Context) {}
+
+#[reject(_ctx.get_request().await.is_post())]
+async fn standalone_reject_handler(_ctx: &Context) {}
+
+#[reject_host("example.com")]
+async fn standalone_reject_host_handler(_ctx: &Context) {}
+
+#[referer("https://example.com")]
+async fn standalone_referer_handler(_ctx: &Context) {}
+
+#[reject_referer("https://malicious.com")]
+async fn standalone_reject_referer_handler(_ctx: &Context) {}
+
+#[request_query("param" => _value)]
+async fn standalone_request_query_handler(_ctx: &Context) {}
+
+#[request_query_option("optional_param" => _optional_value)]
+async fn standalone_request_query_option_handler(_ctx: &Context) {}
+
+#[request_header(HOST => _host_value)]
+async fn standalone_request_header_handler(_ctx: &Context) {}
+
+#[request_header_option(USER_AGENT => _user_agent)]
+async fn standalone_request_header_option_handler(_ctx: &Context) {}
+
+#[request_querys(_querys)]
+async fn standalone_request_querys_handler(_ctx: &Context) {}
+
+#[request_headers(_headers)]
+async fn standalone_request_headers_handler(_ctx: &Context) {}
+
+#[request_cookies(_cookies)]
+async fn standalone_request_cookies_handler(_ctx: &Context) {}
+
+#[request_cookie("session" => _session_cookie)]
+async fn standalone_request_cookie_handler(_ctx: &Context) {}
+
+#[request_cookie_option("optional_cookie" => _optional_cookie)]
+async fn standalone_request_cookie_option_handler(_ctx: &Context) {}
+
+#[request_version(_version)]
+async fn standalone_request_version_handler(_ctx: &Context) {}
+
+#[request_path(_path)]
+async fn standalone_request_path_handler(_ctx: &Context) {}
+
+#[attribute("key" => _attr_value: String)]
+async fn standalone_attribute_handler(_ctx: &Context) {}
+
+#[attribute_option("optional_key" => _optional_attr: String)]
+async fn standalone_attribute_option_handler(_ctx: &Context) {}
+
+#[attributes(_attrs)]
+async fn standalone_attributes_handler(_ctx: &Context) {}
+
+#[route_params(_params)]
+async fn standalone_route_params_handler(_ctx: &Context) {}
+
+#[route_param("param" => _param_value)]
+async fn standalone_route_param_handler(_ctx: &Context) {}
+
+#[route_param_option("optional_param" => _optional_param_value)]
+async fn standalone_route_param_option_handler(_ctx: &Context) {}
+
+#[request_body_json(_user: TestData)]
+async fn standalone_request_body_json_handler(_ctx: &Context) {}
+
+#[request_body_json_result(_user_result: TestData)]
+async fn standalone_request_body_json_result_handler(_ctx: &Context) {}
+
+#[http_from_stream(RequestConfig::default())]
+async fn standalone_http_from_stream_with_config_handler(_ctx: &Context) {}
+
+#[ws_from_stream(RequestConfig::default())]
+async fn standalone_ws_from_stream_with_config_handler(_ctx: &Context) {}
+
+#[http_from_stream(_request)]
+async fn standalone_http_from_stream_with_request_handler(_ctx: &Context) {}
+
+#[ws_from_stream(_request)]
+async fn standalone_ws_from_stream_with_request_handler(_ctx: &Context) {}
+
+#[http_from_stream(RequestConfig::default(), _request)]
+async fn standalone_http_from_stream_full_handler(_ctx: &Context) {}
+
+#[ws_from_stream(RequestConfig::default(), _request)]
+async fn standalone_ws_from_stream_full_handler(_ctx: &Context) {}
+
+#[send]
+async fn standalone_send_handler_2(_ctx: &Context) {}
+
+#[send_body]
+async fn standalone_send_body_handler_2(_ctx: &Context) {}
+
+#[send_body_with_data("Custom send body data")]
+async fn standalone_send_body_with_data_handler_2(_ctx: &Context) {}
+
+#[try_send]
+async fn standalone_try_send_handler_2(_ctx: &Context) {}
+
+#[try_send_body]
+async fn standalone_try_send_body_handler_2(_ctx: &Context) {}
+
+#[try_send_body_with_data("Custom try send body data")]
+async fn standalone_try_send_body_with_data_handler_2(_ctx: &Context) {}
+
+#[flush]
+async fn standalone_flush_handler_2(_ctx: &Context) {}
+
+#[try_flush]
+async fn standalone_try_flush_handler_2(_ctx: &Context) {}
+
+#[aborted]
+async fn standalone_aborted_handler_2(_ctx: &Context) {}
+
+#[closed]
+async fn standalone_closed_handler_2(_ctx: &Context) {}
+
+#[clear_response_headers]
+async fn standalone_clear_response_headers_handler(_ctx: &Context) {}
+
+#[prologue_macros(
+    get,
+    response_status_code(200),
+    response_header(CONTENT_TYPE => TEXT_PLAIN),
+    response_body("prologue macros test")
+)]
+async fn standalone_prologue_macros_complex_handler(_ctx: &Context) {}
+
+#[epilogue_macros(
+    response_status_code(201),
+    response_header(CONTENT_TYPE => APPLICATION_JSON),
+    response_body("epilogue macros test"),
+    try_send,
+    flush
+)]
+async fn standalone_epilogue_macros_complex_handler(_ctx: &Context) {}
+
+#[prologue_hooks(prologue_hooks_fn)]
+async fn standalone_prologue_hooks_handler(_ctx: &Context) {}
+
+#[epilogue_hooks(epilogue_hooks_fn)]
+async fn standalone_epilogue_hooks_handler(_ctx: &Context) {}
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]
