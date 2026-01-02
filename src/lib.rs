@@ -3007,9 +3007,9 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[panic_hook]
-/// #[panic_hook(1)]
-/// #[panic_hook("2")]
+/// #[panic]
+/// #[panic(1)]
+/// #[panic("2")]
 /// struct PanicHook;
 ///
 /// impl ServerHook for PanicHook {
@@ -3017,7 +3017,7 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(response_body("panic_hook"), send)]
+///     #[epilogue_macros(response_body("panic"), send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -3026,8 +3026,13 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
-pub fn panic_hook(attr: TokenStream, item: TokenStream) -> TokenStream {
-    panic_hook_macro(attr, item)
+pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
+    panic_macro(attr, item)
+}
+
+#[proc_macro_attribute]
+pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_error_macro(attr, item)
 }
 
 /// Injects a list of macros before the decorated function.

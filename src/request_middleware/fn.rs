@@ -25,10 +25,7 @@ pub(crate) fn request_middleware_macro(attr: TokenStream, item: TokenStream) -> 
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookMacro {
-                hook_type: ::hyperlane::HookType::RequestMiddleware(#order),
-                handler: ::hyperlane::HookHandlerSpec::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
-            }
+            ::hyperlane::HookType::RequestMiddleware(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
         }
     };
     gen_code.into()

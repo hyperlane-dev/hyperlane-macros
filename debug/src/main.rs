@@ -16,12 +16,12 @@ struct TestData {
     age: u32,
 }
 
-#[panic_hook]
-#[panic_hook(1)]
-#[panic_hook("2")]
-struct PanicHook;
+#[panic]
+#[panic(1)]
+#[panic("2")]
+struct ServerPanic;
 
-impl ServerHook for PanicHook {
+impl ServerHook for ServerPanic {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
@@ -29,7 +29,26 @@ impl ServerHook for PanicHook {
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body("panic_hook"),
+        response_body("panic"),
+        send
+    )]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[request_error]
+#[request_error(1)]
+#[request_error("2")]
+struct RequestError;
+
+impl ServerHook for RequestError {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[epilogue_macros(
+        response_version(HttpVersion::Http1_1),
+        response_status_code(500),
+        response_body("request_error"),
         send
     )]
     async fn handle(self, ctx: &Context) {}
@@ -132,7 +151,7 @@ impl ServerHook for ResponseMiddleware3 {
         ws,
         response_header(STEP => "response_middleware_3")
     )]
-    #[epilogue_macros(try_send_body, flush)]
+    #[epilogue_macros(try_send, flush)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -400,7 +419,7 @@ impl ServerHook for Get {
         Self
     }
 
-    #[prologue_macros(ws, get, response_body("get"), try_send_body)]
+    #[prologue_macros(ws, get, response_body("get"))]
     async fn handle(self, ctx: &Context) {}
 }
 

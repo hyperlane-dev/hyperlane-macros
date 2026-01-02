@@ -18,7 +18,7 @@ use crate::*;
 ///
 /// The macro generates:
 /// - The original struct unchanged
-/// - An `inventory::submit!` block that registers a `HookMacro` instance
+/// - An `inventory::submit!` block that registers a `HookType` instance
 /// - A handler factory that creates boxed handlers for the struct
 pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let route_attr: RouteAttr = parse_macro_input!(attr as RouteAttr);
@@ -28,10 +28,7 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookMacro {
-                hook_type: ::hyperlane::HookType::Route(#path),
-                handler: ::hyperlane::HookHandlerSpec::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
-            }
+            ::hyperlane::HookType::Route(#path, || ::hyperlane::server_hook_factory::<#struct_name>())
         }
     };
     gen_code.into()

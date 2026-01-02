@@ -191,7 +191,7 @@ cargo add hyperlane-macros
 
 - `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
-- `#[panic_hook]` - Execute function when a panic occurs within the server
+- `#[panic]` - Execute function when a panic occurs within the server
 - `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
 - `#[epilogue_macros(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
@@ -201,8 +201,8 @@ cargo add hyperlane-macros
 - `#[request_middleware(order)]` - Register a function as a request middleware with specified order
 - `#[response_middleware]` - Register a function as a response middleware
 - `#[response_middleware(order)]` - Register a function as a response middleware with specified order
-- `#[panic_hook]` - Register a function as a panic hook
-- `#[panic_hook(order)]` - Register a function as a panic hook with specified order
+- `#[panic]` - Register a function as a panic hook
+- `#[panic(order)]` - Register a function as a panic hook with specified order
 
 ### Stream Processing Macros
 
@@ -229,7 +229,7 @@ cargo add hyperlane-macros
 
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
-- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic_hook]`)
+- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic]`)
 - **Multi-parameter support** Most data extraction macros support multiple parameters in a single call (e.g., `#[request_body(var1, var2)]`, `#[request_query("k1" => v1, "k2" => v2)]`). This reduces macro repetition and improves code readability.
 
 ### Best Practice Warning

@@ -17,7 +17,7 @@ use crate::*;
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the hook registration.
-pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn panic_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
@@ -25,10 +25,7 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookMacro {
-                hook_type: ::hyperlane::HookType::PanicHook(#order),
-                handler: ::hyperlane::HookHandlerSpec::Factory(|| ::hyperlane::server_hook_factory::<#struct_name>()),
-            }
+            ::hyperlane::HookType::Panic(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
         }
     };
     gen_code.into()
@@ -36,8 +33,45 @@ pub(crate) fn panic_hook_macro(attr: TokenStream, item: TokenStream) -> TokenStr
 
 inventory::submit! {
     InjectableMacro {
-        name: "panic_hook",
-        handler: Handler::WithAttr(panic_hook_macro),
+        name: "panic",
+        handler: Handler::WithAttr(panic_macro),
+    }
+}
+
+/// Registers a request error hook.
+///
+/// This macro takes a struct as input and registers it as a request error hook.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute `TokenStream`, which can optionally specify an `order`.
+/// - `TokenStream` - The input `TokenStream` representing the struct to be registered as a hook.
+///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
+/// # Returns
+///
+/// Returns the expanded `TokenStream` with the hook registration.
+pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
+    let order: TokenStream2 = expr_to_isize(&attr_args.order);
+    let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
+    let struct_name: &Ident = &input_struct.ident;
+    let gen_code: TokenStream2 = quote! {
+        #input_struct
+        ::hyperlane::inventory::submit! {
+            ::hyperlane::HookType::RequestError(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
+        }
+    };
+    gen_code.into()
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_error",
+        handler: Handler::WithAttr(request_error_macro),
     }
 }
 
