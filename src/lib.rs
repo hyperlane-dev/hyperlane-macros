@@ -3030,6 +3030,39 @@ pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
     panic_macro(attr, item)
 }
 
+/// Registers a function as a request error hook.
+///
+/// This attribute macro registers the decorated function to handle request errors that occur
+/// during request processing. This macro requires the `#[hyperlane(server: Server)]` macro to be used to define the server instance.
+///
+/// # Note
+///
+/// If an order parameter is not specified, the hook will have a higher priority than hooks with a specified order.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[request_error]
+/// #[request_error(1)]
+/// #[request_error("2")]
+/// struct RequestErrorHook;
+///
+/// impl ServerHook for RequestErrorHook {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(response_body("request_error"), send)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// # Dependencies
+///
+/// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
 pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
     request_error_macro(attr, item)

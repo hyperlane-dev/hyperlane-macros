@@ -192,6 +192,7 @@ cargo add hyperlane-macros
 - `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
 - `#[panic]` - Execute function when a panic occurs within the server
+- `#[request_error]` - Execute function when a request error occurs within the server
 - `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
 - `#[epilogue_macros(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
@@ -203,6 +204,8 @@ cargo add hyperlane-macros
 - `#[response_middleware(order)]` - Register a function as a response middleware with specified order
 - `#[panic]` - Register a function as a panic hook
 - `#[panic(order)]` - Register a function as a panic hook with specified order
+- `#[request_error]` - Register a function as a request error hook
+- `#[request_error(order)]` - Register a function as a request error hook with specified order
 
 ### Stream Processing Macros
 
