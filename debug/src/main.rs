@@ -16,9 +16,9 @@ struct TestData {
     age: u32,
 }
 
-#[panic]
-#[panic(1)]
-#[panic("2")]
+#[task_panic]
+#[task_panic(1)]
+#[task_panic("2")]
 struct ServerPanic;
 
 impl ServerHook for ServerPanic {
@@ -26,19 +26,22 @@ impl ServerHook for ServerPanic {
         Self
     }
 
-    #[prologue_macros(panic_data_option(panic_data_option), panic_data(panic_data))]
+    #[prologue_macros(
+        task_panic_data_option(task_panic_data_option),
+        task_panic_data(task_panic_data)
+    )]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body(format!("{panic_data} {panic_data_option:?}")),
+        response_body(format!("{task_panic_data} {task_panic_data_option:?}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}
 }
 
-#[request_error]
-#[request_error(1)]
-#[request_error("2")]
+#[request_read_error]
+#[request_read_error(1)]
+#[request_read_error("2")]
 struct ServerRequestError;
 
 impl ServerHook for ServerRequestError {
@@ -47,13 +50,13 @@ impl ServerHook for ServerRequestError {
     }
 
     #[prologue_macros(
-        request_error_data_option(request_error_data_option),
-        request_error_data(request_error_data)
+        request_read_error_data_option(request_read_error_data_option),
+        request_read_error_data(request_read_error_data)
     )]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body(format!("{request_error_data} {request_error_data_option:?}")),
+        response_body(format!("{request_read_error_data} {request_read_error_data_option:?}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}

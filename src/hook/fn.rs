@@ -17,7 +17,7 @@ use crate::*;
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the hook registration.
-pub(crate) fn panic_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn task_panic_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
@@ -33,8 +33,8 @@ pub(crate) fn panic_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
 
 inventory::submit! {
     InjectableMacro {
-        name: "panic",
-        handler: Handler::WithAttr(panic_macro),
+        name: "task_panic",
+        handler: Handler::WithAttr(task_panic_macro),
     }
 }
 
@@ -54,7 +54,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the hook registration.
-pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn request_read_error_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
@@ -70,8 +70,8 @@ pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> Token
 
 inventory::submit! {
     InjectableMacro {
-        name: "request_error",
-        handler: Handler::WithAttr(request_error_macro),
+        name: "request_read_error",
+        handler: Handler::WithAttr(request_read_error_macro),
     }
 }
 

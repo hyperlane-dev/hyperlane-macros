@@ -2186,7 +2186,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/panic_data_option")]
+/// #[route("/task_panic_data_option")]
 /// struct PanicDataOptionTest;
 ///
 /// impl ServerHook for PanicDataOptionTest {
@@ -2194,18 +2194,18 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Panic data: {panic_data_option:?}"))]
-///     #[panic_data_option(panic_data_option)]
+///     #[response_body(&format!("Panic data: {task_panic_data_option:?}"))]
+///     #[task_panic_data_option(task_panic_data_option)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl PanicDataOptionTest {
-///     #[panic_data_option(panic_data_option)]
-///     async fn panic_data_option_with_ref_self(&self, ctx: &Context) {}
+///     #[task_panic_data_option(task_panic_data_option)]
+///     async fn task_panic_data_option_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[panic_data_option(panic_data_option)]
-/// async fn standalone_panic_data_option_handler(ctx: &Context) {}
+/// #[task_panic_data_option(task_panic_data_option)]
+/// async fn standalone_task_panic_data_option_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a variable name that will contain the panic data.
@@ -2217,7 +2217,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/panic_data_option")]
+/// #[route("/task_panic_data_option")]
 /// struct MultiPanicDataOption;
 ///
 /// impl ServerHook for MultiPanicDataOption {
@@ -2226,15 +2226,15 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("panic1: {panic1:?}, panic2: {panic2:?}"))]
-///     #[panic_data_option(panic1, panic2)]
+///     #[task_panic_data_option(panic1, panic2)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
-pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    panic_data_option_macro(attr, item, Position::Prologue)
+pub fn task_panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    task_panic_data_option_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts panic data into a variable with panic on missing value.
@@ -2249,7 +2249,7 @@ pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/panic_data")]
+/// #[route("/task_panic_data")]
 /// struct PanicDataTest;
 ///
 /// impl ServerHook for PanicDataTest {
@@ -2257,18 +2257,18 @@ pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Panic data: {panic_data}"))]
-///     #[panic_data(panic_data)]
+///     #[response_body(&format!("Panic data: {task_panic_data}"))]
+///     #[task_panic_data(task_panic_data)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl PanicDataTest {
-///     #[panic_data(panic_data)]
-///     async fn panic_data_with_ref_self(&self, ctx: &Context) {}
+///     #[task_panic_data(task_panic_data)]
+///     async fn task_panic_data_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[panic_data(panic_data)]
-/// async fn standalone_panic_data_handler(ctx: &Context) {}
+/// #[task_panic_data(task_panic_data)]
+/// async fn standalone_task_panic_data_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a variable name that will contain the panic data.
@@ -2280,7 +2280,7 @@ pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/panic_data")]
+/// #[route("/task_panic_data")]
 /// struct MultiPanicData;
 ///
 /// impl ServerHook for MultiPanicData {
@@ -2289,7 +2289,7 @@ pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("panic1: {panic1}, panic2: {panic2}"))]
-///     #[panic_data(panic1, panic2)]
+///     #[task_panic_data(panic1, panic2)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -2300,8 +2300,8 @@ pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This macro will panic if no panic data exists in the request context.
 #[proc_macro_attribute]
-pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    panic_data_macro(attr, item, Position::Prologue)
+pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    task_panic_data_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts request error data into a variable wrapped in Option type.
@@ -2316,7 +2316,7 @@ pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data_option")]
+/// #[route("/request_read_error_data_option")]
 /// struct RequestErrorDataOptionTest;
 ///
 /// impl ServerHook for RequestErrorDataOptionTest {
@@ -2324,18 +2324,18 @@ pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Request error data: {request_error_data_option:?}"))]
-///     #[request_error_data_option(request_error_data_option)]
+///     #[response_body(&format!("Request error data: {request_read_error_data_option:?}"))]
+///     #[request_read_error_data_option(request_read_error_data_option)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl RequestErrorDataOptionTest {
-///     #[request_error_data_option(request_error_data_option)]
-///     async fn request_error_data_option_with_ref_self(&self, ctx: &Context) {}
+///     #[request_read_error_data_option(request_read_error_data_option)]
+///     async fn request_read_error_data_option_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[request_error_data_option(request_error_data_option)]
-/// async fn standalone_request_error_data_option_handler(ctx: &Context) {}
+/// #[request_read_error_data_option(request_read_error_data_option)]
+/// async fn standalone_request_read_error_data_option_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a variable name that will contain the request error data.
@@ -2347,7 +2347,7 @@ pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data_option")]
+/// #[route("/request_read_error_data_option")]
 /// struct MultiRequestErrorDataOption;
 ///
 /// impl ServerHook for MultiRequestErrorDataOption {
@@ -2356,15 +2356,15 @@ pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("error1: {error1:?}, error2: {error2:?}"))]
-///     #[request_error_data_option(error1, error2)]
+///     #[request_read_error_data_option(error1, error2)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
 ///
 /// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
-pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_error_data_option_macro(attr, item, Position::Prologue)
+pub fn request_read_error_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_read_error_data_option_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts request error data into a variable with panic on missing value.
@@ -2379,7 +2379,7 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data")]
+/// #[route("/request_read_error_data")]
 /// struct RequestErrorDataTest;
 ///
 /// impl ServerHook for RequestErrorDataTest {
@@ -2387,18 +2387,18 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Request error data: {request_error_data}"))]
-///     #[request_error_data(request_error_data)]
+///     #[response_body(&format!("Request error data: {request_read_error_data}"))]
+///     #[request_read_error_data(request_read_error_data)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
 /// impl RequestErrorDataTest {
-///     #[request_error_data(request_error_data)]
-///     async fn request_error_data_with_ref_self(&self, ctx: &Context) {}
+///     #[request_read_error_data(request_read_error_data)]
+///     async fn request_read_error_data_with_ref_self(&self, ctx: &Context) {}
 /// }
 ///
-/// #[request_error_data(request_error_data)]
-/// async fn standalone_request_error_data_handler(ctx: &Context) {}
+/// #[request_read_error_data(request_read_error_data)]
+/// async fn standalone_request_read_error_data_handler(ctx: &Context) {}
 /// ```
 ///
 /// The macro accepts a variable name that will contain the request error data.
@@ -2410,7 +2410,7 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data")]
+/// #[route("/request_read_error_data")]
 /// struct MultiRequestErrorData;
 ///
 /// impl ServerHook for MultiRequestErrorData {
@@ -2419,7 +2419,7 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 ///     }
 ///
 ///     #[response_body(&format!("error1: {error1}, error2: {error2}"))]
-///     #[request_error_data(error1, error2)]
+///     #[request_read_error_data(error1, error2)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -2430,8 +2430,8 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 ///
 /// This macro will panic if no request error data exists in the request context.
 #[proc_macro_attribute]
-pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_error_data_macro(attr, item, Position::Prologue)
+pub fn request_read_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_read_error_data_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific route parameter into a variable wrapped in Option type.
@@ -3267,9 +3267,9 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[panic]
-/// #[panic(1)]
-/// #[panic("2")]
+/// #[task_panic]
+/// #[task_panic(1)]
+/// #[task_panic("2")]
 /// struct PanicHook;
 ///
 /// impl ServerHook for PanicHook {
@@ -3277,7 +3277,7 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(response_body("panic"), send)]
+///     #[epilogue_macros(response_body("task_panic"), send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -3286,8 +3286,8 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 ///
 /// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
-pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
-    panic_macro(attr, item)
+pub fn task_panic(attr: TokenStream, item: TokenStream) -> TokenStream {
+    task_panic_macro(attr, item)
 }
 
 /// Registers a function as a request error hook.
@@ -3305,9 +3305,9 @@ pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[request_error]
-/// #[request_error(1)]
-/// #[request_error("2")]
+/// #[request_read_error]
+/// #[request_read_error(1)]
+/// #[request_read_error("2")]
 /// struct RequestErrorHook;
 ///
 /// impl ServerHook for RequestErrorHook {
@@ -3315,7 +3315,7 @@ pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(response_body("request_error"), send)]
+///     #[epilogue_macros(response_body("request_read_error"), send)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -3324,8 +3324,8 @@ pub fn panic(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// This macro depends on the `#[hyperlane(server: Server)]` macro to define the server instance.
 #[proc_macro_attribute]
-pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_error_macro(attr, item)
+pub fn request_read_error(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_read_error_macro(attr, item)
 }
 
 /// Injects a list of macros before the decorated function.

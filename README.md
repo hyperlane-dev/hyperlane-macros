@@ -117,17 +117,17 @@ cargo add hyperlane-macros
 
 ### Panic Data Macros
 
-- `#[panic_data_option(variable_name)]` - Extract panic data into a variable wrapped in Option type
-- `#[panic_data_option(var1, var2, ...)]` - Supports multiple panic data variables
-- `#[panic_data(variable_name)]` - Extract panic data into a variable with panic on missing value
-- `#[panic_data(var1, var2, ...)]` - Supports multiple panic data variables
+- `#[task_panic_data_option(variable_name)]` - Extract panic data into a variable wrapped in Option type
+- `#[task_panic_data_option(var1, var2, ...)]` - Supports multiple panic data variables
+- `#[task_panic_data(variable_name)]` - Extract panic data into a variable with panic on missing value
+- `#[task_panic_data(var1, var2, ...)]` - Supports multiple panic data variables
 
 ### Request Error Data Macros
 
-- `#[request_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
-- `#[request_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
-- `#[request_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
-- `#[request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[request_read_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
+- `#[request_read_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[request_read_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
+- `#[request_read_error_data(var1, var2, ...)]` - Supports multiple request error data variables
 
 ### Route Param Macros
 
@@ -205,8 +205,8 @@ cargo add hyperlane-macros
 
 - `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
-- `#[panic]` - Execute function when a panic occurs within the server
-- `#[request_error]` - Execute function when a request error occurs within the server
+- `#[task_panic]` - Execute function when a panic occurs within the server
+- `#[request_read_error]` - Execute function when a request error occurs within the server
 - `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
 - `#[epilogue_macros(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
@@ -216,10 +216,10 @@ cargo add hyperlane-macros
 - `#[request_middleware(order)]` - Register a function as a request middleware with specified order
 - `#[response_middleware]` - Register a function as a response middleware
 - `#[response_middleware(order)]` - Register a function as a response middleware with specified order
-- `#[panic]` - Register a function as a panic hook
-- `#[panic(order)]` - Register a function as a panic hook with specified order
-- `#[request_error]` - Register a function as a request error hook
-- `#[request_error(order)]` - Register a function as a request error hook with specified order
+- `#[task_panic]` - Register a function as a panic hook
+- `#[task_panic(order)]` - Register a function as a panic hook with specified order
+- `#[request_read_error]` - Register a function as a request error hook
+- `#[request_read_error(order)]` - Register a function as a request error hook with specified order
 
 ### Stream Processing Macros
 
@@ -246,7 +246,7 @@ cargo add hyperlane-macros
 
 - **Request related macros** (data extraction) use **`get`** operations - they retrieve/query data from the request
 - **Response related macros** (data setting) use **`set`** operations - they assign/configure response data
-- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[panic]`)
+- **Hook macros** For hook-related macros that support an `order` parameter, if `order` is not specified, the hook will have higher priority than hooks with a specified `order` (applies only to macros like `#[request_middleware]`, `#[response_middleware]`, `#[task_panic]`)
 - **Multi-parameter support** Most data extraction macros support multiple parameters in a single call (e.g., `#[request_body(var1, var2)]`, `#[request_query("k1" => v1, "k2" => v2)]`). This reduces macro repetition and improves code readability.
 
 ### Best Practice Warning
