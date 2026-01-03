@@ -26,10 +26,11 @@ impl ServerHook for ServerPanic {
         Self
     }
 
+    #[prologue_macros(panic_data_option(panic_data_option), panic_data(panic_data))]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body("panic"),
+        response_body(format!("{panic_data} {panic_data_option:?}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}
@@ -38,17 +39,21 @@ impl ServerHook for ServerPanic {
 #[request_error]
 #[request_error(1)]
 #[request_error("2")]
-struct RequestError;
+struct ServerRequestError;
 
-impl ServerHook for RequestError {
+impl ServerHook for ServerRequestError {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
+    #[prologue_macros(
+        request_error_data_option(request_error_data_option),
+        request_error_data(request_error_data)
+    )]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body("request_error"),
+        response_body(format!("{request_error_data} {request_error_data_option:?}")),
         send
     )]
     async fn handle(self, ctx: &Context) {}

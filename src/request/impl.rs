@@ -452,3 +452,63 @@ impl Parse for MultiRequestPathData {
         Ok(MultiRequestPathData { variables })
     }
 }
+
+/// Implementation of Parse trait for MultiPanicData.
+///
+/// Parses panic data variables from input stream.
+/// Supports both single and multiple variables.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiPanicData>` - Parsed MultiPanicData or error.
+impl Parse for MultiPanicData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiPanicData { variables })
+    }
+}
+
+/// Implementation of Parse trait for MultiRequestErrorData.
+///
+/// Parses request error data variables from input stream.
+/// Supports both single and multiple variables.
+///
+/// # Arguments
+///
+/// - `ParseStream` - The input parse stream.
+///
+/// # Returns
+///
+/// - `syn::Result<MultiRequestErrorData>` - Parsed MultiRequestErrorData or error.
+impl Parse for MultiRequestErrorData {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut variables: Vec<Ident> = Vec::new();
+        loop {
+            let variable: Ident = input.parse()?;
+            variables.push(variable);
+            if input.is_empty() {
+                break;
+            }
+            input.parse::<Token![,]>()?;
+            if input.is_empty() {
+                break;
+            }
+        }
+        Ok(MultiRequestErrorData { variables })
+    }
+}

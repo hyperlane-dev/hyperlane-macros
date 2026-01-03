@@ -133,3 +133,21 @@ pub(crate) struct MultiRequestPathData {
     /// Vector of request path variables.
     pub(crate) variables: Vec<Ident>,
 }
+
+/// Container for panic data.
+///
+/// Used to store parsed panic data variable from macro input.
+/// Supports both single and multiple variables.
+pub(crate) struct MultiPanicData {
+    /// Vector of panic data variables.
+    pub(crate) variables: Vec<Ident>,
+}
+
+/// Container for request error data.
+///
+/// Used to store parsed request error data variable from macro input.
+/// Supports both single and multiple variables.
+pub(crate) struct MultiRequestErrorData {
+    /// Vector of request error data variables.
+    pub(crate) variables: Vec<Ident>,
+}

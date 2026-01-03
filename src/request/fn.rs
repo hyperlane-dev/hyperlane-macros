@@ -230,6 +230,154 @@ inventory::submit! {
     }
 }
 
+/// Gets panic data and assigns to specified variable wrapped in Option.
+/// Supports both single and multiple variable extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with panic data extraction.
+pub(crate) fn panic_data_option_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_panic_data: MultiPanicData = parse_macro_input!(attr as MultiPanicData);
+    inject(position, item, |context| {
+        let statements = multi_panic_data.variables.iter().map(|variable| {
+            quote! {
+                let #variable: Option<::hyperlane::PanicData> = #context.try_get_panic_data().await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "panic_data_option",
+        handler: Handler::WithAttrPosition(panic_data_option_macro),
+    }
+}
+
+/// Gets panic data and assigns to specified variable with panic on missing value.
+/// Supports both single and multiple variable extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with panic data extraction.
+pub(crate) fn panic_data_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_panic_data: MultiPanicData = parse_macro_input!(attr as MultiPanicData);
+    inject(position, item, |context| {
+        let statements = multi_panic_data.variables.iter().map(|variable| {
+            quote! {
+                let #variable: ::hyperlane::PanicData = #context.get_panic_data().await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "panic_data",
+        handler: Handler::WithAttrPosition(panic_data_macro),
+    }
+}
+
+/// Gets request error data and assigns to specified variable wrapped in Option.
+/// Supports both single and multiple variable extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with request error data extraction.
+pub(crate) fn request_error_data_option_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_error_data: MultiRequestErrorData = parse_macro_input!(attr as MultiRequestErrorData);
+    inject(position, item, |context| {
+        let statements = multi_error_data.variables.iter().map(|variable| {
+            quote! {
+                let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_error_data().await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_error_data_option",
+        handler: Handler::WithAttrPosition(request_error_data_option_macro),
+    }
+}
+
+/// Gets request error data and assigns to specified variable with panic on missing value.
+/// Supports both single and multiple variable extraction.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The attribute token stream.
+/// - `TokenStream` - The input token stream to process.
+/// - `Position` - The position to inject the code.
+///
+/// # Returns
+///
+/// - `TokenStream` - The expanded token stream with request error data extraction.
+pub(crate) fn request_error_data_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let multi_error_data: MultiRequestErrorData = parse_macro_input!(attr as MultiRequestErrorData);
+    inject(position, item, |context| {
+        let statements = multi_error_data.variables.iter().map(|variable| {
+            quote! {
+                let #variable: ::hyperlane::RequestError = #context.get_request_error_data().await;
+            }
+        });
+        quote! {
+            #(#statements)*
+        }
+    })
+}
+
+inventory::submit! {
+    InjectableMacro {
+        name: "request_error_data",
+        handler: Handler::WithAttrPosition(request_error_data_macro),
+    }
+}
+
 /// Gets route parameter by key and assigns to specified variable.
 /// Supports both single and multiple route parameter extraction.
 ///

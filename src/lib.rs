@@ -2174,6 +2174,266 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
     attributes_macro(attr, item, Position::Prologue)
 }
 
+/// Extracts panic data into a variable wrapped in Option type.
+///
+/// This attribute macro retrieves panic information if a panic occurred during handling
+/// and makes it available as an Option variable. The extracted value is wrapped
+/// in an Option type to safely handle cases where no panic occurred.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/panic_data_option")]
+/// struct PanicDataOptionTest;
+///
+/// impl ServerHook for PanicDataOptionTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("Panic data: {panic_data_option:?}"))]
+///     #[panic_data_option(panic_data_option)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl PanicDataOptionTest {
+///     #[panic_data_option(panic_data_option)]
+///     async fn panic_data_option_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[panic_data_option(panic_data_option)]
+/// async fn standalone_panic_data_option_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a variable name that will contain the panic data.
+/// The variable will be available as an `Option<PanicData>` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/panic_data_option")]
+/// struct MultiPanicDataOption;
+///
+/// impl ServerHook for MultiPanicDataOption {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("panic1: {panic1:?}, panic2: {panic2:?}"))]
+///     #[panic_data_option(panic1, panic2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
+#[proc_macro_attribute]
+pub fn panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    panic_data_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts panic data into a variable with panic on missing value.
+///
+/// This attribute macro retrieves panic information if a panic occurred during handling
+/// and makes it available as a variable. If no panic data exists,
+/// the function will panic with an error message.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/panic_data")]
+/// struct PanicDataTest;
+///
+/// impl ServerHook for PanicDataTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("Panic data: {panic_data}"))]
+///     #[panic_data(panic_data)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl PanicDataTest {
+///     #[panic_data(panic_data)]
+///     async fn panic_data_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[panic_data(panic_data)]
+/// async fn standalone_panic_data_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a variable name that will contain the panic data.
+/// The variable will be available as a `PanicData` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/panic_data")]
+/// struct MultiPanicData;
+///
+/// impl ServerHook for MultiPanicData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("panic1: {panic1}, panic2: {panic2}"))]
+///     #[panic_data(panic1, panic2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
+///
+/// # Panics
+///
+/// This macro will panic if no panic data exists in the request context.
+#[proc_macro_attribute]
+pub fn panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    panic_data_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts request error data into a variable wrapped in Option type.
+///
+/// This attribute macro retrieves request error information if an error occurred during handling
+/// and makes it available as an Option variable. The extracted value is wrapped
+/// in an Option type to safely handle cases where no error occurred.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/request_error_data_option")]
+/// struct RequestErrorDataOptionTest;
+///
+/// impl ServerHook for RequestErrorDataOptionTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("Request error data: {request_error_data_option:?}"))]
+///     #[request_error_data_option(request_error_data_option)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RequestErrorDataOptionTest {
+///     #[request_error_data_option(request_error_data_option)]
+///     async fn request_error_data_option_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[request_error_data_option(request_error_data_option)]
+/// async fn standalone_request_error_data_option_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a variable name that will contain the request error data.
+/// The variable will be available as an `Option<RequestError>` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/request_error_data_option")]
+/// struct MultiRequestErrorDataOption;
+///
+/// impl ServerHook for MultiRequestErrorDataOption {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("error1: {error1:?}, error2: {error2:?}"))]
+///     #[request_error_data_option(error1, error2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
+#[proc_macro_attribute]
+pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_error_data_option_macro(attr, item, Position::Prologue)
+}
+
+/// Extracts request error data into a variable with panic on missing value.
+///
+/// This attribute macro retrieves request error information if an error occurred during handling
+/// and makes it available as a variable. If no error data exists,
+/// the function will panic with an error message.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/request_error_data")]
+/// struct RequestErrorDataTest;
+///
+/// impl ServerHook for RequestErrorDataTest {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("Request error data: {request_error_data}"))]
+///     #[request_error_data(request_error_data)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl RequestErrorDataTest {
+///     #[request_error_data(request_error_data)]
+///     async fn request_error_data_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[request_error_data(request_error_data)]
+/// async fn standalone_request_error_data_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro accepts a variable name that will contain the request error data.
+/// The variable will be available as a `RequestError` in the function scope.
+///
+/// # Multi-Parameter Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/request_error_data")]
+/// struct MultiRequestErrorData;
+///
+/// impl ServerHook for MultiRequestErrorData {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[response_body(&format!("error1: {error1}, error2: {error2}"))]
+///     #[request_error_data(error1, error2)]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+/// ```
+///
+/// The macro accepts multiple variable names separated by commas.
+///
+/// # Panics
+///
+/// This macro will panic if no request error data exists in the request context.
+#[proc_macro_attribute]
+pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    request_error_data_macro(attr, item, Position::Prologue)
+}
+
 /// Extracts a specific route parameter into a variable wrapped in Option type.
 ///
 /// This attribute macro retrieves a specific route parameter by key and makes it
