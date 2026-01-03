@@ -115,6 +115,20 @@ cargo add hyperlane-macros
 - `#[attributes(variable_name)]` - Get all attributes as a HashMap for comprehensive attribute access
 - `#[attributes(var1, var2, ...)]` - Supports multiple attribute collections
 
+### Panic Data Macros
+
+- `#[panic_data_option(variable_name)]` - Extract panic data into a variable wrapped in Option type
+- `#[panic_data_option(var1, var2, ...)]` - Supports multiple panic data variables
+- `#[panic_data(variable_name)]` - Extract panic data into a variable with panic on missing value
+- `#[panic_data(var1, var2, ...)]` - Supports multiple panic data variables
+
+### Request Error Data Macros
+
+- `#[request_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
+- `#[request_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[request_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
+- `#[request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
+
 ### Route Param Macros
 
 - `#[route_param_option(key => variable_name)]` - Extract a specific route parameter by key into a variable
@@ -172,20 +186,6 @@ cargo add hyperlane-macros
 
 - `#[request_path(variable_name)]` - Extract the HTTP request path into a variable
 - `#[request_path(var1, var2, ...)]` - Supports multiple request path variables
-
-### Panic Data Macros
-
-- `#[panic_data_option(variable_name)]` - Extract panic data into a variable wrapped in Option type
-- `#[panic_data_option(var1, var2, ...)]` - Supports multiple panic data variables
-- `#[panic_data(variable_name)]` - Extract panic data into a variable with panic on missing value
-- `#[panic_data(var1, var2, ...)]` - Supports multiple panic data variables
-
-### Request Error Data Macros
-
-- `#[request_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
-- `#[request_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
-- `#[request_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
-- `#[request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
 
 ### Host Macros
 
