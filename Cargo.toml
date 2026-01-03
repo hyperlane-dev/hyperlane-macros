@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-macros"
-version = "10.12.1"
+version = "10.12.2"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -25,7 +25,7 @@ proc-macro = true
 
 [dependencies]
 quote = "1.0.42"
-hyperlane = "10.26.1"
+hyperlane = "10.26.2"
 proc-macro2 = "1.0.104"
 syn = { version = "2.0.112", features = ["full"] }
 
