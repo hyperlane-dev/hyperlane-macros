@@ -25,7 +25,7 @@ pub(crate) fn task_panic_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookType::Panic(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
+            ::hyperlane::HookType::TaskPanic(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
         }
     };
     gen_code.into()
@@ -54,7 +54,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// Returns the expanded `TokenStream` with the hook registration.
-pub(crate) fn request_read_error_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
     let order: TokenStream2 = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
@@ -70,8 +70,8 @@ pub(crate) fn request_read_error_macro(attr: TokenStream, item: TokenStream) -> 
 
 inventory::submit! {
     InjectableMacro {
-        name: "request_read_error",
-        handler: Handler::WithAttr(request_read_error_macro),
+        name: "request_error",
+        handler: Handler::WithAttr(request_error_macro),
     }
 }
 

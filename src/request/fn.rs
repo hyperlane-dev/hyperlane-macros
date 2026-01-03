@@ -316,7 +316,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with request error data extraction.
-pub(crate) fn request_read_error_data_option_macro(
+pub(crate) fn request_error_data_option_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -325,7 +325,7 @@ pub(crate) fn request_read_error_data_option_macro(
     inject(position, item, |context| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_read_error_data().await;
+                let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_error_data().await;
             }
         });
         quote! {
@@ -336,8 +336,8 @@ pub(crate) fn request_read_error_data_option_macro(
 
 inventory::submit! {
     InjectableMacro {
-        name: "request_read_error_data_option",
-        handler: Handler::WithAttrPosition(request_read_error_data_option_macro),
+        name: "request_error_data_option",
+        handler: Handler::WithAttrPosition(request_error_data_option_macro),
     }
 }
 
@@ -353,7 +353,7 @@ inventory::submit! {
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with request error data extraction.
-pub(crate) fn request_read_error_data_macro(
+pub(crate) fn request_error_data_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -362,7 +362,7 @@ pub(crate) fn request_read_error_data_macro(
     inject(position, item, |context| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestError = #context.get_request_read_error_data().await;
+                let #variable: ::hyperlane::RequestError = #context.get_request_error_data().await;
             }
         });
         quote! {
@@ -373,8 +373,8 @@ pub(crate) fn request_read_error_data_macro(
 
 inventory::submit! {
     InjectableMacro {
-        name: "request_read_error_data",
-        handler: Handler::WithAttrPosition(request_read_error_data_macro),
+        name: "request_error_data",
+        handler: Handler::WithAttrPosition(request_error_data_macro),
     }
 }
 

@@ -124,10 +124,10 @@ cargo add hyperlane-macros
 
 ### Request Error Data Macros
 
-- `#[request_read_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
-- `#[request_read_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
-- `#[request_read_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
-- `#[request_read_error_data(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[request_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
+- `#[request_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[request_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
+- `#[request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
 
 ### Route Param Macros
 
@@ -206,7 +206,7 @@ cargo add hyperlane-macros
 - `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
 - `#[task_panic]` - Execute function when a panic occurs within the server
-- `#[request_read_error]` - Execute function when a request error occurs within the server
+- `#[request_error]` - Execute function when a request error occurs within the server
 - `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
 - `#[epilogue_macros(macro1, macro2, ...)]` - Injects a list of macros after the decorated function.
 
@@ -218,8 +218,8 @@ cargo add hyperlane-macros
 - `#[response_middleware(order)]` - Register a function as a response middleware with specified order
 - `#[task_panic]` - Register a function as a panic hook
 - `#[task_panic(order)]` - Register a function as a panic hook with specified order
-- `#[request_read_error]` - Register a function as a request error hook
-- `#[request_read_error(order)]` - Register a function as a request error hook with specified order
+- `#[request_error]` - Register a function as a request error hook
+- `#[request_error(order)]` - Register a function as a request error hook with specified order
 
 ### Stream Processing Macros
 
