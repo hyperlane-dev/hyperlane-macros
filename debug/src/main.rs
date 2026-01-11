@@ -1663,15 +1663,14 @@ impl ServerHook for HooksExpression {
     }
 
     #[get]
-    #[prologue_hooks(PrologueHooks::new_hook, PrologueHooks::method_hook)]
+    #[prologue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
+    #[epilogue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
     #[response_body("hooks expression test")]
     async fn handle(self, ctx: &Context) {}
 }
 
-impl PrologueHooks {
-    async fn new_hook(_ctx: &Context) {
-        prologue_hooks_fn(_ctx).await;
-    }
+impl HooksExpression {
+    async fn new_hook(_ctx: &Context) {}
 
     async fn method_hook(_ctx: &Context) {}
 }

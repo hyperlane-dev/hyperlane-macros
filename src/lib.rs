@@ -1666,7 +1666,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     async fn handle(self, _ctx: &Context) {}
 /// }
 ///
-/// async fn prologue_hooks_fn(ctx: Context) {
+/// async fn prologue_hooks_fn(ctx: &Context) {
 ///     let hook = PrologueHooks::new(&ctx).await;
 ///     hook.handle(&ctx).await;
 /// }
@@ -1688,6 +1688,33 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The macro accepts a comma-separated list of function names as parameters. All hook functions
 /// and the main function must accept a `Context` parameter. Avoid combining this macro with other
 /// macros on the same function to prevent macro expansion conflicts.
+///
+/// # Advanced Usage with Method Expressions
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/hooks_expression")]
+/// struct HooksExpression;
+///
+/// impl ServerHook for HooksExpression {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[get]
+///     #[prologue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
+///     #[response_body("hooks expression test")]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl HooksExpression {
+///     async fn new_hook(_ctx: &Context) {}
+///
+///     async fn method_hook(_ctx: &Context) {}
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
     prologue_hooks_macro(attr, item, Position::Prologue)
@@ -1715,7 +1742,7 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///
-/// async fn epilogue_hooks_fn(ctx: Context) {
+/// async fn epilogue_hooks_fn(ctx: &Context) {
 ///     let hook = EpilogueHooks::new(&ctx).await;
 ///     hook.handle(&ctx).await;
 /// }
@@ -1732,11 +1759,39 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     #[response_body("Testing hook macro")]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
+///
 /// ```
 ///
 /// The macro accepts a comma-separated list of function names as parameters. All hook functions
 /// and the main function must accept a `Context` parameter. Avoid combining this macro with other
 /// macros on the same function to prevent macro expansion conflicts.
+///
+/// # Advanced Usage with Method Expressions
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/hooks_expression")]
+/// struct HooksExpression;
+///
+/// impl ServerHook for HooksExpression {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[get]
+///     #[epilogue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
+///     #[response_body("hooks expression test")]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl HooksExpression {
+///     async fn new_hook(_ctx: &Context) {}
+///
+///     async fn method_hook(_ctx: &Context) {}
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_hooks_macro(attr, item, Position::Epilogue)

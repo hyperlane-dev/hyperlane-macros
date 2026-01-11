@@ -205,6 +205,8 @@ cargo add hyperlane-macros
 
 - `#[prologue_hooks(function_name)]` - Execute specified function before the main handler function
 - `#[epilogue_hooks(function_name)]` - Execute specified function after the main handler function
+- `#[prologue_hooks(method::expression, another::method)]` - Supports method expressions for advanced hook configurations
+- `#[epilogue_hooks(method::expression, another::method)]` - Supports method expressions for advanced hook configurations
 - `#[task_panic]` - Execute function when a panic occurs within the server
 - `#[request_error]` - Execute function when a request error occurs within the server
 - `#[prologue_macros(macro1, macro2, ...)]` - Injects a list of macros before the decorated function.
