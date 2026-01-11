@@ -79,7 +79,7 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream containing a list of function names.
+/// - `TokenStream` - The attribute token stream containing a list of function names or expressions.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
@@ -91,12 +91,12 @@ pub(crate) fn prologue_hooks_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let functions: Punctuated<Ident, Token![,]> =
+    let functions: Punctuated<Expr, Token![,]> =
         parse_macro_input!(attr with Punctuated::parse_terminated);
     inject(position, item, |context| {
-        let hook_calls = functions.iter().map(|function_name| {
+        let hook_calls = functions.iter().map(|function_expr| {
             quote! {
-                let _ = #function_name(#context.clone()).await;
+                let _ = #function_expr(#context).await;
             }
         });
         quote! {
@@ -116,7 +116,7 @@ inventory::submit! {
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The attribute token stream containing a list of function names.
+/// - `TokenStream` - The attribute token stream containing a list of function names or expressions.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
@@ -128,12 +128,12 @@ pub(crate) fn epilogue_hooks_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let functions: Punctuated<Ident, Token![,]> =
+    let functions: Punctuated<Expr, Token![,]> =
         parse_macro_input!(attr with Punctuated::parse_terminated);
     inject(position, item, |context| {
-        let hook_calls = functions.iter().map(|function_name| {
+        let hook_calls = functions.iter().map(|function_expr| {
             quote! {
-                let _ = #function_name(#context.clone()).await;
+                let _ = #function_expr(#context).await;
             }
         });
         quote! {

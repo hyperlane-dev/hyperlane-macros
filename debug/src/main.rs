@@ -186,14 +186,14 @@ impl ServerHook for EpilogueHooks {
     async fn handle(self, ctx: &Context) {}
 }
 
-async fn prologue_hooks_fn(ctx: Context) {
-    let hook = PrologueHooks::new(&ctx).await;
-    hook.handle(&ctx).await;
+async fn prologue_hooks_fn(ctx: &Context) {
+    let hook = PrologueHooks::new(ctx).await;
+    hook.handle(ctx).await;
 }
 
-async fn epilogue_hooks_fn(ctx: Context) {
-    let hook = EpilogueHooks::new(&ctx).await;
-    hook.handle(&ctx).await;
+async fn epilogue_hooks_fn(ctx: &Context) {
+    let hook = EpilogueHooks::new(ctx).await;
+    hook.handle(ctx).await;
 }
 
 #[route("/response")]
@@ -1653,6 +1653,28 @@ async fn standalone_prologue_hooks_handler(_ctx: &Context) {}
 
 #[epilogue_hooks(epilogue_hooks_fn)]
 async fn standalone_epilogue_hooks_handler(_ctx: &Context) {}
+
+#[route("/hooks_expression")]
+struct HooksExpression;
+
+impl ServerHook for HooksExpression {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[get]
+    #[prologue_hooks(PrologueHooks::new_hook, PrologueHooks::method_hook)]
+    #[response_body("hooks expression test")]
+    async fn handle(self, ctx: &Context) {}
+}
+
+impl PrologueHooks {
+    async fn new_hook(_ctx: &Context) {
+        prologue_hooks_fn(_ctx).await;
+    }
+
+    async fn method_hook(_ctx: &Context) {}
+}
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]
