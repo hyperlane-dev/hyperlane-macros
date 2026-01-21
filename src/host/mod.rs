@@ -1,5 +1,5 @@
-pub(crate) mod r#fn;
-pub(crate) mod r#impl;
-pub(crate) mod r#struct;
+mod r#fn;
+mod r#impl;
+mod r#struct;
 
 pub(crate) use {r#fn::*, r#struct::*};
