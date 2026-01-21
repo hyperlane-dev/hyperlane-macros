@@ -266,7 +266,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
     }
 }
 
-/// Checks if an expression is an integer literal or RequestConfigData::default().
+/// Checks if an expression is an integer literal, RequestConfigData::default(), or &RequestConfigData::default().
 ///
 /// # Arguments
 ///
@@ -274,7 +274,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 ///
 /// # Returns
 ///
-/// - `bool` - Returns `true` if the expression is an integer literal or RequestConfigData::default(), `false` otherwise.
+/// - `bool` - Returns `true` if the expression is an integer literal, RequestConfigData::default(), or &RequestConfigData::default(), `false` otherwise.
 pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
     if matches!(
         expr,
@@ -296,6 +296,11 @@ pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
             }
         }
     }
-
+    if let Expr::Reference(ExprReference {
+        expr: inner_expr, ..
+    }) = expr
+    {
+        return is_integer_literal(inner_expr);
+    }
     false
 }

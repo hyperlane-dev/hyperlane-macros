@@ -27,14 +27,14 @@ pub(crate) fn generate_stream(
     match (data.request_config.clone(), data.variable_name.clone()) {
         (Some(request_config), Some(variable_name)) => {
             quote! {
-                while let Ok(#variable_name) = #context.#method_ident(&#request_config).await {
+                while let Ok(#variable_name) = #context.#method_ident(#request_config).await {
                     #(#stmts)*
                 }
             }
         }
         (Some(request_config), None) => {
             quote! {
-                while #context.#method_ident(&#request_config).await.is_ok() {
+                while #context.#method_ident(#request_config).await.is_ok() {
                     #(#stmts)*
                 }
             }

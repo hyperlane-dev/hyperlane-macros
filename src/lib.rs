@@ -109,7 +109,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(RequestConfigData::default())]
+///     #[ws_from_stream(&RequestConfigData::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -157,7 +157,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(RequestConfigData::default(), request)]
+///     #[ws_from_stream(&RequestConfigData::default(), request)]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -181,7 +181,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(request, RequestConfigData::default())]
+///     #[ws_from_stream(request, &RequestConfigData::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -241,7 +241,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         request_query("test" => request_query_option),
 ///         response_body(&format!("request query: {request_query_option:?}")),
 ///         send,
-///         http_from_stream(RequestConfigData::default())
+///         http_from_stream(&RequestConfigData::default())
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
