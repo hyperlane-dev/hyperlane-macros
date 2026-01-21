@@ -266,7 +266,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
     }
 }
 
-/// Checks if an expression is an integer literal or RequestConfig::default().
+/// Checks if an expression is an integer literal or RequestConfigData::default().
 ///
 /// # Arguments
 ///
@@ -274,9 +274,8 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 ///
 /// # Returns
 ///
-/// - `bool` - Returns `true` if the expression is an integer literal or RequestConfig::default(), `false` otherwise.
+/// - `bool` - Returns `true` if the expression is an integer literal or RequestConfigData::default(), `false` otherwise.
 pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
-    // Check for integer literals
     if matches!(
         expr,
         Expr::Lit(ExprLit {
@@ -286,14 +285,12 @@ pub(crate) fn is_integer_literal(expr: &Expr) -> bool {
     ) {
         return true;
     }
-
-    // Check for RequestConfig::default() function calls
     if let Expr::Call(ExprCall { func, .. }) = expr {
         if let Expr::Path(ExprPath { path, .. }) = &**func {
             if path.segments.len() == 2 {
                 let first = &path.segments[0];
                 let second = &path.segments[1];
-                if first.ident == "RequestConfig" && second.ident == "default" {
+                if first.ident == "RequestConfigData" && second.ident == "default" {
                     return true;
                 }
             }

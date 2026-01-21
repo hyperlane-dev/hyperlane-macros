@@ -27,38 +27,24 @@ mod route;
 mod send;
 mod stream;
 
-pub(crate) use aborted::*;
-pub(crate) use closed::*;
-pub(crate) use common::*;
-pub(crate) use filter::*;
-pub(crate) use flush::*;
-pub(crate) use from_stream::*;
-pub(crate) use hook::*;
-pub(crate) use host::*;
-pub(crate) use http::*;
-pub(crate) use hyperlane::*;
-pub(crate) use inject::*;
-pub(crate) use protocol::*;
-pub(crate) use referer::*;
-pub(crate) use reject::*;
-pub(crate) use request::*;
-pub(crate) use request_middleware::*;
-pub(crate) use response::*;
-pub(crate) use response_middleware::*;
-pub(crate) use route::*;
-pub(crate) use send::*;
-pub(crate) use stream::*;
+use {
+    aborted::*, closed::*, common::*, filter::*, flush::*, from_stream::*, hook::*, host::*,
+    http::*, hyperlane::*, inject::*, protocol::*, referer::*, reject::*, request::*,
+    request_middleware::*, response::*, response_middleware::*, route::*, send::*, stream::*,
+};
 
-pub(crate) use ::hyperlane::inventory;
-pub(crate) use proc_macro::TokenStream;
-pub(crate) use proc_macro2::TokenStream as TokenStream2;
-pub(crate) use quote::quote;
-pub(crate) use syn::{
-    Ident, Token,
-    parse::{Parse, ParseStream, Parser, Result},
-    punctuated::Punctuated,
-    token::Comma,
-    *,
+use {
+    ::hyperlane::inventory,
+    proc_macro::TokenStream,
+    proc_macro2::TokenStream as TokenStream2,
+    quote::quote,
+    syn::{
+        Ident, Token,
+        parse::{Parse, ParseStream, Parser, Result},
+        punctuated::Punctuated,
+        token::Comma,
+        *,
+    },
 };
 
 inventory::collect!(InjectableMacro);
@@ -123,7 +109,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(RequestConfig::default())]
+///     #[ws_from_stream(RequestConfigData::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -171,7 +157,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(RequestConfig::default(), request)]
+///     #[ws_from_stream(RequestConfigData::default(), request)]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -195,7 +181,7 @@ inventory::collect!(InjectableMacro);
 ///     }
 ///
 ///     #[ws]
-///     #[ws_from_stream(request, RequestConfig::default())]
+///     #[ws_from_stream(request, RequestConfigData::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -255,7 +241,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         request_query("test" => request_query_option),
 ///         response_body(&format!("request query: {request_query_option:?}")),
 ///         send,
-///         http_from_stream(RequestConfig::default())
+///         http_from_stream(RequestConfigData::default())
 ///     )]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
@@ -3179,11 +3165,11 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 ///
 /// #[hyperlane(server: Server)]
-/// #[hyperlane(config: ServerConfig)]
+/// #[hyperlane(server_config: ServerConfig)]
 /// #[tokio::main]
 /// async fn main() {
-///     config.disable_nodelay().await;
-///     server.config(config).await;
+///     server_config.disable_nodelay().await;
+///     server.server_config(server_config).await;
 ///     let server_hook: ServerControlHook = server.run().await.unwrap_or_default();
 ///     server_hook.wait().await;
 /// }
