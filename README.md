@@ -48,16 +48,16 @@ cargo add hyperlane-macros
 
 ### HTTP Version Macros
 
-- `#[http_version]` - HTTP check, ensures function only executes for standard HTTP requests
 - `#[http0_9_version]` - HTTP/0.9 check, ensures function only executes for HTTP/0.9 protocol requests
 - `#[http1_0_version]` - HTTP/1.0 check, ensures function only executes for HTTP/1.0 protocol requests
 - `#[http1_1_version]` - HTTP/1.1 check, ensures function only executes for HTTP/1.1 protocol requests
-- `#[http1_1_or_higher_version]` - HTTP/1.1 or higher version check, ensures function only executes for HTTP/1.1 or newer protocol versions
 - `#[http2_version]` - HTTP/2 check, ensures function only executes for HTTP/2 protocol requests
 - `#[http3_version]` - HTTP/3 check, ensures function only executes for HTTP/3 protocol requests
+- `#[http1_1_or_higher_version]` - HTTP/1.1 or higher version check, ensures function only executes for HTTP/1.1 or newer protocol versions
+- `#[http_version]` - HTTP check, ensures function only executes for standard HTTP requests
 - `#[unknown_version]` - Unknown version check, ensures function only executes for requests with unknown HTTP versions
 
-### Protocol Check Macros
+### Upgrade type Macros
 
 - `#[ws_upgrade_type]` - WebSocket check, ensures function only executes for WebSocket upgrade requests
 - `#[h2c_upgrade_type]` - HTTP/2 Cleartext check, ensures function only executes for HTTP/2 cleartext requests

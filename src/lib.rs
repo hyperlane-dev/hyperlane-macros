@@ -719,6 +719,479 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
     methods_macro(attr, item, Position::Prologue)
 }
 
+/// Restricts function execution to HTTP/0.9 requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/0.9
+/// protocol requests, the earliest version of the HTTP protocol.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http0_9_version")]
+/// struct Http09;
+///
+/// impl ServerHook for Http09 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http09 {
+///     #[http0_9_version]
+///     async fn http0_9_version_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http0_9_version]
+/// async fn standalone_http0_9_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http0_9_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/1.0 requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/1.0
+/// protocol requests.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http1_0_version")]
+/// struct Http10;
+///
+/// impl ServerHook for Http10 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http10 {
+///     #[http1_0_version]
+///     async fn http1_0_version_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http1_0_version]
+/// async fn standalone_http1_0_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_0_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/1.1 requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/1.1
+/// protocol requests.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http1_1_version")]
+/// struct Http11;
+///
+/// impl ServerHook for Http11 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http11 {
+///     #[http1_1_version]
+///     async fn http1_1_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http1_1_version]
+/// async fn standalone_http1_1_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_1_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/2 requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/2
+/// protocol requests.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http2_version")]
+/// struct Http2;
+///
+/// impl ServerHook for Http2 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http2_version, response_body("http2_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http2 {
+///     #[http2_version]
+///     async fn http2_version_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http2_version]
+/// async fn standalone_http2_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http2_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/3 requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/3
+/// protocol requests, the latest version of the HTTP protocol.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http3_version")]
+/// struct Http3;
+///
+/// impl ServerHook for Http3 {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http3_version, response_body("http3_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http3 {
+///     #[http3_version]
+///     async fn http3_version_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http3_version]
+/// async fn standalone_http3_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http3_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/1.1 or higher protocol versions.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/1.1
+/// or newer protocol versions, including HTTP/2, HTTP/3, and future versions.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http1_1_or_higher_version")]
+/// struct Http11OrHigher;
+///
+/// impl ServerHook for Http11OrHigher {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Http11OrHigher {
+///     #[http1_1_or_higher_version]
+///     async fn http1_1_or_higher_version_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http1_1_or_higher_version]
+/// async fn standalone_http1_1_or_higher_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http1_1_or_higher_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to standard HTTP requests only.
+///
+/// This attribute macro ensures the decorated function only executes for standard HTTP requests,
+/// excluding WebSocket upgrades and other protocol upgrade requests.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/http")]
+/// struct HttpOnly;
+///
+/// impl ServerHook for HttpOnly {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(http_version, response_body("http"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl HttpOnly {
+///     #[http_version]
+///     async fn http_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[http_version]
+/// async fn standalone_http_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    http_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to requests with unknown HTTP versions only.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// uses an unrecognized or non-standard HTTP version (not HTTP/0.9, HTTP/1.0, HTTP/1.1, HTTP/2, or HTTP/3).
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/unknown_version")]
+/// struct UnknownVersionHandler;
+///
+/// impl ServerHook for UnknownVersionHandler {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(unknown_version, response_body("unknown version"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl UnknownVersionHandler {
+///     #[unknown_version]
+///     async fn handle_unknown_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[unknown_version]
+/// async fn standalone_unknown_version_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    unknown_version_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to WebSocket upgrade requests only.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// is a valid WebSocket upgrade request with proper request headers and protocol negotiation.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/ws_upgrade_type")]
+/// struct Websocket;
+///
+/// impl ServerHook for Websocket {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[ws_upgrade_type]
+///     #[ws_from_stream]
+///     async fn handle(self, ctx: &Context) {
+///         let body: RequestBody = ctx.get_request_body().await;
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
+///         ctx.send_body_list_with_data(&body_list).await;
+///     }
+/// }
+///
+/// impl Websocket {
+///     #[ws_upgrade_type]
+///     async fn ws_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[ws_upgrade_type]
+/// async fn standalone_ws_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    ws_upgrade_type_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to HTTP/2 Cleartext (h2c_upgrade_type) requests only.
+///
+/// This attribute macro ensures the decorated function only executes for HTTP/2 cleartext
+/// requests that use the h2c_upgrade_type upgrade mechanism.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/h2c_upgrade_type")]
+/// struct H2c;
+///
+/// impl ServerHook for H2c {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl H2c {
+///     #[h2c_upgrade_type]
+///     async fn h2c_upgrade_type_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[h2c_upgrade_type]
+/// async fn standalone_h2c_upgrade_type_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    h2c_upgrade_type_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to TLS-encrypted requests only.
+///
+/// This attribute macro ensures the decorated function only executes for requests
+/// that use TLS/SSL encryption on the connection.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/tls_upgrade_type")]
+/// struct Tls;
+///
+/// impl ServerHook for Tls {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl Tls {
+///     #[tls_upgrade_type]
+///     async fn tls_upgrade_type_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[tls_upgrade_type]
+/// async fn standalone_tls_upgrade_type_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    tls_upgrade_type_macro(item, Position::Prologue)
+}
+
+/// Restricts function execution to requests with unknown protocol upgrade types only.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// uses an unrecognized or non-standard protocol upgrade type (not WebSocket, h2c, or TLS).
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/unknown_upgrade_type")]
+/// struct UnknownUpgrade;
+///
+/// impl ServerHook for UnknownUpgrade {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(unknown_upgrade_type, response_body("unknown upgrade type"))]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl UnknownUpgrade {
+///     #[unknown_upgrade_type]
+///     async fn unknown_upgrade_type_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[unknown_upgrade_type]
+/// async fn standalone_unknown_upgrade_type_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    unknown_upgrade_type_macro(item, Position::Prologue)
+}
+
 /// Sets the HTTP status code for the response.
 ///
 /// This attribute macro configures the HTTP status code that will be sent with the response.
@@ -1052,479 +1525,6 @@ pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
     closed_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/0.9 requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/0.9
-/// protocol requests, the earliest version of the HTTP protocol.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http0_9_version")]
-/// struct Http09;
-///
-/// impl ServerHook for Http09 {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http09 {
-///     #[http0_9_version]
-///     async fn http0_9_version_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http0_9_version]
-/// async fn standalone_http0_9_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http0_9_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/1.0 requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/1.0
-/// protocol requests.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http1_0_version")]
-/// struct Http10;
-///
-/// impl ServerHook for Http10 {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http10 {
-///     #[http1_0_version]
-///     async fn http1_0_version_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http1_0_version]
-/// async fn standalone_http1_0_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_0_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/1.1 requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/1.1
-/// protocol requests.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http1_1_version")]
-/// struct Http11;
-///
-/// impl ServerHook for Http11 {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http11 {
-///     #[http1_1_version]
-///     async fn http1_1_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http1_1_version]
-/// async fn standalone_http1_1_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/1.1 or higher protocol versions.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/1.1
-/// or newer protocol versions, including HTTP/2, HTTP/3, and future versions.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http1_1_or_higher_version")]
-/// struct Http11OrHigher;
-///
-/// impl ServerHook for Http11OrHigher {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http11OrHigher {
-///     #[http1_1_or_higher_version]
-///     async fn http1_1_or_higher_version_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http1_1_or_higher_version]
-/// async fn standalone_http1_1_or_higher_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_or_higher_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/2 requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/2
-/// protocol requests.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http2_version")]
-/// struct Http2;
-///
-/// impl ServerHook for Http2 {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http2_version, response_body("http2_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http2 {
-///     #[http2_version]
-///     async fn http2_version_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http2_version]
-/// async fn standalone_http2_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http2_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/3 requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/3
-/// protocol requests, the latest version of the HTTP protocol.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http3_version")]
-/// struct Http3;
-///
-/// impl ServerHook for Http3 {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http3_version, response_body("http3_version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Http3 {
-///     #[http3_version]
-///     async fn http3_version_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http3_version]
-/// async fn standalone_http3_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http3_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to standard HTTP requests only.
-///
-/// This attribute macro ensures the decorated function only executes for standard HTTP requests,
-/// excluding WebSocket upgrades and other protocol upgrade requests.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/http")]
-/// struct HttpOnly;
-///
-/// impl ServerHook for HttpOnly {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(http_version, response_body("http"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl HttpOnly {
-///     #[http_version]
-///     async fn http_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[http_version]
-/// async fn standalone_http_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to requests with unknown HTTP versions only.
-///
-/// This attribute macro ensures the decorated function only executes when the incoming request
-/// uses an unrecognized or non-standard HTTP version (not HTTP/0.9, HTTP/1.0, HTTP/1.1, HTTP/2, or HTTP/3).
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/unknown_version")]
-/// struct UnknownVersionHandler;
-///
-/// impl ServerHook for UnknownVersionHandler {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(unknown_version, response_body("unknown version"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl UnknownVersionHandler {
-///     #[unknown_version]
-///     async fn handle_unknown_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[unknown_version]
-/// async fn standalone_unknown_version_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    unknown_version_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to WebSocket upgrade requests only.
-///
-/// This attribute macro ensures the decorated function only executes when the incoming request
-/// is a valid WebSocket upgrade request with proper request headers and protocol negotiation.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws_upgrade_type")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws_upgrade_type]
-///     #[ws_from_stream]
-///     async fn handle(self, ctx: &Context) {
-///         let body: RequestBody = ctx.get_request_body().await;
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await;
-///     }
-/// }
-///
-/// impl Websocket {
-///     #[ws_upgrade_type]
-///     async fn ws_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[ws_upgrade_type]
-/// async fn standalone_ws_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    ws_upgrade_type_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to HTTP/2 Cleartext (h2c_upgrade_type) requests only.
-///
-/// This attribute macro ensures the decorated function only executes for HTTP/2 cleartext
-/// requests that use the h2c_upgrade_type upgrade mechanism.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/h2c_upgrade_type")]
-/// struct H2c;
-///
-/// impl ServerHook for H2c {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl H2c {
-///     #[h2c_upgrade_type]
-///     async fn h2c_upgrade_type_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[h2c_upgrade_type]
-/// async fn standalone_h2c_upgrade_type_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    h2c_upgrade_type_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to TLS-encrypted requests only.
-///
-/// This attribute macro ensures the decorated function only executes for requests
-/// that use TLS/SSL encryption on the connection.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/tls_upgrade_type")]
-/// struct Tls;
-///
-/// impl ServerHook for Tls {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl Tls {
-///     #[tls_upgrade_type]
-///     async fn tls_upgrade_type_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[tls_upgrade_type]
-/// async fn standalone_tls_upgrade_type_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    tls_upgrade_type_macro(item, Position::Prologue)
-}
-
-/// Restricts function execution to requests with unknown protocol upgrade types only.
-///
-/// This attribute macro ensures the decorated function only executes when the incoming request
-/// uses an unrecognized or non-standard protocol upgrade type (not WebSocket, h2c, or TLS).
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/unknown_upgrade_type")]
-/// struct UnknownUpgrade;
-///
-/// impl ServerHook for UnknownUpgrade {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[prologue_macros(unknown_upgrade_type, response_body("unknown upgrade type"))]
-///     async fn handle(self, ctx: &Context) {}
-/// }
-///
-/// impl UnknownUpgrade {
-///     #[unknown_upgrade_type]
-///     async fn unknown_upgrade_type_with_ref_self(&self, ctx: &Context) {}
-/// }
-///
-/// #[unknown_upgrade_type]
-/// async fn standalone_unknown_upgrade_type_handler(ctx: &Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&Context` parameter.
-#[proc_macro_attribute]
-pub fn unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    unknown_upgrade_type_macro(item, Position::Prologue)
 }
 
 /// Filters requests based on a boolean condition.

@@ -211,22 +211,149 @@ impl ServerHook for Response {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[route("/http_version")]
-struct HttpOnly;
+#[route("/connect")]
+struct ConnectMethod;
 
-impl ServerHook for HttpOnly {
+impl ServerHook for ConnectMethod {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
-    #[prologue_macros(http_version, response_body("http_version"))]
+    #[prologue_macros(connect_method, response_body("connect"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/delete")]
+struct DeleteMethod;
+
+impl ServerHook for DeleteMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(delete_method, response_body("delete"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/head")]
+struct HeadMethod;
+
+impl ServerHook for HeadMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(head_method, response_body("head"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/options")]
+struct OptionsMethod;
+
+impl ServerHook for OptionsMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(options_method, response_body("options"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/patch")]
+struct PatchMethod;
+
+impl ServerHook for PatchMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(patch_method, response_body("patch"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/put")]
+struct PutMethod;
+
+impl ServerHook for PutMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(put_method, response_body("put"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/trace")]
+struct TraceMethod;
+
+impl ServerHook for TraceMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(trace_method, response_body("trace"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/get_post_method")]
+struct GetPostMethod;
+
+impl ServerHook for GetPostMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[closed]
+    #[prologue_macros(
+        http_version,
+        methods(get, post),
+        response_body("get_post_method"),
+        response_status_code(200),
+        response_reason_phrase("OK")
+    )]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/get_method")]
+struct GetMethod;
+
+impl ServerHook for GetMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(ws_upgrade_type, get_method, response_body("get_method"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/post_method")]
+struct PostMethod;
+
+impl ServerHook for PostMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(post_method, response_body("post_method"), try_send)]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/unknown_method")]
+struct UnknownMethod;
+
+impl ServerHook for UnknownMethod {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(unknown_method, response_body("unknown_method"), try_send)]
     async fn handle(self, ctx: &Context) {}
 }
 
 #[route("/http0_9_version")]
-struct Http09;
+struct Http09Version;
 
-impl ServerHook for Http09 {
+impl ServerHook for Http09Version {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
@@ -236,9 +363,9 @@ impl ServerHook for Http09 {
 }
 
 #[route("/http1_0_version")]
-struct Http10;
+struct Http10Version;
 
-impl ServerHook for Http10 {
+impl ServerHook for Http10Version {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
@@ -248,9 +375,9 @@ impl ServerHook for Http10 {
 }
 
 #[route("/http1_1_version")]
-struct Http11;
+struct Http11Version;
 
-impl ServerHook for Http11 {
+impl ServerHook for Http11Version {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
@@ -260,9 +387,9 @@ impl ServerHook for Http11 {
 }
 
 #[route("/http2_version")]
-struct Http2;
+struct Http2Version;
 
-impl ServerHook for Http2 {
+impl ServerHook for Http2Version {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
@@ -272,14 +399,38 @@ impl ServerHook for Http2 {
 }
 
 #[route("/http3_version")]
-struct Http3;
+struct Http3Version;
 
-impl ServerHook for Http3 {
+impl ServerHook for Http3Version {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
     #[prologue_macros(http3_version, response_body("http3_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http1_1_or_higher_version")]
+struct Http11OrHigher;
+
+impl ServerHook for Http11OrHigher {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http_version")]
+struct HttpAllVersion;
+
+impl ServerHook for HttpAllVersion {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http_version, response_body("http_version"))]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -295,134 +446,27 @@ impl ServerHook for UnknownVersion {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[route("/h2c_upgrade_type")]
-struct H2c;
+#[route("/ws_upgrade_type")]
+struct WsUpgradeType;
 
-impl ServerHook for H2c {
+impl ServerHook for WsUpgradeType {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[ws_upgrade_type]
+    async fn handle(self, _ctx: &Context) {}
+}
+
+#[route("/h2c_upgrade_type")]
+struct H2cUpgradeType;
+
+impl ServerHook for H2cUpgradeType {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
     #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/connect")]
-struct Connect;
-
-impl ServerHook for Connect {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(connect_method, response_body("connect"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/delete")]
-struct Delete;
-
-impl ServerHook for Delete {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(delete_method, response_body("delete"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/head")]
-struct Head;
-
-impl ServerHook for Head {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(head_method, response_body("head"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/options")]
-struct Options;
-
-impl ServerHook for Options {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(options_method, response_body("options"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/patch")]
-struct Patch;
-
-impl ServerHook for Patch {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(patch_method, response_body("patch"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/put")]
-struct Put;
-
-impl ServerHook for Put {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(put_method, response_body("put"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/trace")]
-struct Trace;
-
-impl ServerHook for Trace {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(trace_method, response_body("trace"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/get_post")]
-struct GetPost;
-
-impl ServerHook for GetPost {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[closed]
-    #[prologue_macros(
-        http_version,
-        methods(get, post),
-        response_body("get_post"),
-        response_status_code(200),
-        response_reason_phrase("OK")
-    )]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/unknown_method")]
-struct UnknownMethod;
-
-impl ServerHook for UnknownMethod {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(
-        clear_response_headers,
-        filter(ctx.get_request_is_unknown_method().await),
-        response_body("unknown_method")
-    )]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -447,42 +491,6 @@ impl ServerHook for UnknownUpgradeType {
     }
 
     #[prologue_macros(unknown_upgrade_type, response_body("unknown_upgrade_type"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http1_1_or_higher_version")]
-struct Http11OrHigher;
-
-impl ServerHook for Http11OrHigher {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/get_method")]
-struct Get;
-
-impl ServerHook for Get {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(ws_upgrade_type, get_method, response_body("get_method"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/post_method")]
-struct Post;
-
-impl ServerHook for Post {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(post_method, response_body("post_method"), try_send)]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -1367,9 +1375,6 @@ async fn standalone_flush_handler(ctx: &Context) {}
 #[try_flush]
 async fn standalone_try_flush_handler(ctx: &Context) {}
 
-#[ws_upgrade_type]
-async fn standalone_ws_handler(ctx: &Context) {}
-
 #[prologue_macros(
     get_method,
     http_version,
@@ -1379,9 +1384,6 @@ async fn standalone_ws_handler(ctx: &Context) {}
 )]
 #[epilogue_macros(try_send, flush)]
 async fn standalone_complex_get_handler(ctx: &Context) {}
-
-#[get_method]
-async fn standalone_get_handler_with_param(_a: bool, ctx: &Context) {}
 
 #[request_body(body1, body2, body3)]
 async fn test_multi_request_body(ctx: &Context) {
@@ -1514,11 +1516,14 @@ async fn standalone_put_handler(_ctx: &Context) {}
 #[trace_method]
 async fn standalone_trace_handler(_ctx: &Context) {}
 
+#[get_method]
+async fn standalone_get_handler_with_param(_a: bool, ctx: &Context) {}
+
 #[unknown_method]
 async fn standalone_unknown_method_handler(_ctx: &Context) {}
 
-#[h2c_upgrade_type]
-async fn standalone_h2c_upgrade_type_handler(_ctx: &Context) {}
+#[methods(get, post, put)]
+async fn standalone_methods_multiple_handler(_ctx: &Context) {}
 
 #[http0_9_version]
 async fn standalone_http0_9_version_handler(_ctx: &Context) {}
@@ -1529,23 +1534,29 @@ async fn standalone_http1_0_version_handler(_ctx: &Context) {}
 #[http1_1_version]
 async fn standalone_http1_1_handler(_ctx: &Context) {}
 
-#[http1_1_or_higher_version]
-async fn standalone_http1_1_or_higher_version_handler(_ctx: &Context) {}
+#[http2_version]
+async fn standalone_http2_version_handler(_ctx: &Context) {}
 
 #[http3_version]
 async fn standalone_http3_version_handler(_ctx: &Context) {}
 
-#[tls_upgrade_type]
-async fn standalone_tls_upgrade_type_handler(_ctx: &Context) {}
+#[http1_1_or_higher_version]
+async fn standalone_http1_1_or_higher_version_handler(_ctx: &Context) {}
 
 #[unknown_version]
 async fn standalone_unknown_version_handler(_ctx: &Context) {}
 
+#[h2c_upgrade_type]
+async fn standalone_h2c_upgrade_type_handler(_ctx: &Context) {}
+
+#[tls_upgrade_type]
+async fn standalone_tls_upgrade_type_handler(_ctx: &Context) {}
+
+#[ws_upgrade_type]
+async fn standalone_ws_handler(ctx: &Context) {}
+
 #[unknown_upgrade_type]
 async fn standalone_unknown_upgrade_type_handler(_ctx: &Context) {}
-
-#[methods(get, post, put)]
-async fn standalone_methods_multiple_handler(_ctx: &Context) {}
 
 #[filter(_ctx.get_request_is_get_method().await)]
 async fn standalone_filter_handler(_ctx: &Context) {}

@@ -58,12 +58,12 @@ macro_rules! impl_version_check_macro {
 impl_version_check_macro!(http0_9_version_macro, http0_9_version, http0_9);
 impl_version_check_macro!(http1_0_version_macro, http1_0_version, http1_0);
 impl_version_check_macro!(http1_1_version_macro, http1_1_version, http1_1);
+impl_version_check_macro!(http2_version_macro, http2_version, http2);
+impl_version_check_macro!(http3_version_macro, http3_version, http3);
 impl_version_check_macro!(
     http1_1_or_higher_version_macro,
     http1_1_or_higher_version,
     http1_1_or_higher
 );
-impl_version_check_macro!(http2_version_macro, http2_version, http2);
-impl_version_check_macro!(http3_version_macro, http3_version, http3);
 impl_version_check_macro!(http_version_macro, http_version, http);
 impl_version_check_macro!(unknown_version_macro, unknown_version, unknown);
