@@ -211,6 +211,102 @@ impl ServerHook for Response {
     async fn handle(self, ctx: &Context) {}
 }
 
+#[route("/http_version")]
+struct HttpOnly;
+
+impl ServerHook for HttpOnly {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http_version, response_body("http_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http0_9_version")]
+struct Http09;
+
+impl ServerHook for Http09 {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http1_0_version")]
+struct Http10;
+
+impl ServerHook for Http10 {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http1_1_version")]
+struct Http11;
+
+impl ServerHook for Http11 {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http2_version")]
+struct Http2;
+
+impl ServerHook for Http2 {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http2_version, response_body("http2_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http3_version")]
+struct Http3;
+
+impl ServerHook for Http3 {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http3_version, response_body("http3_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/unknown_version")]
+struct UnknownVersion;
+
+impl ServerHook for UnknownVersion {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(unknown_version, response_body("unknown_version"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/h2c_upgrade_type")]
+struct H2c;
+
+impl ServerHook for H2c {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
 #[route("/connect")]
 struct Connect;
 
@@ -295,111 +391,22 @@ impl ServerHook for Trace {
     async fn handle(self, ctx: &Context) {}
 }
 
-#[route("/h2c_upgrade_type")]
-struct H2c;
+#[route("/get_post")]
+struct GetPost;
 
-impl ServerHook for H2c {
+impl ServerHook for GetPost {
     async fn new(_ctx: &Context) -> Self {
         Self
     }
 
-    #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http_version")]
-struct HttpOnly;
-
-impl ServerHook for HttpOnly {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http_version, response_body("http_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http0_9_version")]
-struct Http09;
-
-impl ServerHook for Http09 {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http1_0_version")]
-struct Http10;
-
-impl ServerHook for Http10 {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http1_1_version")]
-struct Http11;
-
-impl ServerHook for Http11 {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http2_version")]
-struct Http2;
-
-impl ServerHook for Http2 {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http2_version, response_body("http2_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http3_version")]
-struct Http3;
-
-impl ServerHook for Http3 {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http3_version, response_body("http3_version"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/tls_upgrade_type")]
-struct Tls;
-
-impl ServerHook for Tls {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/http1_1_or_higher_version")]
-struct Http11OrHigher;
-
-impl ServerHook for Http11OrHigher {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
+    #[closed]
+    #[prologue_macros(
+        http_version,
+        methods(get, post),
+        response_body("get_post"),
+        response_status_code(200),
+        response_reason_phrase("OK")
+    )]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -416,6 +423,42 @@ impl ServerHook for UnknownMethod {
         filter(ctx.get_request_is_unknown_method().await),
         response_body("unknown_method")
     )]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/tls_upgrade_type")]
+struct Tls;
+
+impl ServerHook for Tls {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/unknown_upgrade_type")]
+struct UnknownUpgradeType;
+
+impl ServerHook for UnknownUpgradeType {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(unknown_upgrade_type, response_body("unknown_upgrade_type"))]
+    async fn handle(self, ctx: &Context) {}
+}
+
+#[route("/http1_1_or_higher_version")]
+struct Http11OrHigher;
+
+impl ServerHook for Http11OrHigher {
+    async fn new(_ctx: &Context) -> Self {
+        Self
+    }
+
+    #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -539,25 +582,6 @@ impl ServerHook for Hook {
     #[prologue_hooks(prologue_hooks_fn)]
     #[epilogue_hooks(epilogue_hooks_fn)]
     #[response_body("Testing hook macro")]
-    async fn handle(self, ctx: &Context) {}
-}
-
-#[route("/get_post")]
-struct GetPost;
-
-impl ServerHook for GetPost {
-    async fn new(_ctx: &Context) -> Self {
-        Self
-    }
-
-    #[closed]
-    #[prologue_macros(
-        http_version,
-        methods(get, post),
-        response_body("get_post"),
-        response_status_code(200),
-        response_reason_phrase("OK")
-    )]
     async fn handle(self, ctx: &Context) {}
 }
 
@@ -1057,6 +1081,9 @@ impl ServerHook for InjectMultipleMethods {
 impl InjectMultipleMethods {
     #[methods(get, post)]
     async fn multiple_methods_with_ref_self(&self, ctx: &Context) {}
+
+    #[unknown_method]
+    async fn unknown_method_with_ref_self(&self, ctx: &Context) {}
 }
 
 #[route("/inject/http_stream")]
@@ -1484,6 +1511,12 @@ async fn standalone_patch_handler(_ctx: &Context) {}
 #[put_method]
 async fn standalone_put_handler(_ctx: &Context) {}
 
+#[trace_method]
+async fn standalone_trace_handler(_ctx: &Context) {}
+
+#[unknown_method]
+async fn standalone_unknown_method_handler(_ctx: &Context) {}
+
 #[h2c_upgrade_type]
 async fn standalone_h2c_upgrade_type_handler(_ctx: &Context) {}
 
@@ -1504,6 +1537,12 @@ async fn standalone_http3_version_handler(_ctx: &Context) {}
 
 #[tls_upgrade_type]
 async fn standalone_tls_upgrade_type_handler(_ctx: &Context) {}
+
+#[unknown_version]
+async fn standalone_unknown_version_handler(_ctx: &Context) {}
+
+#[unknown_upgrade_type]
+async fn standalone_unknown_upgrade_type_handler(_ctx: &Context) {}
 
 #[methods(get, post, put)]
 async fn standalone_methods_multiple_handler(_ctx: &Context) {}

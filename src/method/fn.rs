@@ -1,50 +1,5 @@
 use crate::*;
 
-/// Implements an HTTP method macro.
-///
-/// This macro generates a handler function for a specific HTTP method (e.g., GET, POST).
-/// It expands to a check that aborts the request if the HTTP method does not match.
-///
-/// # Arguments
-///
-/// - `$name` - The name of the generated handler function.
-/// - `$submit_name` - The string name for macro registration as an ident.
-/// - `$method` - The HTTP method as an ident (e.g., get, post).
-///
-/// # Returns
-///
-/// Returns a macro that generates a handler function for the specified HTTP method.
-macro_rules! impl_http_method_macro {
-    ($name:ident, $submit_name:ident, $method:ident) => {
-        pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
-            inject(
-                position,
-                item,
-                create_method_check(
-                    &proc_macro2::Ident::new(stringify!($method), proc_macro2::Span::call_site()),
-                    proc_macro2::Span::call_site(),
-                ),
-            )
-        }
-        inventory::submit! {
-            InjectableMacro {
-                name: stringify!($submit_name),
-                handler: Handler::NoAttrPosition($name),
-            }
-        }
-    };
-}
-
-impl_http_method_macro!(get_method_handler, get_method, get);
-impl_http_method_macro!(post_method_handler, post_method, post);
-impl_http_method_macro!(put_method_handler, put_method, put);
-impl_http_method_macro!(delete_method_handler, delete_method, delete);
-impl_http_method_macro!(patch_method_handler, patch_method, patch);
-impl_http_method_macro!(head_method_handler, head_method, head);
-impl_http_method_macro!(options_method_handler, options_method, options);
-impl_http_method_macro!(connect_method_handler, connect_method, connect);
-impl_http_method_macro!(trace_method_handler, trace_method, trace);
-
 /// Creates the method check function identifier.
 ///
 /// # Arguments
@@ -132,3 +87,49 @@ inventory::submit! {
         handler: Handler::WithAttrPosition(methods_macro),
     }
 }
+
+/// Implements an HTTP method macro.
+///
+/// This macro generates a handler function for a specific HTTP method (e.g., GET, POST).
+/// It expands to a check that aborts the request if the HTTP method does not match.
+///
+/// # Arguments
+///
+/// - `$name` - The name of the generated handler function.
+/// - `$submit_name` - The string name for macro registration as an ident.
+/// - `$method` - The HTTP method as an ident (e.g., get, post).
+///
+/// # Returns
+///
+/// Returns a macro that generates a handler function for the specified HTTP method.
+macro_rules! impl_http_method_macro {
+    ($name:ident, $submit_name:ident, $method:ident) => {
+        pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
+            inject(
+                position,
+                item,
+                create_method_check(
+                    &proc_macro2::Ident::new(stringify!($method), proc_macro2::Span::call_site()),
+                    proc_macro2::Span::call_site(),
+                ),
+            )
+        }
+        inventory::submit! {
+            InjectableMacro {
+                name: stringify!($submit_name),
+                handler: Handler::NoAttrPosition($name),
+            }
+        }
+    };
+}
+
+impl_http_method_macro!(get_method_handler, get_method, get);
+impl_http_method_macro!(post_method_handler, post_method, post);
+impl_http_method_macro!(put_method_handler, put_method, put);
+impl_http_method_macro!(delete_method_handler, delete_method, delete);
+impl_http_method_macro!(patch_method_handler, patch_method, patch);
+impl_http_method_macro!(head_method_handler, head_method, head);
+impl_http_method_macro!(options_method_handler, options_method, options);
+impl_http_method_macro!(connect_method_handler, connect_method, connect);
+impl_http_method_macro!(trace_method_handler, trace_method, trace);
+impl_http_method_macro!(unknown_method_handler, unknown_method, unknown);

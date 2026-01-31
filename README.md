@@ -44,6 +44,7 @@ cargo add hyperlane-macros
 - `#[options_method]` - OPTIONS method handler
 - `#[connect_method]` - CONNECT method handler
 - `#[trace_method]` - TRACE method handler
+- `#[unknown_method]` - Unknown method handler
 
 ### HTTP Version Macros
 

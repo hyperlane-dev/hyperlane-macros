@@ -13,9 +13,9 @@ mod flush;
 mod from_stream;
 mod hook;
 mod host;
-mod http;
 mod hyperlane;
 mod inject;
+mod method;
 mod referer;
 mod reject;
 mod request;
@@ -30,7 +30,7 @@ mod version;
 
 use {
     aborted::*, closed::*, common::*, filter::*, flush::*, from_stream::*, hook::*, host::*,
-    http::*, hyperlane::*, inject::*, referer::*, reject::*, request::*, request_middleware::*,
+    hyperlane::*, inject::*, method::*, referer::*, reject::*, request::*, request_middleware::*,
     response::*, response_middleware::*, route::*, send::*, stream::*, upgrade::*, version::*,
 };
 
@@ -630,6 +630,50 @@ pub fn connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     trace_method_handler(item, Position::Prologue)
+}
+
+/// Restricts function execution to unknown HTTP methods only.
+///
+/// This attribute macro ensures the decorated function only executes when the incoming request
+/// uses an HTTP method that is not one of the standard methods (GET, POST, PUT, DELETE, PATCH,
+/// HEAD, OPTIONS, CONNECT, TRACE). Requests with standard methods will be filtered out.
+///
+/// # Usage
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/unknown_method")]
+/// struct UnknownMethod;
+///
+/// impl ServerHook for UnknownMethod {
+///     async fn new(_ctx: &Context) -> Self {
+///         Self
+///     }
+///
+///     #[prologue_macros(
+///         clear_response_headers,
+///         filter(ctx.get_request_is_unknown_method().await),
+///         response_body("unknown_method")
+///     )]
+///     async fn handle(self, ctx: &Context) {}
+/// }
+///
+/// impl UnknownMethod {
+///     #[unknown_method]
+///     async fn unknown_method_with_ref_self(&self, ctx: &Context) {}
+/// }
+///
+/// #[unknown_method]
+/// async fn standalone_unknown_method_handler(ctx: &Context) {}
+/// ```
+///
+/// The macro takes no parameters and should be applied directly to async functions
+/// that accept a `&Context` parameter.
+#[proc_macro_attribute]
+pub fn unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    unknown_method_handler(item, Position::Prologue)
 }
 
 /// Allows function to handle multiple HTTP methods.
