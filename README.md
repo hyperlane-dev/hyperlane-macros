@@ -35,28 +35,33 @@ cargo add hyperlane-macros
 ### HTTP Method Macros
 
 - `#[methods(method1, method2, ...)]` - Accepts multiple HTTP methods
-- `#[get]` - GET method handler
-- `#[post]` - POST method handler
-- `#[put]` - PUT method handler
-- `#[delete]` - DELETE method handler
-- `#[patch]` - PATCH method handler
-- `#[head]` - HEAD method handler
-- `#[options]` - OPTIONS method handler
-- `#[connect]` - CONNECT method handler
-- `#[trace]` - TRACE method handler
+- `#[get_method]` - GET method handler
+- `#[post_method]` - POST method handler
+- `#[put_method]` - PUT method handler
+- `#[delete_method]` - DELETE method handler
+- `#[patch_method]` - PATCH method handler
+- `#[head_method]` - HEAD method handler
+- `#[options_method]` - OPTIONS method handler
+- `#[connect_method]` - CONNECT method handler
+- `#[trace_method]` - TRACE method handler
+
+### HTTP Version Macros
+
+- `#[http_version]` - HTTP check, ensures function only executes for standard HTTP requests
+- `#[http0_9_version]` - HTTP/0.9 check, ensures function only executes for HTTP/0.9 protocol requests
+- `#[http1_0_version]` - HTTP/1.0 check, ensures function only executes for HTTP/1.0 protocol requests
+- `#[http1_1_version]` - HTTP/1.1 check, ensures function only executes for HTTP/1.1 protocol requests
+- `#[http1_1_or_higher_version]` - HTTP/1.1 or higher version check, ensures function only executes for HTTP/1.1 or newer protocol versions
+- `#[http2_version]` - HTTP/2 check, ensures function only executes for HTTP/2 protocol requests
+- `#[http3_version]` - HTTP/3 check, ensures function only executes for HTTP/3 protocol requests
+- `#[unknown_version]` - Unknown version check, ensures function only executes for requests with unknown HTTP versions
 
 ### Protocol Check Macros
 
-- `#[ws]` - WebSocket check, ensures function only executes for WebSocket upgrade requests
-- `#[http]` - HTTP check, ensures function only executes for standard HTTP requests
-- `#[h2c]` - HTTP/2 Cleartext check, ensures function only executes for HTTP/2 cleartext requests
-- `#[http0_9]` - HTTP/0.9 check, ensures function only executes for HTTP/0.9 protocol requests
-- `#[http1_0]` - HTTP/1.0 check, ensures function only executes for HTTP/1.0 protocol requests
-- `#[http1_1]` - HTTP/1.1 check, ensures function only executes for HTTP/1.1 protocol requests
-- `#[http1_1_or_higher]` - HTTP/1.1 or higher version check, ensures function only executes for HTTP/1.1 or newer protocol versions
-- `#[http2]` - HTTP/2 check, ensures function only executes for HTTP/2 protocol requests
-- `#[http3]` - HTTP/3 check, ensures function only executes for HTTP/3 protocol requests
-- `#[tls]` - TLS check, ensures function only executes for TLS-secured connections
+- `#[ws_upgrade_type]` - WebSocket check, ensures function only executes for WebSocket upgrade requests
+- `#[h2c_upgrade_type]` - HTTP/2 Cleartext check, ensures function only executes for HTTP/2 cleartext requests
+- `#[tls_upgrade_type]` - TLS check, ensures function only executes for TLS-secured connections
+- `#[unknown_upgrade_type]` - Unknown upgrade type check, ensures function only executes for requests with unknown upgrade types
 
 ### Response Setting Macros
 

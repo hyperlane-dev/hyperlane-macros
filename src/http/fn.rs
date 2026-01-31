@@ -8,57 +8,75 @@ use crate::*;
 /// # Arguments
 ///
 /// - `$name` - The name of the generated handler function.
-/// - `$method` - The HTTP method as a string literal (e.g., "get", "post").
+/// - `$submit_name` - The string name for macro registration as an ident.
+/// - `$method` - The HTTP method as an ident (e.g., get, post).
 ///
 /// # Returns
 ///
 /// Returns a macro that generates a handler function for the specified HTTP method.
 macro_rules! impl_http_method_macro {
-    ($name:ident, $method:expr) => {
+    ($name:ident, $submit_name:ident, $method:ident) => {
         pub(crate) fn $name(item: TokenStream, position: Position) -> TokenStream {
             inject(
                 position,
                 item,
-                create_method_check($method, proc_macro2::Span::call_site()),
+                create_method_check(
+                    &proc_macro2::Ident::new(stringify!($method), proc_macro2::Span::call_site()),
+                    proc_macro2::Span::call_site(),
+                ),
             )
         }
         inventory::submit! {
             InjectableMacro {
-                name: $method,
+                name: stringify!($submit_name),
                 handler: Handler::NoAttrPosition($name),
             }
         }
     };
 }
 
-impl_http_method_macro!(get_handler, "get");
-impl_http_method_macro!(post_handler, "post");
-impl_http_method_macro!(put_handler, "put");
-impl_http_method_macro!(delete_handler, "delete");
-impl_http_method_macro!(patch_handler, "patch");
-impl_http_method_macro!(head_handler, "head");
-impl_http_method_macro!(options_handler, "options");
-impl_http_method_macro!(connect_handler, "connect");
-impl_http_method_macro!(trace_handler, "trace");
+impl_http_method_macro!(get_method_handler, get_method, get);
+impl_http_method_macro!(post_method_handler, post_method, post);
+impl_http_method_macro!(put_method_handler, put_method, put);
+impl_http_method_macro!(delete_method_handler, delete_method, delete);
+impl_http_method_macro!(patch_method_handler, patch_method, patch);
+impl_http_method_macro!(head_method_handler, head_method, head);
+impl_http_method_macro!(options_method_handler, options_method, options);
+impl_http_method_macro!(connect_method_handler, connect_method, connect);
+impl_http_method_macro!(trace_method_handler, trace_method, trace);
+
+/// Creates the method check function identifier.
+///
+/// # Arguments
+///
+/// - `&str` - The HTTP method name as a string.
+/// - `proc_macro2::Span` - The span for error reporting.
+///
+/// # Returns
+///
+/// Returns the check function identifier.
+pub(crate) fn create_method_check_ident(method: &str, span: proc_macro2::Span) -> Ident {
+    Ident::new(&format!("get_request_is_{method}_method"), span)
+}
 
 /// Creates a method check function for HTTP request validation.
 ///
 /// # Arguments
 ///
-/// - `method_name` - The HTTP method name as a string.
-/// - `span` - The span for error reporting.
+/// - `&proc_macro2::Ident` - The HTTP method name as an ident.
+/// - `proc_macro2::Span` - The span for error reporting.
 ///
 /// # Returns
 ///
 /// Returns a closure that generates the method check code.
 pub(crate) fn create_method_check(
-    method_name: &str,
+    method: &proc_macro2::Ident,
     span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> TokenStream2 {
-    let check_method: Ident = Ident::new(&format!("is_{method_name}"), span);
+    let check_method: Ident = create_method_check_ident(&method.to_string(), span);
     move |context| {
         quote! {
-            if !#context.get_request().await.#check_method() {
+            if !#context.#check_method().await {
                 return;
             }
         }
@@ -91,9 +109,9 @@ pub(crate) fn methods_macro(
     match parse_context_from_signature(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
-                let check_fn: Ident = Ident::new(&format!("is_{method}"), method.span());
+                let check_fn: Ident = create_method_check_ident(&method.to_string(), method.span());
                 quote! {
-                    #context.get_request().await.#check_fn()
+                    #context.#check_fn().await
                 }
             });
             inject(position, item_clone_1, |_| {
