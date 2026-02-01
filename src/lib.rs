@@ -1979,7 +1979,7 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct TestData {
 ///     name: String,
 ///     age: u32,
@@ -2014,12 +2014,12 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane_macros::*;
 /// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct User {
 ///     name: String,
 /// }
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct Config {
 ///     debug: bool,
 /// }
@@ -2058,7 +2058,7 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// use hyperlane_macros::*;
 /// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct TestData {
 ///     name: String,
 ///     age: u32,
@@ -2093,12 +2093,12 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// use hyperlane_macros::*;
 /// use serde::{Deserialize, Serialize};
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct User {
 ///     name: String,
 /// }
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct Config {
 ///     debug: bool,
 /// }
@@ -2143,7 +2143,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct TestData {
 ///     name: String,
 ///     age: u32,
@@ -2215,7 +2215,7 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// const TEST_ATTRIBUTE_KEY: &str = "test_attribute_key";
 ///
-/// #[derive(Debug, Serialize, Deserialize, Clone)]
+/// #[derive(Clone, Debug, Deserialize, Serialize)]
 /// struct TestData {
 ///     name: String,
 ///     age: u32,

@@ -10,7 +10,7 @@ const CUSTOM_HEADER_NAME: &str = "X-Custom-Header";
 const CUSTOM_HEADER_VALUE: &str = "custom-value";
 const RESPONSE_DATA: &str = "{\"status\": \"success\"}";
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 struct TestData {
     name: String,
     age: u32,
