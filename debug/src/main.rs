@@ -1725,38 +1725,40 @@ impl HooksExpression {
     async fn method_hook(_ctx: &Context) {}
 }
 
-async fn test_hyperlane_macro_in_impl() {
-    #[derive(Clone, Copy)]
-    struct TestServer;
+#[route("/server_config")]
+struct MultiServerConfig;
 
-    impl TestServer {
-        #[hyperlane(test_server: Server)]
-        async fn create_server_1() -> Server {
-            test_server
-        }
-
-        #[hyperlane(test_server: Server)]
-        async fn create_server_2(self) -> Server {
-            test_server
-        }
-
-        #[hyperlane(test_server: Server)]
-        async fn create_server_3(&self) -> Server {
-            test_server
-        }
+impl ServerHook for MultiServerConfig {
+    async fn new(_ctx: &Context) -> Self {
+        Self
     }
 
-    let test_server: TestServer = TestServer;
-    TestServer::create_server_1().await;
-    test_server.create_server_2().await;
-    test_server.create_server_3().await;
+    #[get_method]
+    #[response_body("multi server config test")]
+    async fn handle(self, ctx: &Context) {}
+}
+
+impl MultiServerConfig {
+    #[hyperlane(server_config: ServerConfig)]
+    async fn server_config_1() -> ServerConfig {
+        server_config
+    }
+
+    #[hyperlane(server_config: ServerConfig)]
+    async fn server_config_2(self) -> ServerConfig {
+        server_config
+    }
+
+    #[hyperlane(server_config: ServerConfig)]
+    async fn server_config_3(&self) -> ServerConfig {
+        server_config
+    }
 }
 
 #[hyperlane(server: Server)]
 #[hyperlane(config: ServerConfig)]
 #[tokio::main]
 async fn main() {
-    test_hyperlane_macro_in_impl().await;
     config.disable_nodelay().await;
     server.server_config(config).await;
     let server_control_hook_1: ServerControlHook = server.run().await.unwrap_or_default();

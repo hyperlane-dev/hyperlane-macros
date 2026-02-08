@@ -3308,16 +3308,19 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// impl ServerInitializer {
 ///     #[hyperlane(server: Server)]
+///     #[hyperlane(server_config: ServerConfig)]
 ///     async fn initialize_server_1() -> Server {
 ///         server
 ///     }
 ///
 ///     #[hyperlane(server: Server)]
+///     #[hyperlane(server_config: ServerConfig)]
 ///     async fn initialize_server_2(self) -> Server {
 ///         server
 ///     }
 ///
 ///     #[hyperlane(server: Server)]
+///     #[hyperlane(server_config: ServerConfig)]
 ///     async fn initialize_server_3(&self) -> Server {
 ///         server
 ///     }
