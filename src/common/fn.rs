@@ -5,7 +5,7 @@ use crate::*;
 /// # Arguments
 ///
 /// - `TokenStream` - The input token stream to process.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - Function to generate code inserted before.
+/// - `FnOnce(&Ident) -> TokenStream2` - Function to generate code inserted before.
 ///
 /// # Returns
 ///
@@ -41,7 +41,7 @@ fn inject_at_start(
 /// # Arguments
 ///
 /// - `TokenStream` - The input `TokenStream` to process.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that takes a context identifier and returns a `TokenStream` to be inserted at the end of the method.
+/// - `FnOnce(&Ident) -> TokenStream2` - A closure that takes a context identifier and returns a `TokenStream` to be inserted at the end of the method.
 fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStream2) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
@@ -71,7 +71,7 @@ fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStrea
 ///
 /// - `Position` - The position at which to inject the code (`Prologue` or `Epilogue`).
 /// - `TokenStream` - The input `TokenStream` of the method to modify.
-/// - `impl FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the method's context identifier.
+/// - `FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the method's context identifier.
 ///
 /// # Returns
 ///
