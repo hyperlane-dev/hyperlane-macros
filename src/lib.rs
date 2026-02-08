@@ -3298,6 +3298,32 @@ pub fn request_path(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
+/// Using in impl block method:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// struct ServerInitializer;
+///
+/// impl ServerInitializer {
+///     #[hyperlane(server: Server)]
+///     async fn initialize_server_1() -> Server {
+///         server
+///     }
+///
+///     #[hyperlane(server: Server)]
+///     async fn initialize_server_2(self) -> Server {
+///         server
+///     }
+///
+///     #[hyperlane(server: Server)]
+///     async fn initialize_server_3(&self) -> Server {
+///         server
+///     }
+/// }
+/// ```
+///
 /// The macro accepts a `variable_name: Type` pair.
 /// The variable will be available as an instance of the specified type in the function scope.
 #[proc_macro_attribute]

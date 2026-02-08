@@ -20,13 +20,9 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let vis: &Visibility = &input_fn.vis;
     let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
-    let ident: &Ident = &sig.ident;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     let stmts: &Vec<Stmt> = &block.stmts;
-    let inputs: &Punctuated<FnArg, token::Comma> = &sig.inputs;
-    let output: &ReturnType = &sig.output;
     let mut init_statements: Vec<TokenStream2> = Vec::new();
-
     for (var_name, type_name) in &multi_hyperlane.params {
         init_statements.push(quote! {
             let #var_name: #type_name = #type_name::new().await;
@@ -45,7 +41,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
 
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
-        #vis async fn #ident(#inputs) #output {
+        #vis #sig {
             #(#init_statements)*
             #(#stmts)*
         }
