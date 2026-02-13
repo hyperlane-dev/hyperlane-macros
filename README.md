@@ -231,16 +231,10 @@ cargo add hyperlane-macros
 
 ### Stream Processing Macros
 
-- `#[http_from_stream]` - Wraps function body with HTTP stream processing, using default request config. The function body only executes if data is successfully read from the HTTP stream.
-- `#[http_from_stream(request_config)]` - Wraps function body with HTTP stream processing using specified request config.
+- `#[http_from_stream]` - Wraps function body with HTTP stream processing. The function body only executes if data is successfully read from the HTTP stream.
 - `#[http_from_stream(variable_name)]` - Wraps function body with HTTP stream processing, storing data in specified variable name.
-- `#[http_from_stream(request_config, variable_name)]` - Wraps function body with HTTP stream processing using specified request config and variable name.
-- `#[http_from_stream(variable_name, request_config)]` - Wraps function body with HTTP stream processing using specified variable name and request config (reversed order).
-- `#[ws_from_stream]` - Wraps function body with WebSocket stream processing, using default request config. The function body only executes if data is successfully read from the WebSocket stream.
-- `#[ws_from_stream(request_config)]` - Wraps function body with WebSocket stream processing using specified request config.
+- `#[ws_from_stream]` - Wraps function body with WebSocket stream processing. The function body only executes if data is successfully read from the WebSocket stream.
 - `#[ws_from_stream(variable_name)]` - Wraps function body with WebSocket stream processing, storing data in specified variable name.
-- `#[ws_from_stream(request_config, variable_name)]` - Wraps function body with WebSocket stream processing using specified request config and variable name.
-- `#[ws_from_stream(variable_name, request_config)]` - Wraps function body with WebSocket stream processing using specified variable name and request config (reversed order).
 
 ### Response Header Macros
 

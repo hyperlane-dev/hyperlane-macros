@@ -56,13 +56,9 @@ inventory::collect!(InjectableMacro);
 /// data can be read from a WebSocket stream. The function body is only executed
 /// if data is successfully read from the stream.
 ///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from a WebSocket stream. The function body is only executed
-/// if data is successfully read from the stream.
-///
 /// # Arguments
 ///
-/// - `TokenStream`: The buffer to read from the WebSocket stream.
+/// - `TokenStream`: Optional variable name to store the read request data.
 /// - `TokenStream`: The function item to be modified
 ///
 /// # Returns
@@ -71,7 +67,7 @@ inventory::collect!(InjectableMacro);
 ///
 /// # Examples
 ///
-/// Using no parameters (default buffer size):
+/// Using no parameters:
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -87,30 +83,6 @@ inventory::collect!(InjectableMacro);
 ///
 ///     #[ws_upgrade_type]
 ///     #[ws_from_stream]
-///     async fn handle(self, ctx: &Context) {
-///         let body: RequestBody = ctx.get_request_body().await;
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await;
-///     }
-/// }
-/// ```
-///
-/// Using only request config:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws_upgrade_type")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws_upgrade_type]
-///     #[ws_from_stream(&RequestConfigData::default())]
 ///     async fn handle(self, ctx: &Context) {
 ///         let body: RequestBody = ctx.get_request_body().await;
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -136,56 +108,8 @@ inventory::collect!(InjectableMacro);
 ///     #[ws_upgrade_type]
 ///     #[ws_from_stream(request)]
 ///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = &request.get_body();
+///         let body: &RequestBody = request.get_body();
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-///         ctx.send_body_list_with_data(&body_list).await;
-///     }
-/// }
-/// ```
-///
-/// Using request config and variable name:
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws_upgrade_type")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws_upgrade_type]
-///     #[ws_from_stream(&RequestConfigData::default(), request)]
-///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await;
-///     }
-/// }
-/// ```
-///
-/// Using variable name and request config (reversed order):
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/ws_upgrade_type")]
-/// struct Websocket;
-///
-/// impl ServerHook for Websocket {
-///     async fn new(_ctx: &Context) -> Self {
-///         Self
-///     }
-///
-///     #[ws_upgrade_type]
-///     #[ws_from_stream(request, &RequestConfigData::default())]
-///     async fn handle(self, ctx: &Context) {
-///         let body: &RequestBody = request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
 ///         ctx.send_body_list_with_data(&body_list).await;
 ///     }
 /// }
@@ -209,13 +133,9 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// data can be read from an HTTP stream. The function body is only executed
 /// if data is successfully read from the stream.
 ///
-/// This attribute macro generates code that wraps the function body with a check to see if
-/// data can be read from an HTTP stream. The function body is only executed
-/// if data is successfully read from the stream.
-///
 /// # Arguments
 ///
-/// - `TokenStream`: The buffer to read from the HTTP stream.
+/// - `TokenStream`: Optional variable name to store the read request data.
 /// - `TokenStream`: The function item to be modified
 ///
 /// # Returns
@@ -224,7 +144,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// # Examples
 ///
-/// Using with epilogue_macros:
+/// Using no parameters:
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -238,12 +158,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(
-///         request_query("test" => request_query_option),
-///         response_body(&format!("request query: {request_query_option:?}")),
-///         send,
-///         http_from_stream(&RequestConfigData::default())
-///     )]
+///     #[http_from_stream]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 /// ```
@@ -262,9 +177,7 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[epilogue_macros(
-///         http_from_stream(_request)
-///     )]
+///     #[http_from_stream(_request)]
 ///     async fn handle(self, ctx: &Context) {}
 /// }
 ///

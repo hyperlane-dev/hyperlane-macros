@@ -537,7 +537,7 @@ impl ServerHook for Websocket3 {
     }
 
     #[ws_upgrade_type]
-    #[ws_from_stream(&RequestConfigData::default(), request)]
+    #[ws_from_stream(request)]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
@@ -554,7 +554,7 @@ impl ServerHook for Websocket4 {
     }
 
     #[ws_upgrade_type]
-    #[ws_from_stream(request, &RequestConfigData::default())]
+    #[ws_from_stream(request)]
     async fn handle(self, ctx: &Context) {
         let body: &RequestBody = request.get_body();
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
@@ -571,7 +571,7 @@ impl ServerHook for Websocket5 {
     }
 
     #[ws_upgrade_type]
-    #[ws_from_stream(&RequestConfigData::default())]
+    #[ws_from_stream]
     async fn handle(self, ctx: &Context) {
         let body: RequestBody = ctx.get_request_body().await;
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -677,7 +677,7 @@ impl ServerHook for RequestQueryOption {
         request_query_option("test" => request_query_option),
         response_body(&format!("request query: {request_query_option:?}")),
         send,
-        http_from_stream(&RequestConfigData::default())
+        http_from_stream
     )]
     #[prologue_macros(
         request_query_option("test" => request_query_option),
@@ -699,7 +699,7 @@ impl ServerHook for RequestQuery {
         request_query("test" => request_query),
         response_body(&format!("request query: {request_query}")),
         send,
-        http_from_stream(&RequestConfigData::default())
+        http_from_stream
     )]
     #[prologue_macros(
         request_query("test" => request_query),
@@ -765,7 +765,7 @@ impl ServerHook for RequestQuerys {
         request_querys(request_querys),
         response_body(&format!("request querys: {request_querys:?}")),
         send,
-        http_from_stream(&RequestConfigData::default(), _request)
+        http_from_stream(_request)
     )]
     #[prologue_macros(
         request_querys(request_querys),
@@ -787,7 +787,7 @@ impl ServerHook for RequestHeaders {
         request_headers(request_headers),
         response_body(&format!("request headers: {request_headers:?}")),
         send,
-        http_from_stream(_request, &RequestConfigData::default())
+        http_from_stream(_request)
     )]
     #[prologue_macros(
         request_headers(request_headers),
@@ -1108,7 +1108,7 @@ impl ServerHook for InjectHttpStream {
 }
 
 impl InjectHttpStream {
-    #[http_from_stream(&RequestConfigData::default(), _request)]
+    #[http_from_stream(_request)]
     async fn http_stream_handler_with_ref_self(&self, _ctx: &Context) {}
 }
 
@@ -1126,7 +1126,7 @@ impl ServerHook for InjectWsStream {
 }
 
 impl InjectWsStream {
-    #[ws_from_stream(&RequestConfigData::default(), _request)]
+    #[ws_from_stream(_request)]
     async fn websocket_stream_handler_with_ref_self(&self, _ctx: &Context) {}
 }
 
@@ -1630,10 +1630,10 @@ async fn standalone_request_body_json_handler(_ctx: &Context) {}
 #[request_body_json_result(_user_result: TestData)]
 async fn standalone_request_body_json_result_handler(_ctx: &Context) {}
 
-#[http_from_stream(&RequestConfigData::default())]
+#[http_from_stream]
 async fn standalone_http_from_stream_with_config_handler(_ctx: &Context) {}
 
-#[ws_from_stream(&RequestConfigData::default())]
+#[ws_from_stream]
 async fn standalone_ws_from_stream_with_config_handler(_ctx: &Context) {}
 
 #[http_from_stream(_request)]
@@ -1642,10 +1642,10 @@ async fn standalone_http_from_stream_with_request_handler(_ctx: &Context) {}
 #[ws_from_stream(_request)]
 async fn standalone_ws_from_stream_with_request_handler(_ctx: &Context) {}
 
-#[http_from_stream(&RequestConfigData::default(), _request)]
+#[http_from_stream(_request)]
 async fn standalone_http_from_stream_full_handler(_ctx: &Context) {}
 
-#[ws_from_stream(&RequestConfigData::default(), _request)]
+#[ws_from_stream(_request)]
 async fn standalone_ws_from_stream_full_handler(_ctx: &Context) {}
 
 #[send]
