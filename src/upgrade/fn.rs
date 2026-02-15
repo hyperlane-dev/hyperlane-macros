@@ -5,20 +5,19 @@ use crate::*;
 /// # Arguments
 ///
 /// - `&proc_macro2::Ident` - The protocol upgrade type identifier as an ident.
-/// - `proc_macro2::Span` - The span for error reporting.
 ///
 /// # Returns
 ///
 /// Returns a closure that generates the protocol check code.
 pub(crate) fn create_protocol_check(
     upgrade_type: &proc_macro2::Ident,
-    span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> TokenStream2 {
-    let check_upgrade: Ident =
-        Ident::new(&format!("get_request_is_{upgrade_type}_upgrade_type"), span);
+    let upgrade_type_str: String = upgrade_type.to_string();
     move |context| {
+        let check_fn: proc_macro2::Ident =
+            Ident::new(&format!("is_{upgrade_type_str}"), context.span());
         quote! {
-            if !#context.#check_upgrade().await {
+            if !#context.get_request().get_upgrade_type().#check_fn() {
                 return;
             }
         }
@@ -41,13 +40,10 @@ macro_rules! impl_protocol_check_macro {
             inject(
                 position,
                 item,
-                create_protocol_check(
-                    &proc_macro2::Ident::new(
-                        stringify!($upgrade_type),
-                        proc_macro2::Span::call_site(),
-                    ),
+                create_protocol_check(&proc_macro2::Ident::new(
+                    stringify!($upgrade_type),
                     proc_macro2::Span::call_site(),
-                ),
+                )),
             )
         }
         inventory::submit! {

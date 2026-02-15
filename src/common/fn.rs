@@ -163,7 +163,7 @@ pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
 ///
 /// # Returns
 ///
-/// - `bool` - Returns `true` if the type is `&::hyperlane::Context` or `&Context`, `false` otherwise.
+/// - `bool` - Returns `true` if the type is `&::hyperlane::Context` or `&mut Context`, `false` otherwise.
 fn is_context_type(ty: &Type) -> bool {
     if let Type::Reference(type_ref) = ty
         && let Type::Path(type_path) = &*type_ref.elem

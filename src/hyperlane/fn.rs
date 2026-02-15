@@ -25,7 +25,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let mut init_statements: Vec<TokenStream2> = Vec::new();
     for (var_name, type_name) in &multi_hyperlane.params {
         init_statements.push(quote! {
-            let #var_name: #type_name = #type_name::new().await;
+            let mut #var_name: #type_name = #type_name::default();
         });
         if type_name == SERVER_TYPE_KEY {
             init_statements.push(quote! {
@@ -33,12 +33,11 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
                 assert_hook_unique_order(hooks.clone());
                 hooks.sort_by_key(|hook| hook.try_get_order());
                 for hook in hooks {
-                    #var_name.handle_hook(hook.clone()).await;
+                    #var_name.handle_hook(hook.clone());
                 }
             });
         }
     }
-
     let gen_code: TokenStream2 = quote! {
         #(#attrs)*
         #vis #sig {

@@ -17,8 +17,7 @@ pub(crate) fn host_macro(attr: TokenStream, item: TokenStream, position: Positio
     inject(position, item, |context| {
         let statements = multi_host.host_values.iter().map(|host_value| {
             quote! {
-                let request_host: ::hyperlane::RequestHost = #context.get_request_host().await;
-                if request_host.as_str() != #host_value {
+                if #context.get_request().get_host() != #host_value {
                     return;
                 }
             }
@@ -57,8 +56,7 @@ pub(crate) fn reject_host_macro(
     inject(position, item, |context| {
         let statements = multi_host.host_values.iter().map(|host_value| {
             quote! {
-                let request_host: ::hyperlane::RequestHost = #context.get_request_host().await;
-                if request_host.as_str() == #host_value {
+                if #context.get_request().get_host() == #host_value {
                     return;
                 }
             }

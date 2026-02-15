@@ -21,7 +21,7 @@ pub(crate) fn request_body_macro(
     inject(position, item, |context| {
         let statements = multi_body.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestBody = #context.get_request_body().await;
+                let #variable: &::hyperlane::RequestBody = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_request().get_body();
             }
         });
         quote! {
@@ -59,7 +59,7 @@ pub(crate) fn request_body_json_result_macro(
     inject(position, item, |context| {
         let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
-                let #variable: Result<#type_name, ::hyperlane::serde_json::Error> = #context.try_get_request_body_json::<#type_name>().await;
+                let #variable: Result<#type_name, ::hyperlane::serde_json::Error> = #context.get_request().try_get_body_json::<#type_name>();
             }
         });
         quote! {
@@ -97,7 +97,7 @@ pub(crate) fn request_body_json_macro(
     inject(position, item, |context| {
         let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
-                let #variable: #type_name = #context.get_request_body_json::<#type_name>().await;
+                let #variable: #type_name = #context.get_request().get_body_json::<#type_name>();
             }
         });
         quote! {
@@ -137,7 +137,7 @@ pub(crate) fn attribute_option_macro(
             .iter()
             .map(|(key_name, variable, type_name)| {
                 quote! {
-                    let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name).await;
+                    let #variable: Option<#type_name> = #context.try_get_attribute(&#key_name);
                 }
             });
         quote! {
@@ -177,7 +177,7 @@ pub(crate) fn attribute_macro(
             .iter()
             .map(|(key_name, variable, type_name)| {
                 quote! {
-                    let #variable: #type_name = #context.get_attribute(&#key_name).await;
+                    let #variable: #type_name = #context.get_attribute(&#key_name);
                 }
             });
         quote! {
@@ -214,7 +214,7 @@ pub(crate) fn attributes_macro(
     inject(position, item, |context| {
         let statements = multi_attrs.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::ThreadSafeAttributeStore = #context.get_attributes().await;
+                let #variable: &::hyperlane::ThreadSafeAttributeStore = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_attributes();
             }
         });
         quote! {
@@ -251,7 +251,7 @@ pub(crate) fn task_panic_data_option_macro(
     inject(position, item, |context| {
         let statements = multi_task_panic_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: Option<::hyperlane::PanicData> = #context.try_get_task_panic_data().await;
+                let #variable: Option<::hyperlane::PanicData> = #context.try_get_task_panic_data();
             }
         });
         quote! {
@@ -288,7 +288,7 @@ pub(crate) fn task_panic_data_macro(
     inject(position, item, |context| {
         let statements = multi_task_panic_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::PanicData = #context.get_task_panic_data().await;
+                let #variable: ::hyperlane::PanicData = #context.get_task_panic_data();
             }
         });
         quote! {
@@ -325,7 +325,7 @@ pub(crate) fn request_error_data_option_macro(
     inject(position, item, |context| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_error_data().await;
+                let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_error_data();
             }
         });
         quote! {
@@ -362,7 +362,7 @@ pub(crate) fn request_error_data_macro(
     inject(position, item, |context| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestError = #context.get_request_error_data().await;
+                let #variable: ::hyperlane::RequestError = #context.get_request_error_data();
             }
         });
         quote! {
@@ -399,7 +399,7 @@ pub(crate) fn route_param_option_macro(
     inject(position, item, |context| {
         let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: Option<std::string::String> = #context.try_get_route_param(#key_name).await;
+                let #variable: Option<std::string::String> = #context.try_get_route_param(#key_name);
             }
         });
         quote! {
@@ -436,7 +436,7 @@ pub(crate) fn route_param_macro(
     inject(position, item, |context| {
         let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: std::string::String = #context.get_route_param(#key_name).await;
+                let #variable: std::string::String = #context.get_route_param(#key_name);
             }
         });
         quote! {
@@ -473,7 +473,7 @@ pub(crate) fn route_params_macro(
     inject(position, item, |context| {
         let statements = multi_route_params.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RouteParams = #context.get_route_params().await;
+                let #variable: &::hyperlane::RouteParams = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_route_params();
             }
         });
         quote! {
@@ -510,7 +510,7 @@ pub(crate) fn request_query_option_macro(
     inject(position, item, |context| {
         let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: Option<::hyperlane::RequestQuerysValue> = #context.try_get_request_query(#key_name).await;
+                let #variable: Option<::hyperlane::RequestQuerysValue> = #context.get_request().try_get_query(#key_name);
             }
         });
         quote! {
@@ -547,7 +547,7 @@ pub(crate) fn request_query_macro(
     inject(position, item, |context| {
         let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: ::hyperlane::RequestQuerysValue = #context.get_request_query(#key_name).await;
+                let #variable: ::hyperlane::RequestQuerysValue = #context.get_request().get_query(#key_name);
             }
         });
         quote! {
@@ -584,7 +584,7 @@ pub(crate) fn request_querys_macro(
     inject(position, item, |context| {
         let statements = multi_querys.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestQuerys = #context.get_request_querys().await;
+                let #variable: &::hyperlane::RequestQuerys = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_request().get_querys();
             }
         });
         quote! {
@@ -621,7 +621,7 @@ pub(crate) fn request_header_option_macro(
     inject(position, item, |context| {
         let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: Option<::hyperlane::RequestHeadersValueItem> = #context.try_get_request_header_back(#key_name).await;
+                let #variable: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(#key_name);
             }
         });
         quote! {
@@ -658,7 +658,7 @@ pub(crate) fn request_header_macro(
     inject(position, item, |context| {
         let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: ::hyperlane::RequestHeadersValueItem = #context.get_request_header_back(#key_name).await;
+                let #variable: ::hyperlane::RequestHeadersValueItem = #context.get_request().get_header_back(#key_name);
             }
         });
         quote! {
@@ -695,7 +695,7 @@ pub(crate) fn request_headers_macro(
     inject(position, item, |context| {
         let statements = multi_headers.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestHeaders = #context.get_request_headers().await;
+                let #variable: &::hyperlane::RequestHeaders = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_request().get_headers();
             }
         });
         quote! {
@@ -732,7 +732,7 @@ pub(crate) fn request_cookie_option_macro(
     inject(position, item, |context| {
         let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: Option<::hyperlane::CookieValue> = #context.try_get_request_cookie(#key_name).await;
+                let #variable: Option<::hyperlane::CookieValue> = #context.get_request().try_get_cookie(#key_name);
             }
         });
         quote! {
@@ -769,7 +769,7 @@ pub(crate) fn request_cookie_macro(
     inject(position, item, |context| {
         let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
-                let #variable: ::hyperlane::CookieValue = #context.get_request_cookie(#key_name).await;
+                let #variable: ::hyperlane::CookieValue = #context.get_request().get_cookie(#key_name);
             }
         });
         quote! {
@@ -806,7 +806,7 @@ pub(crate) fn request_cookies_macro(
     inject(position, item, |context| {
         let statements = multi_cookies.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::Cookies = #context.get_request_cookies().await;
+                let #variable: ::hyperlane::Cookies = #context.get_request().get_cookies();
             }
         });
         quote! {
@@ -844,7 +844,7 @@ pub(crate) fn request_version_macro(
     inject(position, item, |context| {
         let statements = multi_version.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestVersion = #context.get_request_version().await;
+                let #variable: &::hyperlane::RequestVersion = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_request().get_version();
             }
         });
         quote! {
@@ -881,7 +881,7 @@ pub(crate) fn request_path_macro(
     inject(position, item, |context| {
         let statements = multi_path.variables.iter().map(|variable| {
             quote! {
-                let #variable: ::hyperlane::RequestPath = #context.get_request_path().await;
+                let #variable: &::hyperlane::RequestPath = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_request().get_path();
             }
         });
         quote! {

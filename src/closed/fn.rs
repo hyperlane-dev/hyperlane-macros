@@ -3,7 +3,7 @@ use crate::*;
 /// Expands the macro to generate an asynchronous closed call.
 ///
 /// This macro takes a `TokenStream` as input, which typically represents
-/// the context of a function or block, and inserts a call to `.closed().await`
+/// the context of a function or block, and inserts a call to `.set_closed(true)`
 /// on that context. This is useful for ensuring that a component gracefully
 /// handles being closed.
 ///
@@ -18,7 +18,7 @@ use crate::*;
 pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            let _ = #context.closed().await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).set_closed(true);
         }
     })
 }

@@ -5,19 +5,18 @@ use crate::*;
 /// # Arguments
 ///
 /// - `&proc_macro2::Ident` - The HTTP version identifier as an ident.
-/// - `proc_macro2::Span` - The span for error reporting.
 ///
 /// # Returns
 ///
 /// Returns a closure that generates the version check code.
 pub(crate) fn create_version_check(
     version: &proc_macro2::Ident,
-    span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> TokenStream2 {
-    let check_version: Ident = Ident::new(&format!("get_request_is_{version}_version"), span);
+    let version_str: String = version.to_string();
     move |context| {
+        let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{version_str}"), context.span());
         quote! {
-            if !#context.#check_version().await {
+            if !#context.get_request().get_version().#check_fn() {
                 return;
             }
         }
@@ -40,10 +39,10 @@ macro_rules! impl_version_check_macro {
             inject(
                 position,
                 item,
-                create_version_check(
-                    &proc_macro2::Ident::new(stringify!($version), proc_macro2::Span::call_site()),
+                create_version_check(&proc_macro2::Ident::new(
+                    stringify!($version),
                     proc_macro2::Span::call_site(),
-                ),
+                )),
             )
         }
         inventory::submit! {

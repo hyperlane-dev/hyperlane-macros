@@ -1,37 +1,22 @@
 use crate::*;
 
-/// Creates the method check function identifier.
-///
-/// # Arguments
-///
-/// - `&str` - The HTTP method name as a string.
-/// - `proc_macro2::Span` - The span for error reporting.
-///
-/// # Returns
-///
-/// Returns the check function identifier.
-pub(crate) fn create_method_check_ident(method: &str, span: proc_macro2::Span) -> Ident {
-    Ident::new(&format!("get_request_is_{method}_method"), span)
-}
-
 /// Creates a method check function for HTTP request validation.
 ///
 /// # Arguments
 ///
 /// - `&proc_macro2::Ident` - The HTTP method name as an ident.
-/// - `proc_macro2::Span` - The span for error reporting.
 ///
 /// # Returns
 ///
 /// Returns a closure that generates the method check code.
 pub(crate) fn create_method_check(
     method: &proc_macro2::Ident,
-    span: proc_macro2::Span,
 ) -> impl FnOnce(&Ident) -> TokenStream2 {
-    let check_method: Ident = create_method_check_ident(&method.to_string(), span);
+    let method_str: String = method.to_string();
     move |context| {
+        let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{method_str}"), context.span());
         quote! {
-            if !#context.#check_method().await {
+            if !#context.get_request().get_method().#check_fn() {
                 return;
             }
         }
@@ -64,9 +49,11 @@ pub(crate) fn methods_macro(
     match parse_context_from_signature(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
-                let check_fn: Ident = create_method_check_ident(&method.to_string(), method.span());
+                let method_str: String = method.to_string();
+                let check_fn: proc_macro2::Ident =
+                    Ident::new(&format!("is_{method_str}"), method.span());
                 quote! {
-                    #context.#check_fn().await
+                    #context.get_request().get_method().#check_fn()
                 }
             });
             inject(position, item_clone_1, |_| {
@@ -108,10 +95,10 @@ macro_rules! impl_http_method_macro {
             inject(
                 position,
                 item,
-                create_method_check(
-                    &proc_macro2::Ident::new(stringify!($method), proc_macro2::Span::call_site()),
+                create_method_check(&proc_macro2::Ident::new(
+                    stringify!($method),
                     proc_macro2::Span::call_site(),
-                ),
+                )),
             )
         }
         inventory::submit! {

@@ -21,7 +21,7 @@ pub(crate) fn referer_macro(
     inject(position, item, |context| {
         let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
-                let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.try_get_request_header_back(REFERER).await;
+                let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(REFERER);
                 if let Some(referer_header) = referer {
                     if referer_header != #referer_value {
                         return;
@@ -65,7 +65,7 @@ pub(crate) fn reject_referer_macro(
     inject(position, item, |context| {
         let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
-                let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.try_get_request_header_back(REFERER).await;
+                let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(REFERER);
                 if let Some(referer_header) = referer {
                     if referer_header == #referer_value {
                         return;

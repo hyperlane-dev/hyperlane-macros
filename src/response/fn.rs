@@ -22,7 +22,7 @@ pub(crate) fn response_status_code_macro(
     };
     inject(position, item, |context| {
         quote! {
-            #context.set_response_status_code(::hyperlane::ResponseStatusCode::from(#value as usize)).await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_status_code(::hyperlane::ResponseStatusCode::from(#value as usize));
         }
     })
 }
@@ -56,7 +56,7 @@ pub(crate) fn response_reason_phrase_macro(
     };
     inject(position, item, |context| {
         quote! {
-            #context.set_response_reason_phrase(&#value).await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_reason_phrase(&#value);
         }
     })
 }
@@ -91,12 +91,12 @@ pub(crate) fn response_header_macro(
     inject(position, item, |context| match operation {
         HeaderOperation::Add => {
             quote! {
-                #context.add_response_header(&#key, &#value).await;
+                std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().add_header(&#key, &#value);
             }
         }
         HeaderOperation::Set => {
             quote! {
-                #context.set_response_header(&#key, &#value).await;
+                std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_header(&#key, &#value);
             }
         }
     })
@@ -129,7 +129,7 @@ pub(crate) fn response_body_macro(
     let body: Expr = body_data.body;
     inject(position, item, |context| {
         quote! {
-            #context.set_response_body(&#body).await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_body(&#body);
         }
     })
 }
@@ -155,7 +155,7 @@ inventory::submit! {
 pub(crate) fn clear_response_headers_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
         quote! {
-            #context.clear_response_headers().await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().clear_headers();
         }
     })
 }
@@ -189,7 +189,7 @@ pub(crate) fn response_version_macro(
     };
     inject(position, item, |context| {
         quote! {
-            #context.set_response_version(#value).await;
+            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_version(#value);
         }
     })
 }
