@@ -21,8 +21,9 @@ pub(crate) fn response_status_code_macro(
         Err(err) => return err.to_compile_error().into(),
     };
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_status_code(::hyperlane::ResponseStatusCode::from(#value as usize));
+            #new_context.get_mut_response().set_status_code(::hyperlane::ResponseStatusCode::from(#value as usize));
         }
     })
 }
@@ -55,8 +56,9 @@ pub(crate) fn response_reason_phrase_macro(
         Err(err) => return err.to_compile_error().into(),
     };
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_reason_phrase(&#value);
+            #new_context.get_mut_response().set_reason_phrase(&#value);
         }
     })
 }
@@ -88,15 +90,18 @@ pub(crate) fn response_header_macro(
     let key: Expr = header_data.key;
     let value: Expr = header_data.value;
     let operation: HeaderOperation = header_data.operation;
-    inject(position, item, |context| match operation {
-        HeaderOperation::Add => {
-            quote! {
-                std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().add_header(&#key, &#value);
+    inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
+        match operation {
+            HeaderOperation::Add => {
+                quote! {
+                    #new_context.get_mut_response().add_header(&#key, &#value);
+                }
             }
-        }
-        HeaderOperation::Set => {
-            quote! {
-                std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_header(&#key, &#value);
+            HeaderOperation::Set => {
+                quote! {
+                    #new_context.get_mut_response().set_header(&#key, &#value);
+                }
             }
         }
     })
@@ -128,8 +133,9 @@ pub(crate) fn response_body_macro(
     let body_data: ResponseBodyData = parse_macro_input!(attr as ResponseBodyData);
     let body: Expr = body_data.body;
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_body(&#body);
+            #new_context.get_mut_response().set_body(&#body);
         }
     })
 }
@@ -154,8 +160,9 @@ inventory::submit! {
 /// - `TokenStream` - The expanded token stream with header operation.
 pub(crate) fn clear_response_headers_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().clear_headers();
+            #new_context.get_mut_response().clear_headers();
         }
     })
 }
@@ -188,8 +195,9 @@ pub(crate) fn response_version_macro(
         Err(err) => return err.to_compile_error().into(),
     };
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).get_mut_response().set_version(#value);
+            #new_context.get_mut_response().set_version(#value);
         }
     })
 }

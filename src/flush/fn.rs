@@ -12,8 +12,9 @@ use crate::*;
 /// - `TokenStream` - The expanded token stream with try_flush call.
 pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            let _ = std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).try_flush().await;
+            let _ = #new_context.try_flush().await;
         }
     })
 }

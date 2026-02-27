@@ -265,3 +265,18 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
         None => quote! { None },
     }
 }
+
+/// Generates a token stream that converts a context identifier into `&mut ::hyperlane::Context`.
+///
+/// # Arguments
+///
+/// - `&Ident` - The context variable identifier.
+///
+/// # Returns
+///
+/// - `TokenStream2` - The token stream performing the conversion.
+pub(crate) fn into_new_context(context: &Ident) -> TokenStream2 {
+    quote! {
+        std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize)
+    }
+}

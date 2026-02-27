@@ -8,6 +8,7 @@
 mod aborted;
 mod closed;
 mod common;
+mod context;
 mod filter;
 mod flush;
 mod from_stream;
@@ -29,9 +30,10 @@ mod upgrade;
 mod version;
 
 use {
-    aborted::*, closed::*, common::*, filter::*, flush::*, from_stream::*, hook::*, host::*,
-    hyperlane::*, inject::*, method::*, referer::*, reject::*, request::*, request_middleware::*,
-    response::*, response_middleware::*, route::*, send::*, stream::*, upgrade::*, version::*,
+    aborted::*, closed::*, common::*, context::*, filter::*, flush::*, from_stream::*, hook::*,
+    host::*, hyperlane::*, inject::*, method::*, referer::*, reject::*, request::*,
+    request_middleware::*, response::*, response_middleware::*, route::*, send::*, stream::*,
+    upgrade::*, version::*,
 };
 
 use {
@@ -3846,4 +3848,37 @@ pub fn try_flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
     flush_macro(item, Position::Prologue)
+}
+
+/// Generates a context reference binding statement.
+///
+/// This function-like procedural macro generates a let statement that converts
+/// a context pointer into a mutable reference to `::hyperlane::Context`.
+/// The conversion is performed through the `Into` trait with an intermediate
+/// conversion to usize.
+///
+/// # Arguments
+///
+/// - `TokenStream` - The input token stream containing a single identifier
+///   that will be used as the variable name in the generated let statement.
+///
+/// # Returns
+///
+/// - `TokenStream` - A let statement binding the specified variable name
+///   to a `&mut ::hyperlane::Context` obtained through pointer conversion.
+///
+/// # Example
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// async fn example(ctx: &mut Context) {
+///     let new_ctx: &mut Context = context!(ctx);
+///     let _ = new_ctx.try_send().await;
+/// }
+/// ```
+#[proc_macro]
+pub fn context(input: TokenStream) -> TokenStream {
+    context_macro(input)
 }

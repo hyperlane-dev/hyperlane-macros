@@ -17,8 +17,9 @@ use crate::*;
 /// Returns the expanded `TokenStream` with the closed call inserted.
 pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
+        let new_context: TokenStream2 = into_new_context(context);
         quote! {
-            std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize).set_closed(true);
+            #new_context.set_closed(true);
         }
     })
 }
