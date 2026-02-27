@@ -3875,6 +3875,7 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// async fn example(ctx: &mut Context) {
 ///     let new_ctx: &mut Context = context!(ctx);
+///     let _ = ctx.try_send().await;
 ///     let _ = new_ctx.try_send().await;
 /// }
 /// ```
