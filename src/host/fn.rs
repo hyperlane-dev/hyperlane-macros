@@ -28,13 +28,6 @@ pub(crate) fn host_macro(attr: TokenStream, item: TokenStream, position: Positio
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "host",
-        handler: Handler::WithAttrPosition(host_macro),
-    }
-}
-
 /// Rejects requests matching the specified host.
 /// Supports both single and multiple host value checks.
 ///
@@ -65,11 +58,4 @@ pub(crate) fn reject_host_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "reject_host",
-        handler: Handler::WithAttrPosition(reject_host_macro),
-    }
 }

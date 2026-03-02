@@ -29,10 +29,3 @@ pub(crate) fn filter_macro(
         }
     })
 }
-
-inventory::submit! {
-    InjectableMacro {
-        name: "filter",
-        handler: Handler::WithAttrPosition(filter_macro),
-    }
-}

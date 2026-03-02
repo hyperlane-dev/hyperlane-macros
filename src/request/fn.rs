@@ -31,13 +31,6 @@ pub(crate) fn request_body_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_body",
-        handler: Handler::WithAttrPosition(request_body_macro),
-    }
-}
-
 /// Parses request body as JSON and assigns to specified variable.
 /// Supports both single and multiple variable-type pair extraction.
 ///
@@ -69,13 +62,6 @@ pub(crate) fn request_body_json_result_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_body_json_result",
-        handler: Handler::WithAttrPosition(request_body_json_result_macro),
-    }
-}
-
 /// Parses request body as JSON and assigns to specified variable.
 /// Supports both single and multiple variable-type pair extraction.
 ///
@@ -105,13 +91,6 @@ pub(crate) fn request_body_json_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_body_json",
-        handler: Handler::WithAttrPosition(request_body_json_macro),
-    }
 }
 
 /// Gets request attribute by key and assigns to specified variable.
@@ -147,13 +126,6 @@ pub(crate) fn attribute_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "attribute_option",
-        handler: Handler::WithAttrPosition(attribute_option_macro),
-    }
-}
-
 /// Gets request attribute by key and assigns to specified variable.
 /// Supports both single and multiple attribute extraction.
 ///
@@ -187,13 +159,6 @@ pub(crate) fn attribute_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "attribute",
-        handler: Handler::WithAttrPosition(attribute_macro),
-    }
-}
-
 /// Gets all request attributes and assigns to specified variable.
 /// Supports both single and multiple variable extraction.
 ///
@@ -223,13 +188,6 @@ pub(crate) fn attributes_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "attributes",
-        handler: Handler::WithAttrPosition(attributes_macro),
-    }
 }
 
 /// Gets panic data and assigns to specified variable wrapped in Option.
@@ -262,13 +220,6 @@ pub(crate) fn task_panic_data_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "task_panic_data_option",
-        handler: Handler::WithAttrPosition(task_panic_data_option_macro),
-    }
-}
-
 /// Gets panic data and assigns to specified variable with panic on missing value.
 /// Supports both single and multiple variable extraction.
 ///
@@ -297,13 +248,6 @@ pub(crate) fn task_panic_data_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "task_panic_data",
-        handler: Handler::WithAttrPosition(task_panic_data_macro),
-    }
 }
 
 /// Gets request error data and assigns to specified variable wrapped in Option.
@@ -336,13 +280,6 @@ pub(crate) fn request_error_data_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_error_data_option",
-        handler: Handler::WithAttrPosition(request_error_data_option_macro),
-    }
-}
-
 /// Gets request error data and assigns to specified variable with panic on missing value.
 /// Supports both single and multiple variable extraction.
 ///
@@ -371,13 +308,6 @@ pub(crate) fn request_error_data_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_error_data",
-        handler: Handler::WithAttrPosition(request_error_data_macro),
-    }
 }
 
 /// Gets route parameter by key and assigns to specified variable.
@@ -410,13 +340,6 @@ pub(crate) fn route_param_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "route_param_option",
-        handler: Handler::WithAttrPosition(route_param_option_macro),
-    }
-}
-
 /// Gets route parameter by key and assigns to specified variable.
 /// Supports both single and multiple route parameter extraction.
 ///
@@ -445,13 +368,6 @@ pub(crate) fn route_param_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "route_param",
-        handler: Handler::WithAttrPosition(route_param_macro),
-    }
 }
 
 /// Gets all route parameters and assigns to specified variable.
@@ -485,13 +401,6 @@ pub(crate) fn route_params_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "route_params",
-        handler: Handler::WithAttrPosition(route_params_macro),
-    }
-}
-
 /// Gets request query parameter by key and assigns to specified variable.
 /// Supports both single and multiple parameter extraction.
 ///
@@ -522,13 +431,6 @@ pub(crate) fn request_query_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_query_option",
-        handler: Handler::WithAttrPosition(request_query_option_macro),
-    }
-}
-
 /// Gets request query parameter by key and assigns to specified variable.
 /// Supports both single and multiple parameter extraction.
 ///
@@ -557,13 +459,6 @@ pub(crate) fn request_query_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_query",
-        handler: Handler::WithAttrPosition(request_query_macro),
-    }
 }
 
 /// Gets all request query parameters and assigns to specified variable.
@@ -597,13 +492,6 @@ pub(crate) fn request_querys_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_querys",
-        handler: Handler::WithAttrPosition(request_querys_macro),
-    }
-}
-
 /// Gets request header by key and assigns to specified variable.
 /// Supports both single and multiple header extraction.
 ///
@@ -634,13 +522,6 @@ pub(crate) fn request_header_option_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_header_option",
-        handler: Handler::WithAttrPosition(request_header_option_macro),
-    }
-}
-
 /// Gets request header by key and assigns to specified variable.
 /// Supports both single and multiple header extraction.
 ///
@@ -669,13 +550,6 @@ pub(crate) fn request_header_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_header",
-        handler: Handler::WithAttrPosition(request_header_macro),
-    }
 }
 
 /// Gets all request headers and assigns to specified variable.
@@ -709,13 +583,6 @@ pub(crate) fn request_headers_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_headers",
-        handler: Handler::WithAttrPosition(request_headers_macro),
-    }
-}
-
 /// Gets request cookie by key and assigns to specified variable.
 /// Supports both single and multiple cookie extraction.
 ///
@@ -744,13 +611,6 @@ pub(crate) fn request_cookie_option_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_cookie_option",
-        handler: Handler::WithAttrPosition(request_cookie_option_macro),
-    }
 }
 
 /// Gets request cookie by key and assigns to specified variable.
@@ -783,13 +643,6 @@ pub(crate) fn request_cookie_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_cookie",
-        handler: Handler::WithAttrPosition(request_cookie_macro),
-    }
-}
-
 /// Gets all request cookies and assigns to specified variable.
 /// Supports both single and multiple variable extraction.
 ///
@@ -818,13 +671,6 @@ pub(crate) fn request_cookies_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_cookies",
-        handler: Handler::WithAttrPosition(request_cookies_macro),
-    }
 }
 
 /// Gets request version and assigns to specified variable.
@@ -859,13 +705,6 @@ pub(crate) fn request_version_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "request_version",
-        handler: Handler::WithAttrPosition(request_version_macro),
-    }
-}
-
 /// Gets request path and assigns to specified variable.
 /// Supports both single and multiple variable extraction.
 ///
@@ -895,11 +734,4 @@ pub(crate) fn request_path_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_path",
-        handler: Handler::WithAttrPosition(request_path_macro),
-    }
 }

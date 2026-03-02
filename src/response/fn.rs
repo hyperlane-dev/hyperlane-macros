@@ -28,13 +28,6 @@ pub(crate) fn response_status_code_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "response_status_code",
-        handler: Handler::WithAttrPosition(response_status_code_macro),
-    }
-}
-
 /// Sets response reason phrase from macro input.
 ///
 /// # Arguments
@@ -61,13 +54,6 @@ pub(crate) fn response_reason_phrase_macro(
             #new_context.get_mut_response().set_reason_phrase(&#value);
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "response_reason_phrase",
-        handler: Handler::WithAttrPosition(response_reason_phrase_macro),
-    }
 }
 
 /// Sets or replaces response header from macro input.
@@ -107,13 +93,6 @@ pub(crate) fn response_header_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "response_header",
-        handler: Handler::WithAttrPosition(response_header_macro),
-    }
-}
-
 /// Sets response body from macro input.
 ///
 /// # Arguments
@@ -140,13 +119,6 @@ pub(crate) fn response_body_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "response_body",
-        handler: Handler::WithAttrPosition(response_body_macro),
-    }
-}
-
 /// Clears all response headers from macro input.
 ///
 /// # Arguments
@@ -165,13 +137,6 @@ pub(crate) fn clear_response_headers_macro(item: TokenStream, position: Position
             #new_context.get_mut_response().clear_headers();
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "clear_response_headers",
-        handler: Handler::NoAttrPosition(clear_response_headers_macro),
-    }
 }
 
 /// Sets response version from macro input.
@@ -200,11 +165,4 @@ pub(crate) fn response_version_macro(
             #new_context.get_mut_response().set_version(#value);
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "response_version",
-        handler: Handler::WithAttrPosition(response_version_macro),
-    }
 }

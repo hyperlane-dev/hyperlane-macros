@@ -37,13 +37,6 @@ pub(crate) fn referer_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "referer",
-        handler: Handler::WithAttrPosition(referer_macro),
-    }
-}
-
 /// Rejects requests matching the specified Referer header.
 /// Supports both single and multiple referer value checks.
 ///
@@ -77,11 +70,4 @@ pub(crate) fn reject_referer_macro(
             #(#statements)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "reject_referer",
-        handler: Handler::WithAttrPosition(reject_referer_macro),
-    }
 }

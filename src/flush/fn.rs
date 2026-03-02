@@ -19,20 +19,6 @@ pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStr
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "try_flush",
-        handler: Handler::NoAttrPosition(try_flush_macro),
-    }
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "flush",
-        handler: Handler::NoAttrPosition(flush_macro),
-    }
-}
-
 /// Expands macro to generate async flush call.
 ///
 /// # Arguments

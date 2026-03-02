@@ -23,10 +23,3 @@ pub(crate) fn aborted_macro(item: TokenStream, position: Position) -> TokenStrea
         }
     })
 }
-
-inventory::submit! {
-    InjectableMacro {
-        name: "aborted",
-        handler: Handler::NoAttrPosition(aborted_macro),
-    }
-}

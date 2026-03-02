@@ -80,13 +80,6 @@ pub(crate) fn http_from_stream_macro(attr: TokenStream, item: TokenStream) -> To
     }
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "http_from_stream",
-        handler: Handler::WithAttr(http_from_stream_macro),
-    }
-}
-
 /// Wraps function body with WebSocket stream processing.
 ///
 /// This macro generates code that wraps the function body with a check to see if
@@ -122,12 +115,5 @@ pub(crate) fn ws_from_stream_macro(attr: TokenStream, item: TokenStream) -> Toke
             .into()
         }
         Err(err) => err.to_compile_error().into(),
-    }
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "ws_from_stream",
-        handler: Handler::WithAttr(ws_from_stream_macro),
     }
 }

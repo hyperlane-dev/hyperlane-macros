@@ -31,13 +31,6 @@ pub(crate) fn task_panic_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     gen_code.into()
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "task_panic",
-        handler: Handler::WithAttr(task_panic_macro),
-    }
-}
-
 /// Registers a request error hook.
 ///
 /// This macro takes a struct as input and registers it as a request error hook.
@@ -66,13 +59,6 @@ pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> Token
         }
     };
     gen_code.into()
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "request_error",
-        handler: Handler::WithAttr(request_error_macro),
-    }
 }
 
 /// Expands macro to add multiple pre-hook function calls.
@@ -105,13 +91,6 @@ pub(crate) fn prologue_hooks_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "prologue_hooks",
-        handler: Handler::WithAttrPosition(prologue_hooks_macro),
-    }
-}
-
 /// Expands macro to add multiple post-hook function calls.
 ///
 /// # Arguments
@@ -140,11 +119,4 @@ pub(crate) fn epilogue_hooks_macro(
             #(#hook_calls)*
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "epilogue_hooks",
-        handler: Handler::WithAttrPosition(epilogue_hooks_macro),
-    }
 }

@@ -23,10 +23,3 @@ pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream
         }
     })
 }
-
-inventory::submit! {
-    InjectableMacro {
-        name: "closed",
-        handler: Handler::NoAttrPosition(closed_macro),
-    }
-}

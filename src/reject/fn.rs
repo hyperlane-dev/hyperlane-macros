@@ -29,10 +29,3 @@ pub(crate) fn reject_macro(
         }
     })
 }
-
-inventory::submit! {
-    InjectableMacro {
-        name: "reject",
-        handler: Handler::WithAttrPosition(reject_macro),
-    }
-}

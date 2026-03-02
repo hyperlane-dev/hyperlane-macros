@@ -45,12 +45,6 @@ macro_rules! impl_version_check_macro {
                 )),
             )
         }
-        inventory::submit! {
-            InjectableMacro {
-                name: stringify!($submit_name),
-                handler: Handler::NoAttrPosition($name),
-            }
-        }
     };
 }
 

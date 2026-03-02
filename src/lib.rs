@@ -37,7 +37,6 @@ use {
 };
 
 use {
-    ::hyperlane::inventory,
     proc_macro::TokenStream,
     proc_macro2::TokenStream as TokenStream2,
     quote::quote,
@@ -49,8 +48,6 @@ use {
         *,
     },
 };
-
-inventory::collect!(InjectableMacro);
 
 /// Wraps function body with WebSocket stream processing.
 ///

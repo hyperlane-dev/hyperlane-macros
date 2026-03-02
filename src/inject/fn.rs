@@ -37,7 +37,7 @@ fn apply_macro(macro_meta: &Meta, item_stream: TokenStream, position: Position) 
         ),
         _ => panic!("Unsupported macro format in inject macro"),
     };
-    for injectable_macro in inventory::iter::<InjectableMacro>() {
+    for injectable_macro in INJECTABLE_MACROS {
         if injectable_macro.name == macro_name {
             return match injectable_macro.handler {
                 Handler::WithAttr(handler) => handler(macro_attr, item_stream),

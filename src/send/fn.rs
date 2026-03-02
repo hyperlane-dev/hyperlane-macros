@@ -18,13 +18,6 @@ pub(crate) fn try_send_macro(item: TokenStream, position: Position) -> TokenStre
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "try_send",
-        handler: Handler::NoAttrPosition(try_send_macro),
-    }
-}
-
 /// Sends the response with both headers and body, panics on failure.
 ///
 /// # Arguments
@@ -41,13 +34,6 @@ pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
             #context.send().await;
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "send",
-        handler: Handler::NoAttrPosition(send_macro),
-    }
 }
 
 /// Tries to send only the response body.
@@ -68,13 +54,6 @@ pub(crate) fn try_send_body_macro(item: TokenStream, position: Position) -> Toke
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "try_send_body",
-        handler: Handler::NoAttrPosition(try_send_body_macro),
-    }
-}
-
 /// Sends only the response body, panics on failure.
 ///
 /// # Arguments
@@ -91,13 +70,6 @@ pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStr
             #context.send_body().await;
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "send_body",
-        handler: Handler::NoAttrPosition(send_body_macro),
-    }
 }
 
 /// Tries to send only the response body with specified data.
@@ -125,13 +97,6 @@ pub(crate) fn try_send_body_with_data_macro(
     })
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "try_send_body_with_data",
-        handler: Handler::WithAttrPosition(try_send_body_with_data_macro),
-    }
-}
-
 /// Sends only the response body with specified data, panics on failure.
 ///
 /// # Arguments
@@ -155,11 +120,4 @@ pub(crate) fn send_body_with_data_macro(
             #context.send_body_with_data(#data).await;
         }
     })
-}
-
-inventory::submit! {
-    InjectableMacro {
-        name: "send_body_with_data",
-        handler: Handler::WithAttrPosition(send_body_with_data_macro),
-    }
 }

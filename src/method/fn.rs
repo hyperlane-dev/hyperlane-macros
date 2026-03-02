@@ -68,13 +68,6 @@ pub(crate) fn methods_macro(
     }
 }
 
-inventory::submit! {
-    InjectableMacro {
-        name: "methods",
-        handler: Handler::WithAttrPosition(methods_macro),
-    }
-}
-
 /// Implements an HTTP method macro.
 ///
 /// This macro generates a handler function for a specific HTTP method (e.g., GET, POST).
@@ -100,12 +93,6 @@ macro_rules! impl_http_method_macro {
                     proc_macro2::Span::call_site(),
                 )),
             )
-        }
-        inventory::submit! {
-            InjectableMacro {
-                name: stringify!($submit_name),
-                handler: Handler::NoAttrPosition($name),
-            }
         }
     };
 }
