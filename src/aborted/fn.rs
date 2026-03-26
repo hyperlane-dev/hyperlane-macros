@@ -17,7 +17,7 @@ use crate::*;
 /// Returns the expanded `TokenStream` with the aborted call inserted.
 pub(crate) fn aborted_macro(item: TokenStream, position: Position) -> TokenStream {
     inject(position, item, |context| {
-        let new_context: TokenStream2 = into_new_context(context);
+        let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.set_aborted(true);
         }

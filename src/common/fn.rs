@@ -266,7 +266,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
     }
 }
 
-/// Generates a token stream that converts a context identifier into `&mut ::hyperlane::Context`.
+/// Generates a token stream that calls `leak_mut()` method on the context identifier.
 ///
 /// # Arguments
 ///
@@ -274,9 +274,9 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 ///
 /// # Returns
 ///
-/// - `TokenStream2` - The token stream performing the conversion.
-pub(crate) fn into_new_context(context: &Ident) -> TokenStream2 {
+/// - `TokenStream2` - The token stream calling `#context.leak_mut()`.
+pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
     quote! {
-        std::convert::Into::<&mut ::hyperlane::Context>::into(#context as *mut ::hyperlane::Context as usize)
+        #context.leak_mut()
     }
 }

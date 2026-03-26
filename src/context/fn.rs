@@ -19,5 +19,5 @@ pub(crate) fn context_macro(input: TokenStream) -> TokenStream {
         Err(err) => return err.to_compile_error().into(),
     };
     let source_ctx: Ident = context_input.source_ctx;
-    into_new_context(&source_ctx).into()
+    leak_mut_context(&source_ctx).into()
 }
