@@ -3850,30 +3850,56 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Generates a context reference binding statement.
 ///
 /// This function-like procedural macro generates a let statement that converts
-/// a context pointer into a mutable reference to `::hyperlane::Context`.
+/// a context pointer into a reference to `::hyperlane::Context`.
 /// The conversion is performed through the `Into` trait with an intermediate
 /// conversion to usize.
 ///
+/// The mutability of the generated reference is determined by the optional type annotation:
+/// - If the type annotation contains `&mut`, generates `leak_mut()` call
+/// - Otherwise, generates `leak()` call (default behavior)
+///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream containing a single identifier
-///   that will be used as the variable name in the generated let statement.
+/// - `TokenStream` - The input token stream containing the variable name identifier
+///   and an optional type annotation (e.g., `ctx` or `ctx: &mut Context`).
 ///
 /// # Returns
 ///
 /// - `TokenStream` - A let statement binding the specified variable name
-///   to a `&mut ::hyperlane::Context` obtained through pointer conversion.
+///   to a `&mut ::hyperlane::Context` or `&::hyperlane::Context` obtained through pointer conversion.
 ///
-/// # Example
+/// # Examples
 ///
+/// With explicit type annotation for mutable reference:
 /// ```rust
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
 /// async fn example(ctx: &mut Context) {
-///     let new_ctx: &mut Context = context!(ctx);
-///     let _ = ctx.try_send().await;
+///     let new_ctx: &mut Context = context!(ctx: &mut Context);
 ///     let _ = new_ctx.try_send().await;
+/// }
+/// ```
+///
+/// With explicit type annotation for immutable reference:
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// async fn example(ctx: &mut Context) {
+///     let new_ctx: &::hyperlane::Context = context!(ctx: &::hyperlane::Context);
+///     let _ = new_ctx.get_request();
+/// }
+/// ```
+///
+/// Without type annotation (defaults to immutable):
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// async fn example(ctx: &mut Context) {
+///     let new_ctx = context!(ctx);
+///     let _ = new_ctx.get_request();
 /// }
 /// ```
 #[proc_macro]

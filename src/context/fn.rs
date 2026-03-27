@@ -1,14 +1,30 @@
 use crate::*;
 
+/// Checks if a type is a mutable reference type.
+///
+/// Returns true if the type is `&mut T`, false otherwise (including `&T` and other types).
+pub(crate) fn is_mutable_reference_type(ty: &Type) -> bool {
+    if let Type::Reference(type_ref) = ty {
+        type_ref.mutability.is_some()
+    } else {
+        false
+    }
+}
+
 /// Implements the context! procedural macro.
 ///
-/// This macro generates a let statement that converts a context pointer into a mutable reference.
-/// The generated code performs an unsafe conversion from a raw pointer to a mutable reference
+/// This macro generates a let statement that converts a context pointer into a reference.
+/// The generated code performs an unsafe conversion from a raw pointer to a reference
 /// through the `Into` trait.
+///
+/// The mutability of the generated reference is determined by the optional type annotation:
+/// - If the type annotation contains `&mut`, generates `leak_mut()` call
+/// - Otherwise, generates `leak()` call (default behavior)
 ///
 /// # Arguments
 ///
-/// - `TokenStream` - The input token stream containing the variable name identifier.
+/// - `TokenStream` - The input token stream containing the variable name identifier
+///   and an optional type annotation (e.g., `ctx` or `ctx: &mut Context`).
 ///
 /// # Returns
 ///
@@ -19,5 +35,13 @@ pub(crate) fn context_macro(input: TokenStream) -> TokenStream {
         Err(err) => return err.to_compile_error().into(),
     };
     let source_ctx: Ident = context_input.source_ctx;
-    leak_mut_context(&source_ctx).into()
+    let is_mut: bool = context_input
+        .ty
+        .as_ref()
+        .is_some_and(is_mutable_reference_type);
+    if is_mut {
+        leak_mut_context(&source_ctx).into()
+    } else {
+        leak_context(&source_ctx).into()
+    }
 }

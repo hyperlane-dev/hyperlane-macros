@@ -280,3 +280,18 @@ pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
         #context.leak_mut()
     }
 }
+
+/// Generates a token stream that calls `leak()` method on the context identifier.
+///
+/// # Arguments
+///
+/// - `&Ident` - The context variable identifier.
+///
+/// # Returns
+///
+/// - `TokenStream2` - The token stream calling `#context.leak()`.
+pub(crate) fn leak_context(context: &Ident) -> TokenStream2 {
+    quote! {
+        #context.leak()
+    }
+}
