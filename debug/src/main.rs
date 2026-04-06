@@ -92,7 +92,7 @@ impl ServerHook for UpgradeHook {
 
     #[epilogue_macros(
         ws_upgrade_type,
-        response_body(&vec![]),
+        response_body(Vec::new()),
         response_status_code(101),
         response_header(UPGRADE => WEBSOCKET),
         response_header(CONNECTION => UPGRADE),
