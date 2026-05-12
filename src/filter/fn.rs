@@ -21,10 +21,10 @@ pub(crate) fn filter_macro(
     position: Position,
 ) -> TokenStream {
     let condition: Expr = parse_macro_input!(attr as Expr);
-    inject(position, item, |_| {
+    inject(position, item, |_, _| {
         quote! {
             if !(#condition) {
-                return;
+                return ::hyperlane::Status::Reject;
             }
         }
     })

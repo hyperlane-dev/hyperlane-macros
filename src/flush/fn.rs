@@ -1,6 +1,6 @@
 use crate::*;
 
-/// Expands macro to generate async try_flush call.
+/// Expands macro to generate async try_flush call on stream.
 ///
 /// # Arguments
 ///
@@ -11,15 +11,14 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with try_flush call.
 pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        let new_context: TokenStream2 = leak_mut_context(context);
+    inject(position, item, |_, stream| {
         quote! {
-            let _ = #new_context.try_flush().await;
+            let _ = #stream.try_flush().await;
         }
     })
 }
 
-/// Expands macro to generate async flush call.
+/// Expands macro to generate async flush call on stream.
 ///
 /// # Arguments
 ///
@@ -30,10 +29,9 @@ pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStr
 ///
 /// - `TokenStream` - The expanded token stream with flush call.
 pub(crate) fn flush_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        quote! {{
-            let new_context: &mut Context = (#context as *mut Context as usize).into();
-            new_context.flush().await;
-        }}
+    inject(position, item, |_, stream| {
+        quote! {
+            #stream.flush().await;
+        }
     })
 }

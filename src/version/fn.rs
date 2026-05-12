@@ -11,13 +11,13 @@ use crate::*;
 /// Returns a closure that generates the version check code.
 pub(crate) fn create_version_check(
     version: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
     let version_str: String = version.to_string();
-    move |context| {
+    move |context, _| {
         let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{version_str}"), context.span());
         quote! {
             if !#context.get_request().get_version().#check_fn() {
-                return;
+                return ::hyperlane::Status::Reject;
             }
         }
     }
@@ -41,7 +41,7 @@ macro_rules! impl_version_check_macro {
                 item,
                 create_version_check(&proc_macro2::Ident::new(
                     stringify!($version),
-                    proc_macro2::Span::call_site(),
+                    Span::call_site(),
                 )),
             )
         }

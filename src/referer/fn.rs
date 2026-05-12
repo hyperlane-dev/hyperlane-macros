@@ -18,16 +18,16 @@ pub(crate) fn referer_macro(
     position: Position,
 ) -> TokenStream {
     let multi_referer: MultiRefererData = parse_macro_input!(attr as MultiRefererData);
-    inject(position, item, |context| {
+    inject(position, item, |context, _| {
         let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
                 let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(REFERER);
                 if let Some(referer_header) = referer {
                     if referer_header != #referer_value {
-                        return;
+                        return ::hyperlane::Status::Reject;
                     }
                 } else {
-                    return;
+                    return ::hyperlane::Status::Reject;
                 }
             }
         });
@@ -55,13 +55,13 @@ pub(crate) fn reject_referer_macro(
     position: Position,
 ) -> TokenStream {
     let multi_referer: MultiRefererData = parse_macro_input!(attr as MultiRefererData);
-    inject(position, item, |context| {
+    inject(position, item, |context, _| {
         let statements = multi_referer.referer_values.iter().map(|referer_value| {
             quote! {
                 let referer: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(REFERER);
                 if let Some(referer_header) = referer {
                     if referer_header == #referer_value {
-                        return;
+                        return ::hyperlane::Status::Reject;
                     }
                 }
             }

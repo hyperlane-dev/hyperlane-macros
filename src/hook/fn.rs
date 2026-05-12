@@ -79,10 +79,10 @@ pub(crate) fn prologue_hooks_macro(
 ) -> TokenStream {
     let functions: Punctuated<Expr, Token![,]> =
         parse_macro_input!(attr with Punctuated::parse_terminated);
-    inject(position, item, |context| {
+    inject(position, item, |context, stream| {
         let hook_calls = functions.iter().map(|function_expr| {
             quote! {
-                let _ = #function_expr(#context).await;
+                let _ = #function_expr(#stream, #context).await;
             }
         });
         quote! {
@@ -109,10 +109,10 @@ pub(crate) fn epilogue_hooks_macro(
 ) -> TokenStream {
     let functions: Punctuated<Expr, Token![,]> =
         parse_macro_input!(attr with Punctuated::parse_terminated);
-    inject(position, item, |context| {
+    inject(position, item, |context, stream| {
         let hook_calls = functions.iter().map(|function_expr| {
             quote! {
-                let _ = #function_expr(#context).await;
+                let _ = #function_expr(#stream, #context).await;
             }
         });
         quote! {

@@ -11,13 +11,13 @@ use crate::*;
 /// Returns a closure that generates the method check code.
 pub(crate) fn create_method_check(
     method: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
     let method_str: String = method.to_string();
-    move |context| {
+    move |context, _| {
         let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{method_str}"), context.span());
         quote! {
             if !#context.get_request().get_method().#check_fn() {
-                return;
+                return ::hyperlane::Status::Reject;
             }
         }
     }
@@ -44,8 +44,8 @@ pub(crate) fn methods_macro(
 ) -> TokenStream {
     let item_clone_1: TokenStream = item.clone();
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
-    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
-    let sig: &Signature = &input_fn.sig;
+    let mut input_fn: ItemFn = parse_macro_input!(item as ItemFn);
+    let sig: &mut Signature = &mut input_fn.sig;
     match parse_context_from_signature(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {
@@ -56,10 +56,10 @@ pub(crate) fn methods_macro(
                     #context.get_request().get_method().#check_fn()
                 }
             });
-            inject(position, item_clone_1, |_| {
+            inject(position, item_clone_1, |_, _| {
                 quote! {
                     if !(#(#method_checks)||*) {
-                        return;
+                        return ::hyperlane::Status::Reject;
                     }
                 }
             })
@@ -90,7 +90,7 @@ macro_rules! impl_http_method_macro {
                 item,
                 create_method_check(&proc_macro2::Ident::new(
                     stringify!($method),
-                    proc_macro2::Span::call_site(),
+                    Span::call_site(),
                 )),
             )
         }

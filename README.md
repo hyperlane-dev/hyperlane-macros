@@ -76,13 +76,10 @@ cargo add hyperlane-macros
 
 ### Send Operation Macros
 
-- `#[try_send]` - Try to send complete response (headers and body) after function execution (returns Result)
-- `#[send]` - Send complete response (headers and body) after function execution (**panics on failure**)
-- `#[try_send_body]` - Try to send only response body after function execution (returns Result)
-- `#[send_body]` - Send only response body after function execution (**panics on failure**)
-- `#[try_send_body_with_data("data")]` - Try to send only response body with specified data after function execution (returns Result)
-
-- `#[send_body_with_data("data")]` - Send only response body with specified data after function execution (**panics on failure**)
+- `#[try_send]` - Try to send data via stream after function execution (returns Result). Defaults to sending the response built from context.
+- `#[try_send(data_expr)]` - Try to send the specified data expression via stream after function execution (returns Result)
+- `#[send]` - Send data via stream after function execution (**panics on failure**). Defaults to sending the response built from context.
+- `#[send(data_expr)]` - Send the specified data expression via stream after function execution (**panics on failure**)
 
 ### Flush Macros
 
@@ -231,10 +228,10 @@ cargo add hyperlane-macros
 
 ### Stream Processing Macros
 
-- `#[http_from_stream]` - Wraps function body with HTTP stream processing. The function body only executes if data is successfully read from the HTTP stream.
-- `#[http_from_stream(variable_name)]` - Wraps function body with HTTP stream processing, storing data in specified variable name.
-- `#[ws_from_stream]` - Wraps function body with WebSocket stream processing. The function body only executes if data is successfully read from the WebSocket stream.
-- `#[ws_from_stream(variable_name)]` - Wraps function body with WebSocket stream processing, storing data in specified variable name.
+- `#[try_get_http_request]` - Wraps function body with HTTP stream processing. The function body only executes if data is successfully read from the HTTP stream.
+- `#[try_get_http_request(variable_name)]` - Wraps function body with HTTP stream processing, storing data in specified variable name.
+- `#[try_get_websocket_request]` - Wraps function body with WebSocket stream processing. The function body only executes if data is successfully read from the WebSocket stream.
+- `#[try_get_websocket_request(variable_name)]` - Wraps function body with WebSocket stream processing, storing data in specified variable name.
 
 ### Response Header Macros
 

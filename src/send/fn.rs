@@ -1,123 +1,75 @@
 use crate::*;
 
-/// Tries to send the response with both headers and body.
+/// Tries to send data via stream after function execution.
+///
+/// If an attribute argument is provided, it is used as the data to send.
+/// If no argument is provided, the response is built from the context automatically.
 ///
 /// # Arguments
 ///
+/// - `TokenStream` - Optional attribute containing the data expression to send.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with try send operation.
-pub(crate) fn try_send_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        quote! {
-            let _ = #context.try_send().await;
+pub(crate) fn try_send_macro(
+    attr: TokenStream,
+    item: TokenStream,
+    position: Position,
+) -> TokenStream {
+    let data_expr: Option<Expr> = if attr.is_empty() {
+        None
+    } else {
+        let data: SendData = parse_macro_input!(attr as SendData);
+        Some(data.data)
+    };
+    inject(position, item, |context, stream| match data_expr {
+        Some(expr) => {
+            quote! {
+                let _ = #stream.try_send(#expr).await;
+            }
+        }
+        None => {
+            quote! {
+                let _ = #stream.try_send(#context.get_mut_response().build()).await;
+            }
         }
     })
 }
 
-/// Sends the response with both headers and body, panics on failure.
+/// Sends data via stream after function execution, panics on failure.
+///
+/// If an attribute argument is provided, it is used as the data to send.
+/// If no argument is provided, the response is built from the context automatically.
 ///
 /// # Arguments
 ///
+/// - `TokenStream` - Optional attribute containing the data expression to send.
 /// - `TokenStream` - The input token stream to process.
 /// - `Position` - The position to inject the code.
 ///
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with send operation that panics on failure.
-pub(crate) fn send_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        quote! {
-            #context.send().await;
+pub(crate) fn send_macro(attr: TokenStream, item: TokenStream, position: Position) -> TokenStream {
+    let data_expr: Option<Expr> = if attr.is_empty() {
+        None
+    } else {
+        let data: SendData = parse_macro_input!(attr as SendData);
+        Some(data.data)
+    };
+    inject(position, item, |context, stream| match data_expr {
+        Some(expr) => {
+            quote! {
+                #stream.send(#expr).await;
+            }
         }
-    })
-}
-
-/// Tries to send only the response body.
-///
-/// # Arguments
-///
-/// - `TokenStream` - The input token stream to process.
-/// - `Position` - The position to inject the code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with body try send operation.
-pub(crate) fn try_send_body_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        quote! {
-            let _ = #context.try_send_body().await;
-        }
-    })
-}
-
-/// Sends only the response body, panics on failure.
-///
-/// # Arguments
-///
-/// - `TokenStream` - The input token stream to process.
-/// - `Position` - The position to inject the code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with body send operation that panics on failure.
-pub(crate) fn send_body_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        quote! {
-            #context.send_body().await;
-        }
-    })
-}
-
-/// Tries to send only the response body with specified data.
-///
-/// # Arguments
-///
-/// - `attr` - The attribute token stream containing the data to send.
-/// - `item` - The input token stream to process.
-/// - `position` - The position to inject the code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with body try send operation.
-pub(crate) fn try_send_body_with_data_macro(
-    attr: TokenStream,
-    item: TokenStream,
-    position: Position,
-) -> TokenStream {
-    let send_data: SendData = parse_macro_input!(attr as SendData);
-    let data: Expr = send_data.data;
-    inject(position, item, |context| {
-        quote! {
-            let _ = #context.try_send_body_with_data(#data).await;
-        }
-    })
-}
-
-/// Sends only the response body with specified data, panics on failure.
-///
-/// # Arguments
-///
-/// - `attr` - The attribute token stream containing the data to send.
-/// - `item` - The input token stream to process.
-/// - `position` - The position to inject the code.
-///
-/// # Returns
-///
-/// - `TokenStream` - The expanded token stream with body send operation that panics on failure.
-pub(crate) fn send_body_with_data_macro(
-    attr: TokenStream,
-    item: TokenStream,
-    position: Position,
-) -> TokenStream {
-    let send_data: SendData = parse_macro_input!(attr as SendData);
-    let data: Expr = send_data.data;
-    inject(position, item, |context| {
-        quote! {
-            #context.send_body_with_data(#data).await;
+        None => {
+            quote! {
+                #stream.send(#context.get_mut_response().build()).await;
+            }
         }
     })
 }

@@ -3,8 +3,8 @@ use crate::*;
 /// Expands the macro to generate an asynchronous closed call.
 ///
 /// This macro takes a `TokenStream` as input, which typically represents
-/// the context of a function or block, and inserts a call to `.set_closed(true)`
-/// on that context. This is useful for ensuring that a component gracefully
+/// the stream of a function or block, and inserts a call to `.set_closed(true)`
+/// on that stream. This is useful for ensuring that a component gracefully
 /// handles being closed.
 ///
 /// # Arguments
@@ -16,10 +16,9 @@ use crate::*;
 ///
 /// Returns the expanded `TokenStream` with the closed call inserted.
 pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context| {
-        let new_context: TokenStream2 = leak_mut_context(context);
+    inject(position, item, |_, stream| {
         quote! {
-            #new_context.set_closed(true);
+            #stream.set_closed(true);
         }
     })
 }

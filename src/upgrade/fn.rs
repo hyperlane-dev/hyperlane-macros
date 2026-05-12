@@ -11,14 +11,14 @@ use crate::*;
 /// Returns a closure that generates the protocol check code.
 pub(crate) fn create_protocol_check(
     upgrade_type: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
     let upgrade_type_str: String = upgrade_type.to_string();
-    move |context| {
+    move |context, _| {
         let check_fn: proc_macro2::Ident =
             Ident::new(&format!("is_{upgrade_type_str}"), context.span());
         quote! {
             if !#context.get_request().get_upgrade_type().#check_fn() {
-                return;
+                return ::hyperlane::Status::Reject;
             }
         }
     }
@@ -42,7 +42,7 @@ macro_rules! impl_protocol_check_macro {
                 item,
                 create_protocol_check(&proc_macro2::Ident::new(
                     stringify!($upgrade_type),
-                    proc_macro2::Span::call_site(),
+                    Span::call_site(),
                 )),
             )
         }

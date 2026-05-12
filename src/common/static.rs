@@ -5,10 +5,6 @@ use crate::*;
 /// This array contains all the macro handlers that can be injected using the `inject` macro.
 pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
     InjectableMacro {
-        name: "aborted",
-        handler: Handler::NoAttrPosition(aborted_macro),
-    },
-    InjectableMacro {
         name: "closed",
         handler: Handler::NoAttrPosition(closed_macro),
     },
@@ -242,35 +238,19 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
     },
     InjectableMacro {
         name: "try_send",
-        handler: Handler::NoAttrPosition(try_send_macro),
+        handler: Handler::WithAttrPosition(try_send_macro),
     },
     InjectableMacro {
         name: "send",
-        handler: Handler::NoAttrPosition(send_macro),
+        handler: Handler::WithAttrPosition(send_macro),
     },
     InjectableMacro {
-        name: "try_send_body",
-        handler: Handler::NoAttrPosition(try_send_body_macro),
+        name: "try_get_http_request",
+        handler: Handler::WithAttr(try_get_http_request_macro),
     },
     InjectableMacro {
-        name: "send_body",
-        handler: Handler::NoAttrPosition(send_body_macro),
-    },
-    InjectableMacro {
-        name: "try_send_body_with_data",
-        handler: Handler::WithAttrPosition(try_send_body_with_data_macro),
-    },
-    InjectableMacro {
-        name: "send_body_with_data",
-        handler: Handler::WithAttrPosition(send_body_with_data_macro),
-    },
-    InjectableMacro {
-        name: "http_from_stream",
-        handler: Handler::WithAttr(http_from_stream_macro),
-    },
-    InjectableMacro {
-        name: "ws_from_stream",
-        handler: Handler::WithAttr(ws_from_stream_macro),
+        name: "try_get_websocket_request",
+        handler: Handler::WithAttr(try_get_websocket_request_macro),
     },
     InjectableMacro {
         name: "ws_upgrade_type",

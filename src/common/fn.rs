@@ -1,77 +1,111 @@
 use crate::*;
 
-/// Expands macro with code inserted before method body.
+/// Expands macro with code inserted before method body, providing both context and stream identifiers.
 ///
 /// # Arguments
 ///
 /// - `TokenStream` - The input token stream to process.
-/// - `FnOnce(&Ident) -> TokenStream2` - Function to generate code inserted before.
+/// - `FnOnce(&Ident, &Ident) -> TokenStream2` - Function to generate code inserted before, receiving context and stream idents.
 ///
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with inserted code.
 fn inject_at_start(
     input: TokenStream,
-    before_fn: impl FnOnce(&Ident) -> TokenStream2,
+    before_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
 ) -> TokenStream {
-    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &Signature = &input_fn.sig;
+    let sig: &mut Signature = &mut input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_signature(sig) {
-        Ok(context) => {
-            let before_code: TokenStream2 = before_fn(context);
-            let stmts: &Vec<Stmt> = &block.stmts;
-            let gen_code: TokenStream2 = quote! {
-                #(#attrs)*
-                #vis #sig {
-                    #before_code
-                    #(#stmts)*
-                }
-            };
-            gen_code.into()
-        }
+        Ok(context) => match parse_stream_from_signature(sig) {
+            Ok(stream) => {
+                let before_code: TokenStream2 = before_fn(&context, &stream);
+                let stmts: &Vec<Stmt> = &block.stmts;
+                let gen_code: TokenStream2 = quote! {
+                    #(#attrs)*
+                    #vis #sig {
+                        #before_code
+                        #(#stmts)*
+                    }
+                };
+                gen_code.into()
+            }
+            Err(err) => err.to_compile_error().into(),
+        },
         Err(err) => err.to_compile_error().into(),
     }
 }
 
-/// Expands macro with code inserted after method body.
+/// Expands macro with code inserted after method body, providing both context and stream identifiers.
 ///
 /// # Arguments
 ///
 /// - `TokenStream` - The input `TokenStream` to process.
-/// - `FnOnce(&Ident) -> TokenStream2` - A closure that takes a context identifier and returns a `TokenStream` to be inserted at the end of the method.
-fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStream2) -> TokenStream {
-    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+/// - `FnOnce(&Ident, &Ident) -> TokenStream2` - A closure that takes context and stream identifiers and returns a `TokenStream` to be inserted at the end of the method.
+fn inject_at_end(
+    input: TokenStream,
+    after_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
+) -> TokenStream {
+    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &Signature = &input_fn.sig;
+    let sig: &mut Signature = &mut input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_signature(sig) {
-        Ok(context) => {
-            let after_code: TokenStream2 = after_fn(context);
-            let stmts: &Vec<Stmt> = &block.stmts;
-            let gen_code: TokenStream2 = quote! {
-                #(#attrs)*
-                #vis #sig {
-                    #(#stmts)*
-                    #after_code
-                }
-            };
-            gen_code.into()
-        }
+        Ok(context) => match parse_stream_from_signature(sig) {
+            Ok(stream) => {
+                let after_code: TokenStream2 = after_fn(&context, &stream);
+                let stmts: &Vec<Stmt> = &block.stmts;
+                let (leading_stmts, tail_expr) = if let Some((last, leading)) = stmts.split_last() {
+                    match last {
+                        Stmt::Expr(expr, None) => (leading, Some(quote! { #expr })),
+                        _ => (stmts.as_slice(), None),
+                    }
+                } else {
+                    (stmts.as_slice(), None)
+                };
+                let normalized_leading: Vec<TokenStream2> = leading_stmts
+                    .iter()
+                    .map(|stmt| match stmt {
+                        Stmt::Expr(expr, None) => quote! { #expr; },
+                        _ => quote! { #stmt },
+                    })
+                    .collect();
+                let gen_code: TokenStream2 = match tail_expr {
+                    Some(expr) => quote! {
+                        #(#attrs)*
+                        #vis #sig {
+                            #(#normalized_leading)*
+                            #after_code
+                            #expr
+                        }
+                    },
+                    None => quote! {
+                        #(#attrs)*
+                        #vis #sig {
+                            #(#normalized_leading)*
+                            #after_code
+                        }
+                    },
+                };
+                gen_code.into()
+            }
+            Err(err) => err.to_compile_error().into(),
+        },
         Err(err) => err.to_compile_error().into(),
     }
 }
 
-/// Injects code into a method at a specified position.
+/// Injects code into a method at a specified position, providing both context and stream identifiers.
 ///
 /// # Arguments
 ///
 /// - `Position` - The position at which to inject the code (`Prologue` or `Epilogue`).
 /// - `TokenStream` - The input `TokenStream` of the method to modify.
-/// - `FnOnce(&Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the method's context identifier.
+/// - `FnOnce(&Ident, &Ident) -> TokenStream2` - A closure that generates the code to be injected, based on the method's context and stream identifiers.
 ///
 /// # Returns
 ///
@@ -79,7 +113,7 @@ fn inject_at_end(input: TokenStream, after_fn: impl FnOnce(&Ident) -> TokenStrea
 pub(crate) fn inject(
     position: Position,
     input: TokenStream,
-    hook: impl FnOnce(&Ident) -> TokenStream2,
+    hook: impl FnOnce(&Ident, &Ident) -> TokenStream2,
 ) -> TokenStream {
     match position {
         Position::Prologue => inject_at_start(input, hook),
@@ -91,20 +125,27 @@ pub(crate) fn inject(
 ///
 /// # Arguments
 ///
-/// - `&Signature` - The function signature to parse.
+/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
 ///
 /// # Returns
 ///
-/// - `syn::Result<&Ident>` - Returns a `syn::Result` containing the context identifier if successful, or an error otherwise.
-#[allow(dead_code)]
-pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
-    match sig.inputs.first() {
+/// - `syn::Result<Ident>` - Returns a `syn::Result` containing the context identifier if successful, or an error otherwise.
+#[allow(dead_code, clippy::replace_box)]
+pub(crate) fn parse_context_from_fn(sig: &mut Signature) -> syn::Result<Ident> {
+    let default_ident: Ident = Ident::new("ctx", Span::call_site());
+    match sig.inputs.first_mut() {
         Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-            Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
-            Pat::Wild(wild) => Err(syn::Error::new_spanned(
-                wild,
-                "The argument cannot be anonymous `_`, please use a named identifier",
-            )),
+            Pat::Ident(pat_ident) => Ok(pat_ident.ident.clone()),
+            Pat::Wild(_) => {
+                pat_type.pat = Box::new(Pat::Ident(PatIdent {
+                    attrs: Vec::new(),
+                    by_ref: None,
+                    mutability: None,
+                    ident: default_ident.clone(),
+                    subpat: None,
+                }));
+                Ok(default_ident)
+            }
             _ => Err(syn::Error::new_spanned(
                 &pat_type.pat,
                 "expected identifier as first argument",
@@ -121,21 +162,28 @@ pub(crate) fn parse_context_from_fn(sig: &Signature) -> syn::Result<&Ident> {
 ///
 /// # Arguments
 ///
-/// - `&Signature` - The method signature to parse.
+/// - `&mut Signature` - The method signature to parse. Modified in place if anonymous `_` is found.
 ///
 /// # Returns
 ///
-/// - `syn::Result<&Ident>` - Returns the context identifier from the second parameter.
-#[allow(dead_code)]
-pub(crate) fn parse_self_from_method(sig: &Signature) -> syn::Result<&Ident> {
+/// - `syn::Result<Ident>` - Returns the context identifier from the second parameter.
+#[allow(dead_code, clippy::replace_box)]
+pub(crate) fn parse_self_from_method(sig: &mut Signature) -> syn::Result<Ident> {
+    let default_ident: Ident = Ident::new("ctx", Span::call_site());
     match sig.inputs.first() {
-        Some(FnArg::Receiver(_)) => match sig.inputs.iter().nth(1) {
+        Some(FnArg::Receiver(_)) => match sig.inputs.iter_mut().nth(1) {
             Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-                Pat::Ident(pat_ident) => Ok(&pat_ident.ident),
-                Pat::Wild(wild) => Err(syn::Error::new_spanned(
-                    wild,
-                    "The context argument cannot be anonymous `_`, please use a named identifier",
-                )),
+                Pat::Ident(pat_ident) => Ok(pat_ident.ident.clone()),
+                Pat::Wild(_) => {
+                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
+                        attrs: Vec::new(),
+                        by_ref: None,
+                        mutability: None,
+                        ident: default_ident.clone(),
+                        subpat: None,
+                    }));
+                    Ok(default_ident)
+                }
                 _ => Err(syn::Error::new_spanned(
                     &pat_type.pat,
                     "expected identifier as second argument (context)",
@@ -185,6 +233,38 @@ fn is_context_type(ty: &Type) -> bool {
     false
 }
 
+/// Checks if a type matches `::hyperlane::Stream`.
+///
+/// This function checks if the given type is a reference to `::hyperlane::Stream`.
+///
+/// # Arguments
+///
+/// - `&Type` - The type to check.
+///
+/// # Returns
+///
+/// - `bool` - Returns `true` if the type is `&::hyperlane::Stream` or `&mut Stream`, `false` otherwise.
+fn is_stream_type(ty: &Type) -> bool {
+    if let Type::Reference(type_ref) = ty
+        && let Type::Path(type_path) = &*type_ref.elem
+    {
+        let path: &Path = &type_path.path;
+        if path.segments.len() >= 2 {
+            let segments: Vec<_> = path.segments.iter().collect();
+            if segments.len() >= 2 {
+                let last_two: &[&PathSegment] = &segments[segments.len() - 2..];
+                if last_two[0].ident == "hyperlane" && last_two[1].ident == "Stream" {
+                    return true;
+                }
+            }
+        }
+        if path.segments.len() == 1 && path.segments[0].ident == "Stream" {
+            return true;
+        }
+    }
+    false
+}
+
 /// Parses context identifier from function signature by searching all parameters.
 ///
 /// This function iterates through all function parameters and returns the first one
@@ -192,26 +272,33 @@ fn is_context_type(ty: &Type) -> bool {
 /// 1. Methods with self: Searches from the second parameter onwards
 /// 2. Functions without self: Searches from the first parameter onwards
 /// 3. Context parameter can be at any position
+/// 4. Anonymous `_` parameters are automatically renamed to `ctx`
 ///
 /// # Arguments
 ///
-/// - `&Signature` - The function signature to parse.
+/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
 ///
 /// # Returns
 ///
-/// - `syn::Result<&Ident>` - Returns the context identifier.
-pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<&Ident> {
-    for arg in sig.inputs.iter() {
+/// - `syn::Result<Ident>` - Returns the context identifier.
+#[allow(clippy::replace_box)]
+pub(crate) fn parse_context_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
+    let default_ident: Ident = Ident::new("ctx", Span::call_site());
+    for arg in sig.inputs.iter_mut() {
         if let FnArg::Typed(pat_type) = arg
             && is_context_type(&pat_type.ty)
         {
             match &*pat_type.pat {
-                Pat::Ident(pat_ident) => return Ok(&pat_ident.ident),
-                Pat::Wild(wild) => {
-                    return Err(syn::Error::new_spanned(
-                        wild,
-                        "The context argument cannot be anonymous `_`, please use a named identifier",
-                    ));
+                Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
+                Pat::Wild(_) => {
+                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
+                        attrs: Vec::new(),
+                        by_ref: None,
+                        mutability: None,
+                        ident: default_ident.clone(),
+                        subpat: None,
+                    }));
+                    return Ok(default_ident);
                 }
                 _ => {
                     return Err(syn::Error::new_spanned(
@@ -225,6 +312,56 @@ pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<&Iden
     Err(syn::Error::new_spanned(
         &sig.inputs,
         "expected at least one parameter of type &::hyperlane::Context",
+    ))
+}
+
+/// Parses stream identifier from function signature by searching all parameters.
+///
+/// This function iterates through all function parameters and returns the first one
+/// that has type `::hyperlane::Stream`. It supports:
+/// 1. Methods with self: Searches from the second parameter onwards
+/// 2. Functions without self: Searches from the first parameter onwards
+/// 3. Stream parameter can be at any position
+/// 4. Anonymous `_` parameters are automatically renamed to `stream`
+///
+/// # Arguments
+///
+/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
+///
+/// # Returns
+///
+/// - `syn::Result<Ident>` - Returns the stream identifier.
+#[allow(clippy::replace_box)]
+pub(crate) fn parse_stream_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
+    let default_ident: Ident = Ident::new("stream", Span::call_site());
+    for arg in sig.inputs.iter_mut() {
+        if let FnArg::Typed(pat_type) = arg
+            && is_stream_type(&pat_type.ty)
+        {
+            match &*pat_type.pat {
+                Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
+                Pat::Wild(_) => {
+                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
+                        attrs: Vec::new(),
+                        by_ref: None,
+                        mutability: None,
+                        ident: default_ident.clone(),
+                        subpat: None,
+                    }));
+                    return Ok(default_ident);
+                }
+                _ => {
+                    return Err(syn::Error::new_spanned(
+                        &pat_type.pat,
+                        "expected identifier for stream parameter",
+                    ));
+                }
+            }
+        }
+    }
+    Err(syn::Error::new_spanned(
+        &sig.inputs,
+        "expected at least one parameter of type &::hyperlane::Stream",
     ))
 }
 
@@ -277,7 +414,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 /// - `TokenStream2` - The token stream calling `#context.leak_mut()`.
 pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
     quote! {
-        #context.leak_mut()
+        unsafe { #context.leak_mut() }
     }
 }
 
@@ -292,6 +429,6 @@ pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
 /// - `TokenStream2` - The token stream calling `#context.leak()`.
 pub(crate) fn leak_context(context: &Ident) -> TokenStream2 {
     quote! {
-        #context.leak()
+        unsafe { #context.leak() }
     }
 }

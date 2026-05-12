@@ -5,7 +5,6 @@
 //! attribute macros that simplify HTTP request handling, protocol
 //! validation, response management, and request data extraction.
 
-mod aborted;
 mod closed;
 mod common;
 mod context;
@@ -30,15 +29,14 @@ mod upgrade;
 mod version;
 
 use {
-    aborted::*, closed::*, common::*, context::*, filter::*, flush::*, from_stream::*, hook::*,
-    host::*, hyperlane::*, inject::*, method::*, referer::*, reject::*, request::*,
-    request_middleware::*, response::*, response_middleware::*, route::*, send::*, stream::*,
-    upgrade::*, version::*,
+    closed::*, common::*, context::*, filter::*, flush::*, from_stream::*, hook::*, host::*,
+    hyperlane::*, inject::*, method::*, referer::*, reject::*, request::*, request_middleware::*,
+    response::*, response_middleware::*, route::*, send::*, stream::*, upgrade::*, version::*,
 };
 
 use {
     proc_macro::TokenStream,
-    proc_macro2::TokenStream as TokenStream2,
+    proc_macro2::{Span, TokenStream as TokenStream2},
     quote::quote,
     syn::{
         Ident, Token,
@@ -76,16 +74,15 @@ use {
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[ws_upgrade_type]
-///     #[ws_from_stream]
-///     async fn handle(self, ctx: &mut Context) {
-///         let body: &RequestBody = ctx.get_request().get_body();
+///     #[try_get_websocket_request(body)]
+///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await;
+///         stream.send_list(body_list).await;
 ///     }
 /// }
 /// ```
@@ -100,30 +97,29 @@ use {
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[ws_upgrade_type]
-///     #[ws_from_stream(request)]
-///     async fn handle(self, ctx: &mut Context) {
-///         let body: &RequestBody = request.get_body();
-///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(body);
-///         ctx.send_body_list_with_data(&body_list).await;
+///     #[try_get_websocket_request(request)]
+///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
+///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
+///         stream.send_list(body_list).await;
 ///     }
 /// }
 ///
 /// impl Websocket {
-///     #[ws_from_stream(request)]
-///     async fn ws_from_stream_with_ref_self(&self, ctx: &mut Context) {}
+///     #[try_get_websocket_request(request)]
+///     async fn try_get_websocket_request_with_ref_self(&self, stream: &mut Stream, _: &mut Context) -> Status {}
 /// }
 ///
-/// #[ws_from_stream]
-/// async fn standalone_ws_from_stream_handler(ctx: &mut Context) {}
+/// #[try_get_websocket_request]
+/// async fn standalone_try_get_websocket_request_handler(stream: &mut Stream, _: &mut Context) -> Status {}
 /// ```
 #[proc_macro_attribute]
-pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
-    ws_from_stream_macro(attr, item)
+pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_websocket_request_macro(attr, item)
 }
 
 /// Wraps function body with HTTP stream processing.
@@ -149,16 +145,16 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http_from_stream")]
+/// #[route("/try_get_http_request")]
 /// struct HttpFromStreamTest;
 ///
 /// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[http_from_stream]
-///     async fn handle(self, ctx: &mut Context) {}
+///     #[try_get_http_request]
+///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {}
 /// }
 /// ```
 ///
@@ -168,29 +164,29 @@ pub fn ws_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http_from_stream")]
+/// #[route("/try_get_http_request")]
 /// struct HttpFromStreamTest;
 ///
 /// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
-///     #[http_from_stream(_request)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     #[try_get_http_request(_request)]
+///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {}
 /// }
 ///
 /// impl HttpFromStreamTest {
-///     #[http_from_stream(_request)]
-///     async fn http_from_stream_with_ref_self(&self, ctx: &mut Context) {}
+///     #[try_get_http_request(_request)]
+///     async fn try_get_http_request_with_ref_self(&self, stream: &mut Stream, _: &mut Context) -> Status {}
 /// }
 ///
-/// #[http_from_stream]
-/// async fn standalone_http_from_stream_handler(ctx: &mut Context) {}
+/// #[try_get_http_request]
+/// async fn standalone_try_get_http_request_handler(stream: &mut Stream, _: &mut Context) -> Status {}
 /// ```
 #[proc_macro_attribute]
-pub fn http_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
-    http_from_stream_macro(attr, item)
+pub fn try_get_http_request(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_http_request_macro(attr, item)
 }
 
 /// Restricts function execution to HTTP GET requests only.
@@ -208,21 +204,21 @@ pub fn http_from_stream(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Get;
 ///
 /// impl ServerHook for Get {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(get_method, response_body("get_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Get {
 ///     #[get_method]
-///     async fn get_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn get_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[get_method]
-/// async fn standalone_get_handler(ctx: &mut Context) {}
+/// async fn standalone_get_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -247,21 +243,21 @@ pub fn get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Post;
 ///
 /// impl ServerHook for Post {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(post_method, response_body("post_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Post {
 ///     #[post_method]
-///     async fn post_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn post_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[post_method]
-/// async fn standalone_post_handler(ctx: &mut Context) {}
+/// async fn standalone_post_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -286,21 +282,21 @@ pub fn post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Put;
 ///
 /// impl ServerHook for Put {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(put_method, response_body("put_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Put {
 ///     #[put_method]
-///     async fn put_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn put_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[put_method]
-/// async fn standalone_put_handler(ctx: &mut Context) {}
+/// async fn standalone_put_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -325,21 +321,21 @@ pub fn put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Delete;
 ///
 /// impl ServerHook for Delete {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(delete_method, response_body("delete_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Delete {
 ///     #[delete_method]
-///     async fn delete_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn delete_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[delete_method]
-/// async fn standalone_delete_handler(ctx: &mut Context) {}
+/// async fn standalone_delete_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -364,21 +360,21 @@ pub fn delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Patch;
 ///
 /// impl ServerHook for Patch {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(patch_method, response_body("patch_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Patch {
 ///     #[patch_method]
-///     async fn patch_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn patch_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[patch_method]
-/// async fn standalone_patch_handler(ctx: &mut Context) {}
+/// async fn standalone_patch_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -403,21 +399,21 @@ pub fn patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Head;
 ///
 /// impl ServerHook for Head {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(head_method, response_body("head_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Head {
 ///     #[head_method]
-///     async fn head_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn head_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[head_method]
-/// async fn standalone_head_handler(ctx: &mut Context) {}
+/// async fn standalone_head_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -442,21 +438,21 @@ pub fn head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Options;
 ///
 /// impl ServerHook for Options {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(options_method, response_body("options_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Options {
 ///     #[options_method]
-///     async fn options_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn options_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[options_method]
-/// async fn standalone_options_handler(ctx: &mut Context) {}
+/// async fn standalone_options_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -481,21 +477,21 @@ pub fn options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Connect;
 ///
 /// impl ServerHook for Connect {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(connect_method, response_body("connect_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Connect {
 ///     #[connect_method]
-///     async fn connect_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn connect_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[connect_method]
-/// async fn standalone_connect_handler(ctx: &mut Context) {}
+/// async fn standalone_connect_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -520,21 +516,21 @@ pub fn connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Trace;
 ///
 /// impl ServerHook for Trace {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(trace_method, response_body("trace_method"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Trace {
 ///     #[trace_method]
-///     async fn trace_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn trace_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[trace_method]
-/// async fn standalone_trace_handler(ctx: &mut Context) {}
+/// async fn standalone_trace_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -560,7 +556,7 @@ pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -569,16 +565,16 @@ pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         filter(ctx.get_request().get_method().is_unknown()),
 ///         response_body("unknown_method")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownMethod {
 ///     #[unknown_method]
-///     async fn unknown_method_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn unknown_method_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[unknown_method]
-/// async fn standalone_unknown_method_handler(ctx: &mut Context) {}
+/// async fn standalone_unknown_method_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -603,7 +599,7 @@ pub fn unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct GetPost;
 ///
 /// impl ServerHook for GetPost {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -612,16 +608,16 @@ pub fn unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         methods(get, post),
 ///         response_body("methods")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl GetPost {
 ///     #[methods(get, post)]
-///     async fn methods_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn methods_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[methods(get, post)]
-/// async fn standalone_methods_handler(ctx: &mut Context) {}
+/// async fn standalone_methods_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a comma-separated list of HTTP method names (lowercase) and should be
@@ -646,21 +642,21 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http09;
 ///
 /// impl ServerHook for Http09 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http09 {
 ///     #[http0_9_version]
-///     async fn http0_9_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http0_9_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http0_9_version]
-/// async fn standalone_http0_9_version_handler(ctx: &mut Context) {}
+/// async fn standalone_http0_9_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -685,21 +681,21 @@ pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http10;
 ///
 /// impl ServerHook for Http10 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http10 {
 ///     #[http1_0_version]
-///     async fn http1_0_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http1_0_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http1_0_version]
-/// async fn standalone_http1_0_version_handler(ctx: &mut Context) {}
+/// async fn standalone_http1_0_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -724,21 +720,21 @@ pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http11;
 ///
 /// impl ServerHook for Http11 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http11 {
 ///     #[http1_1_version]
-///     async fn http1_1_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http1_1_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http1_1_version]
-/// async fn standalone_http1_1_handler(ctx: &mut Context) {}
+/// async fn standalone_http1_1_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -763,21 +759,21 @@ pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http2;
 ///
 /// impl ServerHook for Http2 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http2_version, response_body("http2_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http2 {
 ///     #[http2_version]
-///     async fn http2_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http2_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http2_version]
-/// async fn standalone_http2_version_handler(ctx: &mut Context) {}
+/// async fn standalone_http2_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -802,21 +798,21 @@ pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http3;
 ///
 /// impl ServerHook for Http3 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http3_version, response_body("http3_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http3 {
 ///     #[http3_version]
-///     async fn http3_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http3_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http3_version]
-/// async fn standalone_http3_version_handler(ctx: &mut Context) {}
+/// async fn standalone_http3_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -841,21 +837,21 @@ pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http11OrHigher;
 ///
 /// impl ServerHook for Http11OrHigher {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http11OrHigher {
 ///     #[http1_1_or_higher_version]
-///     async fn http1_1_or_higher_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http1_1_or_higher_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http1_1_or_higher_version]
-/// async fn standalone_http1_1_or_higher_version_handler(ctx: &mut Context) {}
+/// async fn standalone_http1_1_or_higher_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -880,21 +876,21 @@ pub fn http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> Token
 /// struct HttpOnly;
 ///
 /// impl ServerHook for HttpOnly {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(http_version, response_body("http"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl HttpOnly {
 ///     #[http_version]
-///     async fn http_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn http_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[http_version]
-/// async fn standalone_http_handler(ctx: &mut Context) {}
+/// async fn standalone_http_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -919,21 +915,21 @@ pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownVersionHandler;
 ///
 /// impl ServerHook for UnknownVersionHandler {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(unknown_version, response_body("unknown version"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownVersionHandler {
 ///     #[unknown_version]
-///     async fn handle_unknown_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn handle_unknown_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[unknown_version]
-/// async fn standalone_unknown_version_handler(ctx: &mut Context) {}
+/// async fn standalone_unknown_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -958,26 +954,25 @@ pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[ws_upgrade_type]
-///     #[ws_from_stream]
-///     async fn handle(self, ctx: &mut Context) {
-///         let body: &RequestBody = ctx.get_request().get_body();
+///     #[try_get_websocket_request(body)]
+///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
-///         ctx.send_body_list_with_data(&body_list).await;
+///         stream.send_list(body_list).await;
 ///     }
 /// }
 ///
 /// impl Websocket {
 ///     #[ws_upgrade_type]
-///     async fn ws_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn ws_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[ws_upgrade_type]
-/// async fn standalone_ws_handler(ctx: &mut Context) {}
+/// async fn standalone_ws_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1002,21 +997,21 @@ pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct H2c;
 ///
 /// impl ServerHook for H2c {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl H2c {
 ///     #[h2c_upgrade_type]
-///     async fn h2c_upgrade_type_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn h2c_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[h2c_upgrade_type]
-/// async fn standalone_h2c_upgrade_type_handler(ctx: &mut Context) {}
+/// async fn standalone_h2c_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1041,21 +1036,21 @@ pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Tls;
 ///
 /// impl ServerHook for Tls {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Tls {
 ///     #[tls_upgrade_type]
-///     async fn tls_upgrade_type_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn tls_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[tls_upgrade_type]
-/// async fn standalone_tls_upgrade_type_handler(ctx: &mut Context) {}
+/// async fn standalone_tls_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1080,21 +1075,21 @@ pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownUpgrade;
 ///
 /// impl ServerHook for UnknownUpgrade {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(unknown_upgrade_type, response_body("unknown upgrade type"))]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownUpgrade {
 ///     #[unknown_upgrade_type]
-///     async fn unknown_upgrade_type_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn unknown_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[unknown_upgrade_type]
-/// async fn standalone_unknown_upgrade_type_handler(ctx: &mut Context) {}
+/// async fn standalone_unknown_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1121,21 +1116,21 @@ pub fn unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStrea
 /// struct ResponseStatusCode;
 ///
 /// impl ServerHook for ResponseStatusCode {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_status_code(CUSTOM_STATUS_CODE)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ResponseStatusCode {
 ///     #[response_status_code(CUSTOM_STATUS_CODE)]
-///     async fn response_status_code_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn response_status_code_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_status_code(200)]
-/// async fn standalone_response_status_code_handler(ctx: &mut Context) {}
+/// async fn standalone_response_status_code_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a numeric HTTP status code or a global constant
@@ -1162,21 +1157,21 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct ResponseReason;
 ///
 /// impl ServerHook for ResponseReason {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_reason_phrase(CUSTOM_REASON)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ResponseReason {
 ///     #[response_reason_phrase(CUSTOM_REASON)]
-///     async fn response_reason_phrase_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn response_reason_phrase_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_reason_phrase("OK")]
-/// async fn standalone_response_reason_phrase_handler(ctx: &mut Context) {}
+/// async fn standalone_response_reason_phrase_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a string literal or global constant for the reason phrase and should be
@@ -1205,35 +1200,35 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct ResponseHeader;
 ///
 /// impl ServerHook for ResponseHeader {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ResponseHeader {
 ///     #[response_header(CUSTOM_HEADER_NAME => CUSTOM_HEADER_VALUE)]
-///     async fn response_header_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn response_header_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[route("/response_header")]
 /// struct ResponseHeaderTest;
 ///
 /// impl ServerHook for ResponseHeaderTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body("Testing header set and replace operations")]
 ///     #[response_header("X-Add-Header", "add-value")]
 ///     #[response_header("X-Set-Header" => "set-value")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_header("X-Custom" => "value")]
-/// async fn standalone_response_header_handler(ctx: &mut Context) {}
+/// async fn standalone_response_header_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts header name and header value, both can be string literals or global constants.
@@ -1261,21 +1256,21 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseBody;
 ///
 /// impl ServerHook for ResponseBody {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&RESPONSE_DATA)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ResponseBody {
 ///     #[response_body(&RESPONSE_DATA)]
-///     async fn response_body_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn response_body_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_body("standalone response body")]
-/// async fn standalone_response_body_handler(ctx: &mut Context) {}
+/// async fn standalone_response_body_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a string literal or global constant for the response body and should be
@@ -1299,7 +1294,7 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ClearResponseHeaders;
 ///
 /// impl ServerHook for ClearResponseHeaders {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1308,16 +1303,16 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         filter(ctx.get_request().get_method().is_unknown()),
 ///         response_body("clear_response_headers")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ClearResponseHeaders {
 ///     #[clear_response_headers]
-///     async fn clear_response_headers_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn clear_response_headers_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[clear_response_headers]
-/// async fn standalone_clear_response_headers_handler(ctx: &mut Context) {}
+/// async fn standalone_clear_response_headers_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro should be applied to async functions that accept a `&mut Context` parameter.   
@@ -1341,7 +1336,7 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// struct RequestMiddleware;
 ///
 /// impl ServerHook for RequestMiddleware {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1350,16 +1345,16 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 ///         response_version(HttpVersion::Http1_1),
 ///         response_header(SERVER => HYPERLANE)
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestMiddleware {
 ///     #[response_version(HttpVersion::Http2)]
-///     async fn response_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn response_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_version(HttpVersion::Http1_0)]
-/// async fn standalone_response_version_handler(ctx: &mut Context) {}
+/// async fn standalone_response_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable or code block for the response version and should be
@@ -1367,45 +1362,6 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 #[proc_macro_attribute]
 pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
     response_version_macro(attr, item, Position::Prologue)
-}
-
-/// Handles aborted request scenarios.
-///
-/// This attribute macro configures the function to handle cases where the client has
-/// aborted the request, providing appropriate handling for interrupted or cancelled requests.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/aborted")]
-/// struct Aborted;
-///
-/// impl ServerHook for Aborted {
-///     async fn new(_ctx: &mut Context) -> Self {
-///         Self
-///     }
-///
-///     #[aborted]
-///     async fn handle(self, ctx: &mut Context) {}
-/// }
-///
-/// impl Aborted {
-///     #[aborted]
-///     async fn aborted_with_ref_self(&self, ctx: &mut Context) {}
-/// }
-///
-/// #[aborted]
-/// async fn standalone_aborted_handler(ctx: &mut Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&mut Context` parameter.
-#[proc_macro_attribute]
-pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    aborted_macro(item, Position::Prologue)
 }
 
 /// Handles closed connection scenarios.
@@ -1423,21 +1379,21 @@ pub fn aborted(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ClosedTest;
 ///
 /// impl ServerHook for ClosedTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[closed]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ClosedTest {
 ///     #[closed]
-///     async fn closed_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn closed_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[closed]
-/// async fn standalone_closed_handler(ctx: &mut Context) {}
+/// async fn standalone_closed_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1461,7 +1417,7 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1469,16 +1425,16 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         filter(ctx.get_request().get_method().is_unknown()),
 ///         response_body("unknown_method")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownMethod {
 ///     #[filter(true)]
-///     async fn filter_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn filter_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[filter(true)]
-/// async fn standalone_filter_handler(ctx: &mut Context) {}
+/// async fn standalone_filter_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 #[proc_macro_attribute]
 pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -1499,23 +1455,23 @@ pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware2;
 ///
 /// impl ServerHook for ResponseMiddleware2 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(
 ///         reject(ctx.get_request().get_upgrade_type().is_ws())
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl ResponseMiddleware2 {
 ///     #[reject(false)]
-///     async fn reject_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn reject_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[reject(false)]
-/// async fn standalone_reject_handler(ctx: &mut Context) {}
+/// async fn standalone_reject_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 #[proc_macro_attribute]
 pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -1537,22 +1493,22 @@ pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Host;
 ///
 /// impl ServerHook for Host {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[host("localhost")]
 ///     #[prologue_macros(response_body("host string literal: localhost"), send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Host {
 ///     #[host("localhost")]
-///     async fn host_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn host_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[host("localhost")]
-/// async fn standalone_host_handler(ctx: &mut Context) {}
+/// async fn standalone_host_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a string literal specifying the expected host value and should be
@@ -1577,7 +1533,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RejectHost;
 ///
 /// impl ServerHook for RejectHost {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1585,16 +1541,16 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         reject_host("filter.localhost"),
 ///         response_body("host filter string literal")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RejectHost {
 ///     #[reject_host("filter.localhost")]
-///     async fn reject_host_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn reject_host_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[reject_host("filter.localhost")]
-/// async fn standalone_reject_host_handler(ctx: &mut Context) {}
+/// async fn standalone_reject_host_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -1619,7 +1575,7 @@ pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Referer;
 ///
 /// impl ServerHook for Referer {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1627,16 +1583,16 @@ pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         referer("http://localhost"),
 ///         response_body("referer string literal: http://localhost")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Referer {
 ///     #[referer("http://localhost")]
-///     async fn referer_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn referer_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[referer("http://localhost")]
-/// async fn standalone_referer_handler(ctx: &mut Context) {}
+/// async fn standalone_referer_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a string literal specifying the expected referer value and should be
@@ -1661,7 +1617,7 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RejectReferer;
 ///
 /// impl ServerHook for RejectReferer {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1669,16 +1625,16 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         reject_referer("http://localhost"),
 ///         response_body("referer filter string literal")
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RejectReferer {
 ///     #[reject_referer("http://localhost")]
-///     async fn reject_referer_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn reject_referer_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[reject_referer("http://localhost")]
-/// async fn standalone_reject_referer_handler(ctx: &mut Context) {}
+/// async fn standalone_reject_referer_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a string literal specifying the referer value to filter out and should be
@@ -1702,31 +1658,31 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PrologueHooks;
 ///
 /// impl ServerHook for PrologueHooks {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[get_method]
 ///     #[http_version]
-///     async fn handle(self, _ctx: &mut Context) {}
+///     async fn handle(self, _: &mut Stream, _: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// async fn prologue_hooks_fn(ctx: &mut Context) {
-///     let hook = PrologueHooks::new(ctx).await;
-///     hook.handle(ctx).await;
+/// async fn prologue_hooks_fn(stream: &mut Stream, ctx: &mut Context) {
+///     let hook = PrologueHooks::new(stream, ctx).await;
+///     hook.handle(stream, ctx).await;
 /// }
 ///
 /// #[route("/hook")]
 /// struct Hook;
 ///
 /// impl ServerHook for Hook {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_hooks(prologue_hooks_fn)]
 ///     #[response_body("Testing hook macro")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -1744,20 +1700,20 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct HooksExpression;
 ///
 /// impl ServerHook for HooksExpression {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[get_method]
 ///     #[prologue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
 ///     #[response_body("hooks expression test")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl HooksExpression {
-///     async fn new_hook(_ctx: &mut Context) {}
+///     async fn new_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
 ///
-///     async fn method_hook(_ctx: &mut Context) {}
+///     async fn method_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1779,30 +1735,30 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct EpilogueHooks;
 ///
 /// impl ServerHook for EpilogueHooks {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_status_code(200)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// async fn epilogue_hooks_fn(ctx: &mut Context) {
-///     let hook = EpilogueHooks::new(ctx).await;
-///     hook.handle(ctx).await;
+/// async fn epilogue_hooks_fn(stream: &mut Stream, ctx: &mut Context) -> Status {
+///     let hook = EpilogueHooks::new(stream, ctx).await;
+///     hook.handle(stream, ctx).await
 /// }
 ///
 /// #[route("/hook")]
 /// struct Hook;
 ///
 /// impl ServerHook for Hook {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_hooks(epilogue_hooks_fn)]
 ///     #[response_body("Testing hook macro")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// ```
@@ -1821,20 +1777,20 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct HooksExpression;
 ///
 /// impl ServerHook for HooksExpression {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[get_method]
 ///     #[epilogue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
 ///     #[response_body("hooks expression test")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl HooksExpression {
-///     async fn new_hook(_ctx: &mut Context) {}
+///     async fn new_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
 ///
-///     async fn method_hook(_ctx: &mut Context) {}
+///     async fn method_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1857,22 +1813,22 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestBodyRoute;
 ///
 /// impl ServerHook for RequestBodyRoute {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("raw body: {raw_body:?}"))]
 ///     #[request_body(raw_body)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestBodyRoute {
 ///     #[request_body(raw_body)]
-///     async fn request_body_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_body_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_body(raw_body)]
-/// async fn standalone_request_body_handler(ctx: &mut Context) {}
+/// async fn standalone_request_body_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// # Multi-Parameter Usage
@@ -1885,13 +1841,13 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiBody;
 ///
 /// impl ServerHook for MultiBody {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("bodies: {body1:?}, {body2:?}"))]
 ///     #[request_body(body1, body2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -1925,22 +1881,22 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestBodyJson;
 ///
 /// impl ServerHook for RequestBodyJson {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request data: {request_data_result:?}"))]
 ///     #[request_body_json_result(request_data_result: TestData)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestBodyJson {
 ///     #[request_body_json_result(request_data_result: TestData)]
-///     async fn request_body_json_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_body_json_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_body_json_result(request_data_result: TestData)]
-/// async fn standalone_request_body_json_handler(ctx: &mut Context) {}
+/// async fn standalone_request_body_json_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// # Multi-Parameter Usage
@@ -1964,13 +1920,13 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TestData;
 ///
 /// impl ServerHook for TestData {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("user: {user:?}, config: {config:?}"))]
 ///     #[request_body_json_result(user: User, config: Config)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2004,22 +1960,22 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// struct RequestBodyJson;
 ///
 /// impl ServerHook for RequestBodyJson {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request data: {request_data_result:?}"))]
 ///     #[request_body_json(request_data_result: TestData)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestBodyJson {
 ///     #[request_body_json(request_data_result: TestData)]
-///     async fn request_body_json_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_body_json_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_body_json(request_data_result: TestData)]
-/// async fn standalone_request_body_json_handler(ctx: &mut Context) {}
+/// async fn standalone_request_body_json_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// # Multi-Parameter Usage
@@ -2043,13 +1999,13 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// struct TestData;
 ///
 /// impl ServerHook for TestData {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("user: {user:?}, config: {config:?}"))]
 ///     #[request_body_json(user: User, config: Config)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2089,22 +2045,22 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attribute;
 ///
 /// impl ServerHook for Attribute {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
 ///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Attribute {
 ///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
-///     async fn attribute_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn attribute_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
-/// async fn standalone_attribute_handler(ctx: &mut Context) {}
+/// async fn standalone_attribute_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `key => variable_name: Type`.
@@ -2120,13 +2076,13 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("attrs: {attr1:?}, {attr2:?}"))]
 ///     #[attribute_option("key1" => attr1: String, "key2" => attr2: i32)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2161,22 +2117,22 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attribute;
 ///
 /// impl ServerHook for Attribute {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request attribute: {request_attribute:?}"))]
 ///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Attribute {
 ///     #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
-///     async fn attribute_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn attribute_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[attribute(TEST_ATTRIBUTE_KEY => request_attribute: TestData)]
-/// async fn standalone_attribute_handler(ctx: &mut Context) {}
+/// async fn standalone_attribute_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `key => variable_name: Type`.
@@ -2192,13 +2148,13 @@ pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("attrs: {attr1}, {attr2}"))]
 ///     #[attribute("key1" => attr1: String, "key2" => attr2: i32)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2227,22 +2183,22 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attributes;
 ///
 /// impl ServerHook for Attributes {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request attributes: {request_attributes:?}"))]
 ///     #[attributes(request_attributes)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Attributes {
 ///     #[attributes(request_attributes)]
-///     async fn attributes_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn attributes_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[attributes(request_attributes)]
-/// async fn standalone_attributes_handler(ctx: &mut Context) {}
+/// async fn standalone_attributes_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain a HashMap of all attributes.
@@ -2258,13 +2214,13 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttrs;
 ///
 /// impl ServerHook for MultiAttrs {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("attrs1: {attrs1:?}, attrs2: {attrs2:?}"))]
 ///     #[attributes(attrs1, attrs2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2290,22 +2246,22 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PanicDataOptionTest;
 ///
 /// impl ServerHook for PanicDataOptionTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Panic data: {task_panic_data_option:?}"))]
 ///     #[task_panic_data_option(task_panic_data_option)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl PanicDataOptionTest {
 ///     #[task_panic_data_option(task_panic_data_option)]
-///     async fn task_panic_data_option_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn task_panic_data_option_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[task_panic_data_option(task_panic_data_option)]
-/// async fn standalone_task_panic_data_option_handler(ctx: &mut Context) {}
+/// async fn standalone_task_panic_data_option_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the panic data.
@@ -2321,13 +2277,13 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiPanicDataOption;
 ///
 /// impl ServerHook for MultiPanicDataOption {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("panic1: {panic1:?}, panic2: {panic2:?}"))]
 ///     #[task_panic_data_option(panic1, panic2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2353,22 +2309,22 @@ pub fn task_panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct PanicDataTest;
 ///
 /// impl ServerHook for PanicDataTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Panic data: {task_panic_data}"))]
 ///     #[task_panic_data(task_panic_data)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl PanicDataTest {
 ///     #[task_panic_data(task_panic_data)]
-///     async fn task_panic_data_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn task_panic_data_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[task_panic_data(task_panic_data)]
-/// async fn standalone_task_panic_data_handler(ctx: &mut Context) {}
+/// async fn standalone_task_panic_data_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the panic data.
@@ -2384,13 +2340,13 @@ pub fn task_panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct MultiPanicData;
 ///
 /// impl ServerHook for MultiPanicData {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("panic1: {panic1}, panic2: {panic2}"))]
 ///     #[task_panic_data(panic1, panic2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2420,22 +2376,22 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestErrorDataOptionTest;
 ///
 /// impl ServerHook for RequestErrorDataOptionTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Request error data: {request_error_data_option:?}"))]
 ///     #[request_error_data_option(request_error_data_option)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestErrorDataOptionTest {
 ///     #[request_error_data_option(request_error_data_option)]
-///     async fn request_error_data_option_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_error_data_option_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_error_data_option(request_error_data_option)]
-/// async fn standalone_request_error_data_option_handler(ctx: &mut Context) {}
+/// async fn standalone_request_error_data_option_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the request error data.
@@ -2451,13 +2407,13 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiRequestErrorDataOption;
 ///
 /// impl ServerHook for MultiRequestErrorDataOption {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("error1: {error1:?}, error2: {error2:?}"))]
 ///     #[request_error_data_option(error1, error2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2483,22 +2439,22 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 /// struct RequestErrorDataTest;
 ///
 /// impl ServerHook for RequestErrorDataTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Request error data: {request_error_data}"))]
 ///     #[request_error_data(request_error_data)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestErrorDataTest {
 ///     #[request_error_data(request_error_data)]
-///     async fn request_error_data_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_error_data_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_error_data(request_error_data)]
-/// async fn standalone_request_error_data_handler(ctx: &mut Context) {}
+/// async fn standalone_request_error_data_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the request error data.
@@ -2514,13 +2470,13 @@ pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenS
 /// struct MultiRequestErrorData;
 ///
 /// impl ServerHook for MultiRequestErrorData {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("error1: {error1}, error2: {error2}"))]
 ///     #[request_error_data(error1, error2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2550,22 +2506,22 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RouteParam;
 ///
 /// impl ServerHook for RouteParam {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("route param: {request_route_param:?}"))]
 ///     #[route_param_option("test" => request_route_param)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RouteParam {
 ///     #[route_param_option("test" => request_route_param)]
-///     async fn route_param_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn route_param_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[route_param_option("test" => request_route_param)]
-/// async fn standalone_route_param_handler(ctx: &mut Context) {}
+/// async fn standalone_route_param_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
@@ -2581,13 +2537,13 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiParam;
 ///
 /// impl ServerHook for MultiParam {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("id: {id:?}, name: {name:?}"))]
 ///     #[route_param_option("id" => id, "name" => name)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2613,22 +2569,22 @@ pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RouteParam;
 ///
 /// impl ServerHook for RouteParam {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("route param: {request_route_param:?}"))]
 ///     #[route_param("test" => request_route_param)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RouteParam {
 ///     #[route_param("test" => request_route_param)]
-///     async fn route_param_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn route_param_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[route_param("test" => request_route_param)]
-/// async fn standalone_route_param_handler(ctx: &mut Context) {}
+/// async fn standalone_route_param_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
@@ -2645,13 +2601,13 @@ pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiParam;
 ///
 /// impl ServerHook for MultiParam {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("id: {id:?}, name: {name:?}"))]
 ///     #[route_param("id" => id, "name" => name)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2680,22 +2636,22 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RouteParams;
 ///
 /// impl ServerHook for RouteParams {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("request route params: {request_route_params:?}"))]
 ///     #[route_params(request_route_params)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RouteParams {
 ///     #[route_params(request_route_params)]
-///     async fn route_params_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn route_params_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[route_params(request_route_params)]
-/// async fn standalone_route_params_handler(ctx: &mut Context) {}
+/// async fn standalone_route_params_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain all route parameters.
@@ -2711,13 +2667,13 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiParams;
 ///
 /// impl ServerHook for MultiParams {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("params1: {params1:?}, params2: {params2:?}"))]
 ///     #[route_params(params1, params2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -2743,7 +2699,7 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestQuery;
 ///
 /// impl ServerHook for RequestQuery {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2752,16 +2708,16 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         response_body(&format!("request query: {request_query_option:?}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestQuery {
 ///     #[request_query_option("test" => request_query_option)]
-///     async fn request_query_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_query_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_query_option("test" => request_query_option)]
-/// async fn standalone_request_query_handler(ctx: &mut Context) {}
+/// async fn standalone_request_query_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
@@ -2789,7 +2745,7 @@ pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct RequestQuery;
 ///
 /// impl ServerHook for RequestQuery {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2798,16 +2754,16 @@ pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream
 ///         response_body(&format!("request query: {request_query}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestQuery {
 ///     #[request_query("test" => request_query)]
-///     async fn request_query_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_query_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_query("test" => request_query)]
-/// async fn standalone_request_query_handler(ctx: &mut Context) {}
+/// async fn standalone_request_query_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
@@ -2838,7 +2794,7 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestQuerys;
 ///
 /// impl ServerHook for RequestQuerys {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2847,16 +2803,16 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         response_body(&format!("request querys: {request_querys:?}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestQuerys {
 ///     #[request_querys(request_querys)]
-///     async fn request_querys_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_querys_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_querys(request_querys)]
-/// async fn standalone_request_querys_handler(ctx: &mut Context) {}
+/// async fn standalone_request_querys_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain all request query parameters.
@@ -2884,7 +2840,7 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestHeader;
 ///
 /// impl ServerHook for RequestHeader {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2893,16 +2849,16 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         response_body(&format!("request header: {request_header_option:?}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestHeader {
 ///     #[request_header_option(HOST => request_header_option)]
-///     async fn request_header_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_header_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_header_option(HOST => request_header_option)]
-/// async fn standalone_request_header_handler(ctx: &mut Context) {}
+/// async fn standalone_request_header_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
@@ -2928,7 +2884,7 @@ pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// struct RequestHeader;
 ///
 /// impl ServerHook for RequestHeader {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2937,16 +2893,16 @@ pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStrea
 ///         response_body(&format!("request header: {request_header}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestHeader {
 ///     #[request_header(HOST => request_header)]
-///     async fn request_header_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_header_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_header(HOST => request_header)]
-/// async fn standalone_request_header_handler(ctx: &mut Context) {}
+/// async fn standalone_request_header_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
@@ -2975,7 +2931,7 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestHeaders;
 ///
 /// impl ServerHook for RequestHeaders {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2984,16 +2940,16 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         response_body(&format!("request headers: {request_headers:?}")),
 ///         send
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestHeaders {
 ///     #[request_headers(request_headers)]
-///     async fn request_headers_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_headers_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_headers(request_headers)]
-/// async fn standalone_request_headers_handler(ctx: &mut Context) {}
+/// async fn standalone_request_headers_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain all HTTP request headers.
@@ -3019,24 +2975,24 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Cookie;
 ///
 /// impl ServerHook for Cookie {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
 ///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Cookie {
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
 ///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
-///     async fn request_cookie_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_cookie_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
 /// #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
-/// async fn standalone_request_cookie_handler(ctx: &mut Context) {}
+/// async fn standalone_request_cookie_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// For specific cookie extraction, the variable will be available as `Option<String>`.
@@ -3062,24 +3018,24 @@ pub fn request_cookie_option(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// struct Cookie;
 ///
 /// impl ServerHook for Cookie {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
 ///     #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Cookie {
 ///     #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
 ///     #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
-///     async fn request_cookie_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_cookie_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_body(&format!("Session cookie: {session_cookie1}, {session_cookie2}"))]
 /// #[request_cookie("test1" => session_cookie1, "test2" => session_cookie2)]
-/// async fn standalone_request_cookie_handler(ctx: &mut Context) {}
+/// async fn standalone_request_cookie_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// For specific cookie extraction, the variable will be available as `String`.
@@ -3108,22 +3064,22 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Cookies;
 ///
 /// impl ServerHook for Cookies {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("All cookies: {cookie_value:?}"))]
 ///     #[request_cookies(cookie_value)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Cookies {
 ///     #[request_cookies(cookie_value)]
-///     async fn request_cookies_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_cookies_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_cookies(cookie_value)]
-/// async fn standalone_request_cookies_handler(ctx: &mut Context) {}
+/// async fn standalone_request_cookies_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain all cookies.
@@ -3139,13 +3095,13 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiCookies;
 ///
 /// impl ServerHook for MultiCookies {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("cookies1: {cookies1:?}, cookies2: {cookies2:?}"))]
 ///     #[request_cookies(cookies1, cookies2)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -3168,22 +3124,22 @@ pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestVersionTest;
 ///
 /// impl ServerHook for RequestVersionTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("HTTP Version: {http_version}"))]
 ///     #[request_version(http_version)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestVersionTest {
 ///     #[request_version(http_version)]
-///     async fn request_version_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_version(http_version)]
-/// async fn standalone_request_version_handler(ctx: &mut Context) {}
+/// async fn standalone_request_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the HTTP request version.
@@ -3208,22 +3164,22 @@ pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestPathTest;
 ///
 /// impl ServerHook for RequestPathTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body(&format!("Request Path: {request_path}"))]
 ///     #[request_path(request_path)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestPathTest {
 ///     #[request_path(request_path)]
-///     async fn request_path_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn request_path_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[request_path(request_path)]
-/// async fn standalone_request_path_handler(ctx: &mut Context) {}
+/// async fn standalone_request_path_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the HTTP request path.
@@ -3305,12 +3261,12 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Response;
 ///
 /// impl ServerHook for Response {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[response_body("response")]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -3345,7 +3301,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestMiddleware;
 ///
 /// impl ServerHook for RequestMiddleware {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3354,7 +3310,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         response_version(HttpVersion::Http1_1),
 ///         response_header(SERVER => HYPERLANE)
 ///     )]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -3385,11 +3341,11 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware1;
 ///
 /// impl ServerHook for ResponseMiddleware1 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -3422,12 +3378,12 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct PanicHook;
 ///
 /// impl ServerHook for PanicHook {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(response_body("task_panic"), send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -3460,12 +3416,12 @@ pub fn task_panic(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestErrorHook;
 ///
 /// impl ServerHook for RequestErrorHook {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(response_body("request_error"), send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
@@ -3492,12 +3448,12 @@ pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PrologueMacros;
 ///
 /// impl ServerHook for PrologueMacros {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[prologue_macros(post_method, response_body("prologue_macros"), send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -3520,12 +3476,12 @@ pub fn prologue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware2;
 ///
 /// impl ServerHook for ResponseMiddleware2 {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(try_send, flush)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -3533,12 +3489,15 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
     epilogue_macros_macro(attr, item)
 }
 
-/// Automatically tries to send the complete response after function execution.
+/// Automatically tries to send data via stream after function execution.
 ///
-/// This attribute macro ensures that the response (request headers and body) is automatically tried to be sent
-/// to the client after the function completes execution.
+/// This attribute macro tries to send data to the client after the function completes execution.
+/// If no argument is provided, the response is built from the context automatically.
+/// If an argument is provided, it is used as the data expression to send.
 ///
 /// # Usage
+///
+/// Using without arguments (default from context):
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -3548,36 +3507,58 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TrySendTest;
 ///
 /// impl ServerHook for TrySendTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(try_send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl TrySendTest {
 ///     #[try_send]
-///     async fn try_send_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn try_send_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[try_send]
-/// async fn standalone_try_send_handler(ctx: &mut Context) {}
+/// async fn standalone_try_send_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&mut Context` parameter.
+/// Using with a data expression:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/try_send_with_data")]
+/// struct TrySendWithDataTest;
+///
+/// impl ServerHook for TrySendWithDataTest {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(try_send(ctx.get_mut_response().build()))]
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+/// }
+/// ```
+///
+/// The macro accepts an optional data expression. If omitted, it defaults to sending
+/// the response built from the context.
 #[proc_macro_attribute]
-pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    try_send_macro(item, Position::Epilogue)
+pub fn try_send(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_send_macro(attr, item, Position::Epilogue)
 }
 
-/// Automatically sends the complete response after function execution.
+/// Automatically sends data via stream after function execution.
 ///
-/// This attribute macro ensures that the response (request headers and body) is automatically sent
-/// to the client after the function completes execution.
+/// This attribute macro sends data to the client after the function completes execution.
+/// If no argument is provided, the response is built from the context automatically.
+/// If an argument is provided, it is used as the data expression to send.
 ///
 /// # Usage
+///
+/// Using without arguments (default from context):
 ///
 /// ```rust
 /// use hyperlane::*;
@@ -3587,182 +3568,51 @@ pub fn try_send(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct SendTest;
 ///
 /// impl ServerHook for SendTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(send)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl SendTest {
 ///     #[send]
-///     async fn send_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn send_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[send]
-/// async fn standalone_send_handler(ctx: &mut Context) {}
+/// async fn standalone_send_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&mut Context` parameter.
+/// Using with a data expression:
+///
+/// ```rust
+/// use hyperlane::*;
+/// use hyperlane_macros::*;
+///
+/// #[route("/send_with_data")]
+/// struct SendWithDataTest;
+///
+/// impl ServerHook for SendWithDataTest {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///         Self
+///     }
+///
+///     #[epilogue_macros(send(ctx.get_mut_response().build()))]
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+/// }
+/// ```
+///
+/// The macro accepts an optional data expression. If omitted, it defaults to sending
+/// the response built from the context.
 ///
 /// # Panics
 ///
 /// This macro will panic if the send operation fails.
 #[proc_macro_attribute]
-pub fn send(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_macro(item, Position::Epilogue)
-}
-
-/// Automatically tries to send only the response body after function execution.
-///
-/// This attribute macro ensures that only the response body is automatically tried to be sent
-/// to the client after the function completes, handling request headers separately.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/try_send_body")]
-/// struct TrySendBodyTest;
-///
-/// impl ServerHook for TrySendBodyTest {
-///     async fn new(_ctx: &mut Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(try_send_body)]
-///     async fn handle(self, ctx: &mut Context) {}
-/// }
-///
-/// impl TrySendBodyTest {
-///     #[try_send_body]
-///     async fn try_send_body_with_ref_self(&self, ctx: &mut Context) {}
-/// }
-///
-/// #[try_send_body]
-/// async fn standalone_try_send_body_handler(ctx: &mut Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&mut Context` parameter.
-#[proc_macro_attribute]
-pub fn try_send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    try_send_body_macro(item, Position::Epilogue)
-}
-
-/// Automatically sends only the response body after function execution.
-///
-/// This attribute macro ensures that only the response body is automatically sent
-/// to the client after the function completes, handling request headers separately.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_body")]
-/// struct SendBodyTest;
-///
-/// impl ServerHook for SendBodyTest {
-///     async fn new(_ctx: &mut Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_body)]
-///     async fn handle(self, ctx: &mut Context) {}
-/// }
-///
-/// impl SendBodyTest {
-///     #[send_body]
-///     async fn send_body_with_ref_self(&self, ctx: &mut Context) {}
-/// }
-///
-/// #[send_body]
-/// async fn standalone_send_body_handler(ctx: &mut Context) {}
-/// ```
-///
-/// The macro takes no parameters and should be applied directly to async functions
-/// that accept a `&mut Context` parameter.
-///
-/// # Panics
-///
-/// This macro will panic if the send body operation fails.
-#[proc_macro_attribute]
-pub fn send_body(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_macro(item, Position::Epilogue)
-}
-
-/// Tries to send only the response body with data after function execution.
-///
-/// This attribute macro ensures that only the response body is automatically tried to be sent
-/// to the client after the function completes, handling request headers separately,
-/// with the specified data.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/try_send_body_with_data")]
-/// struct TrySendBodyWithData;
-///
-/// impl ServerHook for TrySendBodyWithData {
-///     async fn new(_ctx: &mut Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(try_send_body_with_data("Response body content"))]
-///     async fn handle(self, ctx: &mut Context) {}
-/// }
-/// ```
-///
-/// The macro accepts data to send and should be applied to async functions
-/// that accept a `&mut Context` parameter.
-#[proc_macro_attribute]
-pub fn try_send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    try_send_body_with_data_macro(attr, item, Position::Epilogue)
-}
-
-/// Sends only the response body with data after function execution.
-///
-/// This attribute macro ensures that only the response body is automatically sent
-/// to the client after the function completes, handling request headers separately,
-/// with the specified data.
-///
-/// # Usage
-///
-/// ```rust
-/// use hyperlane::*;
-/// use hyperlane_macros::*;
-///
-/// #[route("/send_body_with_data")]
-/// struct SendBodyWithData;
-///
-/// impl ServerHook for SendBodyWithData {
-///     async fn new(_ctx: &mut Context) -> Self {
-///         Self
-///     }
-///
-///     #[epilogue_macros(send_body_with_data("Response body content"))]
-///     async fn handle(self, ctx: &mut Context) {}
-/// }
-/// ```
-///
-/// The macro accepts data to send and should be applied to async functions
-/// that accept a `&mut Context` parameter.
-///
-/// # Panics
-///
-/// This macro will panic if the send body with data operation fails.
-#[proc_macro_attribute]
-pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream {
-    send_body_with_data_macro(attr, item, Position::Epilogue)
+pub fn send(attr: TokenStream, item: TokenStream) -> TokenStream {
+    send_macro(attr, item, Position::Epilogue)
 }
 
 /// Tries to flush the response stream after function execution.
@@ -3780,21 +3630,21 @@ pub fn send_body_with_data(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct TryFlushTest;
 ///
 /// impl ServerHook for TryFlushTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(try_flush)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl TryFlushTest {
 ///     #[try_flush]
-///     async fn try_flush_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn try_flush_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[try_flush]
-/// async fn standalone_try_flush_handler(ctx: &mut Context) {}
+/// async fn standalone_try_flush_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -3819,21 +3669,21 @@ pub fn try_flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct FlushTest;
 ///
 /// impl ServerHook for FlushTest {
-///     async fn new(_ctx: &mut Context) -> Self {
+///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
 ///     #[epilogue_macros(flush)]
-///     async fn handle(self, ctx: &mut Context) {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl FlushTest {
 ///     #[flush]
-///     async fn flush_with_ref_self(&self, ctx: &mut Context) {}
+///     async fn flush_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[flush]
-/// async fn standalone_flush_handler(ctx: &mut Context) {}
+/// async fn standalone_flush_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
@@ -3875,9 +3725,9 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// async fn example(ctx: &mut Context) {
-///     let new_ctx: &mut Context = context!(ctx: &mut Context);
-///     let _ = new_ctx.try_send().await;
+/// async fn example(stream: &mut Stream, ctx: &mut Context) {
+///     let new_: &mut Context = context!(ctx: &mut Context);
+///     let _ = new_.get_mut_response();
 /// }
 /// ```
 ///
@@ -3886,9 +3736,9 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// async fn example(ctx: &mut Context) {
-///     let new_ctx: &::hyperlane::Context = context!(ctx: &::hyperlane::Context);
-///     let _ = new_ctx.get_request();
+/// async fn example(stream: &mut Stream, ctx: &mut Context) {
+///     let new_: &::hyperlane::Context = context!(ctx: &::hyperlane::Context);
+///     let _ = new_.get_request();
 /// }
 /// ```
 ///
@@ -3897,9 +3747,9 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// async fn example(ctx: &mut Context) {
-///     let new_ctx = context!(ctx);
-///     let _ = new_ctx.get_request();
+/// async fn example(stream: &mut Stream, ctx: &mut Context) {
+///     let new_ = context!(ctx);
+///     let _ = new_.get_request();
 /// }
 /// ```
 #[proc_macro]
