@@ -13,7 +13,7 @@ pub(crate) fn create_protocol_check(
     upgrade_type: &proc_macro2::Ident,
 ) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
     let upgrade_type_str: String = upgrade_type.to_string();
-    move |context, _| {
+    move |context: &Ident, _: &Ident| {
         let check_fn: proc_macro2::Ident =
             Ident::new(&format!("is_{upgrade_type_str}"), context.span());
         quote! {

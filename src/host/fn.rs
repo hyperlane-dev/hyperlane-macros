@@ -14,7 +14,7 @@ use crate::*;
 /// - `TokenStream` - The expanded token stream with host filter.
 pub(crate) fn host_macro(attr: TokenStream, item: TokenStream, position: Position) -> TokenStream {
     let multi_host: MultiHostData = parse_macro_input!(attr as MultiHostData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_host.host_values.iter().map(|host_value| {
             quote! {
                 if #context.get_request().get_host() != #host_value {
@@ -46,7 +46,7 @@ pub(crate) fn reject_host_macro(
     position: Position,
 ) -> TokenStream {
     let multi_host: MultiHostData = parse_macro_input!(attr as MultiHostData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_host.host_values.iter().map(|host_value| {
             quote! {
                 if #context.get_request().get_host() == #host_value {

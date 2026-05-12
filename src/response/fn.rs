@@ -20,7 +20,7 @@ pub(crate) fn response_status_code_macro(
         Ok(v) => v,
         Err(err) => return err.to_compile_error().into(),
     };
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.get_mut_response().set_status_code(::hyperlane::ResponseStatusCode::from(#value as usize));
@@ -48,7 +48,7 @@ pub(crate) fn response_reason_phrase_macro(
         Ok(v) => v,
         Err(err) => return err.to_compile_error().into(),
     };
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.get_mut_response().set_reason_phrase(&#value);
@@ -76,7 +76,7 @@ pub(crate) fn response_header_macro(
     let key: Expr = header_data.key;
     let value: Expr = header_data.value;
     let operation: HeaderOperation = header_data.operation;
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         match operation {
             HeaderOperation::Add => {
@@ -111,7 +111,7 @@ pub(crate) fn response_body_macro(
 ) -> TokenStream {
     let body_data: ResponseBodyData = parse_macro_input!(attr as ResponseBodyData);
     let body: Expr = body_data.body;
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.get_mut_response().set_body(&#body);
@@ -131,7 +131,7 @@ pub(crate) fn response_body_macro(
 ///
 /// - `TokenStream` - The expanded token stream with header operation.
 pub(crate) fn clear_response_headers_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.get_mut_response().clear_headers();
@@ -159,7 +159,7 @@ pub(crate) fn response_version_macro(
         Ok(v) => v,
         Err(err) => return err.to_compile_error().into(),
     };
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_mut_context(context);
         quote! {
             #new_context.get_mut_response().set_version(#value);

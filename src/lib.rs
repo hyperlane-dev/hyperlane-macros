@@ -80,7 +80,7 @@ use {
 ///
 ///     #[ws_upgrade_type]
 ///     #[try_get_websocket_request(body)]
-///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
 ///         stream.send_list(body_list).await;
 ///     }
@@ -103,7 +103,7 @@ use {
 ///
 ///     #[ws_upgrade_type]
 ///     #[try_get_websocket_request(request)]
-///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
 ///         stream.send_list(body_list).await;
 ///     }
@@ -111,11 +111,11 @@ use {
 ///
 /// impl Websocket {
 ///     #[try_get_websocket_request(request)]
-///     async fn try_get_websocket_request_with_ref_self(&self, stream: &mut Stream, _: &mut Context) -> Status {}
+///     async fn try_get_websocket_request_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// }
 ///
 /// #[try_get_websocket_request]
-/// async fn standalone_try_get_websocket_request_handler(stream: &mut Stream, _: &mut Context) -> Status {}
+/// async fn standalone_try_get_websocket_request_handler(stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// ```
 #[proc_macro_attribute]
 pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -154,7 +154,7 @@ pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenS
 ///     }
 ///
 ///     #[try_get_http_request]
-///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// }
 /// ```
 ///
@@ -173,16 +173,16 @@ pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenS
 ///     }
 ///
 ///     #[try_get_http_request(_request)]
-///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {}
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// }
 ///
 /// impl HttpFromStreamTest {
 ///     #[try_get_http_request(_request)]
-///     async fn try_get_http_request_with_ref_self(&self, stream: &mut Stream, _: &mut Context) -> Status {}
+///     async fn try_get_http_request_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// }
 ///
 /// #[try_get_http_request]
-/// async fn standalone_try_get_http_request_handler(stream: &mut Stream, _: &mut Context) -> Status {}
+/// async fn standalone_try_get_http_request_handler(stream: &mut Stream, ctx: &mut Context) -> Status {}
 /// ```
 #[proc_macro_attribute]
 pub fn try_get_http_request(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -960,7 +960,7 @@ pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 ///     #[ws_upgrade_type]
 ///     #[try_get_websocket_request(body)]
-///     async fn handle(self, stream: &mut Stream, _: &mut Context) -> Status {
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
 ///         stream.send_list(body_list).await;
 ///     }
@@ -1664,7 +1664,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 ///     #[get_method]
 ///     #[http_version]
-///     async fn handle(self, _: &mut Stream, _: &mut Context) -> Status { Status::Continue }
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// async fn prologue_hooks_fn(stream: &mut Stream, ctx: &mut Context) {

@@ -13,7 +13,7 @@ pub(crate) fn create_method_check(
     method: &proc_macro2::Ident,
 ) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
     let method_str: String = method.to_string();
-    move |context, _| {
+    move |context: &Ident, _: &Ident| {
         let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{method_str}"), context.span());
         quote! {
             if !#context.get_request().get_method().#check_fn() {
@@ -42,7 +42,6 @@ pub(crate) fn methods_macro(
     item: TokenStream,
     position: Position,
 ) -> TokenStream {
-    let item_clone_1: TokenStream = item.clone();
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
     let mut input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let sig: &mut Signature = &mut input_fn.sig;
@@ -56,13 +55,17 @@ pub(crate) fn methods_macro(
                     #context.get_request().get_method().#check_fn()
                 }
             });
-            inject(position, item_clone_1, |_, _| {
-                quote! {
-                    if !(#(#method_checks)||*) {
-                        return ::hyperlane::Status::Reject;
+            inject(
+                position,
+                TokenStream::from(quote! { #input_fn }),
+                |_: &Ident, _: &Ident| {
+                    quote! {
+                        if !(#(#method_checks)||*) {
+                            return ::hyperlane::Status::Reject;
+                        }
                     }
-                }
-            })
+                },
+            )
         }
         Err(err) => err.to_compile_error().into(),
     }

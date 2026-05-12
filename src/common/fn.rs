@@ -121,86 +121,6 @@ pub(crate) fn inject(
     }
 }
 
-/// Parses context identifier from function signature.
-///
-/// # Arguments
-///
-/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
-///
-/// # Returns
-///
-/// - `syn::Result<Ident>` - Returns a `syn::Result` containing the context identifier if successful, or an error otherwise.
-#[allow(dead_code, clippy::replace_box)]
-pub(crate) fn parse_context_from_fn(sig: &mut Signature) -> syn::Result<Ident> {
-    let default_ident: Ident = Ident::new("ctx", Span::call_site());
-    match sig.inputs.first_mut() {
-        Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-            Pat::Ident(pat_ident) => Ok(pat_ident.ident.clone()),
-            Pat::Wild(_) => {
-                pat_type.pat = Box::new(Pat::Ident(PatIdent {
-                    attrs: Vec::new(),
-                    by_ref: None,
-                    mutability: None,
-                    ident: default_ident.clone(),
-                    subpat: None,
-                }));
-                Ok(default_ident)
-            }
-            _ => Err(syn::Error::new_spanned(
-                &pat_type.pat,
-                "expected identifier as first argument",
-            )),
-        },
-        _ => Err(syn::Error::new_spanned(
-            &sig.inputs,
-            "expected at least one argument",
-        )),
-    }
-}
-
-/// Parses self from method signature and returns the context identifier (second parameter).
-///
-/// # Arguments
-///
-/// - `&mut Signature` - The method signature to parse. Modified in place if anonymous `_` is found.
-///
-/// # Returns
-///
-/// - `syn::Result<Ident>` - Returns the context identifier from the second parameter.
-#[allow(dead_code, clippy::replace_box)]
-pub(crate) fn parse_self_from_method(sig: &mut Signature) -> syn::Result<Ident> {
-    let default_ident: Ident = Ident::new("ctx", Span::call_site());
-    match sig.inputs.first() {
-        Some(FnArg::Receiver(_)) => match sig.inputs.iter_mut().nth(1) {
-            Some(FnArg::Typed(pat_type)) => match &*pat_type.pat {
-                Pat::Ident(pat_ident) => Ok(pat_ident.ident.clone()),
-                Pat::Wild(_) => {
-                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
-                        attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: default_ident.clone(),
-                        subpat: None,
-                    }));
-                    Ok(default_ident)
-                }
-                _ => Err(syn::Error::new_spanned(
-                    &pat_type.pat,
-                    "expected identifier as second argument (context)",
-                )),
-            },
-            _ => Err(syn::Error::new_spanned(
-                &sig.inputs,
-                "expected context as second argument",
-            )),
-        },
-        _ => Err(syn::Error::new_spanned(
-            &sig.inputs,
-            "expected self as first argument for method",
-        )),
-    }
-}
-
 /// Checks if a type matches `::hyperlane::Context`.
 ///
 /// This function checks if the given type is a reference to `::hyperlane::Context`.
@@ -272,33 +192,27 @@ fn is_stream_type(ty: &Type) -> bool {
 /// 1. Methods with self: Searches from the second parameter onwards
 /// 2. Functions without self: Searches from the first parameter onwards
 /// 3. Context parameter can be at any position
-/// 4. Anonymous `_` parameters are automatically renamed to `ctx`
+/// 4. Anonymous `_` parameters cause a compile error
 ///
 /// # Arguments
 ///
-/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
+/// - `&mut Signature` - The function signature to parse.
 ///
 /// # Returns
 ///
-/// - `syn::Result<Ident>` - Returns the context identifier.
-#[allow(clippy::replace_box)]
+/// - `syn::Result<Ident>` - Returns the context identifier or an error.
 pub(crate) fn parse_context_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
-    let default_ident: Ident = Ident::new("ctx", Span::call_site());
-    for arg in sig.inputs.iter_mut() {
+    for arg in sig.inputs.iter() {
         if let FnArg::Typed(pat_type) = arg
             && is_context_type(&pat_type.ty)
         {
             match &*pat_type.pat {
                 Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
                 Pat::Wild(_) => {
-                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
-                        attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: default_ident.clone(),
-                        subpat: None,
-                    }));
-                    return Ok(default_ident);
+                    return Err(syn::Error::new_spanned(
+                        &pat_type.pat,
+                        "anonymous `_` parameter is not allowed for context; please use a named identifier like `ctx`",
+                    ));
                 }
                 _ => {
                     return Err(syn::Error::new_spanned(
@@ -322,33 +236,27 @@ pub(crate) fn parse_context_from_signature(sig: &mut Signature) -> syn::Result<I
 /// 1. Methods with self: Searches from the second parameter onwards
 /// 2. Functions without self: Searches from the first parameter onwards
 /// 3. Stream parameter can be at any position
-/// 4. Anonymous `_` parameters are automatically renamed to `stream`
+/// 4. Anonymous `_` parameters cause a compile error
 ///
 /// # Arguments
 ///
-/// - `&mut Signature` - The function signature to parse. Modified in place if anonymous `_` is found.
+/// - `&mut Signature` - The function signature to parse.
 ///
 /// # Returns
 ///
-/// - `syn::Result<Ident>` - Returns the stream identifier.
-#[allow(clippy::replace_box)]
+/// - `syn::Result<Ident>` - Returns the stream identifier or an error.
 pub(crate) fn parse_stream_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
-    let default_ident: Ident = Ident::new("stream", Span::call_site());
-    for arg in sig.inputs.iter_mut() {
+    for arg in sig.inputs.iter() {
         if let FnArg::Typed(pat_type) = arg
             && is_stream_type(&pat_type.ty)
         {
             match &*pat_type.pat {
                 Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
                 Pat::Wild(_) => {
-                    pat_type.pat = Box::new(Pat::Ident(PatIdent {
-                        attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: default_ident.clone(),
-                        subpat: None,
-                    }));
-                    return Ok(default_ident);
+                    return Err(syn::Error::new_spanned(
+                        &pat_type.pat,
+                        "anonymous `_` parameter is not allowed for stream; please use a named identifier like `stream`",
+                    ));
                 }
                 _ => {
                     return Err(syn::Error::new_spanned(

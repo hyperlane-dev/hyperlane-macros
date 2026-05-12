@@ -18,7 +18,7 @@ pub(crate) fn request_body_macro(
     position: Position,
 ) -> TokenStream {
     let multi_body: MultiRequestBodyData = parse_macro_input!(attr as MultiRequestBodyData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_body.variables.iter().map(|variable| {
             quote! {
@@ -50,7 +50,7 @@ pub(crate) fn request_body_json_result_macro(
 ) -> TokenStream {
     let multi_body_json: MultiRequestBodyJsonData =
         parse_macro_input!(attr as MultiRequestBodyJsonData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
                 let #variable: Result<#type_name, ::hyperlane::serde_json::Error> = #context.get_request().try_get_body_json::<#type_name>();
@@ -81,7 +81,7 @@ pub(crate) fn request_body_json_macro(
 ) -> TokenStream {
     let multi_body_json: MultiRequestBodyJsonData =
         parse_macro_input!(attr as MultiRequestBodyJsonData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_body_json.params.iter().map(|(variable, type_name)| {
             quote! {
                 let #variable: #type_name = #context.get_request().get_body_json::<#type_name>();
@@ -111,7 +111,7 @@ pub(crate) fn attribute_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_attr: MultiAttributeData = parse_macro_input!(attr as MultiAttributeData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_attr
             .params
             .iter()
@@ -144,7 +144,7 @@ pub(crate) fn attribute_macro(
     position: Position,
 ) -> TokenStream {
     let multi_attr: MultiAttributeData = parse_macro_input!(attr as MultiAttributeData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_attr
             .params
             .iter()
@@ -177,7 +177,7 @@ pub(crate) fn attributes_macro(
     position: Position,
 ) -> TokenStream {
     let multi_attrs: MultiAttributesData = parse_macro_input!(attr as MultiAttributesData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_attrs.variables.iter().map(|variable| {
             quote! {
@@ -208,7 +208,7 @@ pub(crate) fn task_panic_data_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_task_panic_data: MultiPanicData = parse_macro_input!(attr as MultiPanicData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_task_panic_data.variables.iter().map(|variable| {
             quote! {
                 let #variable: Option<::hyperlane::PanicData> = #context.try_get_task_panic_data();
@@ -238,7 +238,7 @@ pub(crate) fn task_panic_data_macro(
     position: Position,
 ) -> TokenStream {
     let multi_task_panic_data: MultiPanicData = parse_macro_input!(attr as MultiPanicData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_task_panic_data.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::PanicData = #context.get_task_panic_data();
@@ -268,7 +268,7 @@ pub(crate) fn request_error_data_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_error_data: MultiRequestErrorData = parse_macro_input!(attr as MultiRequestErrorData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
                 let #variable: Option<::hyperlane::RequestError> = #context.try_get_request_error_data();
@@ -298,7 +298,7 @@ pub(crate) fn request_error_data_macro(
     position: Position,
 ) -> TokenStream {
     let multi_error_data: MultiRequestErrorData = parse_macro_input!(attr as MultiRequestErrorData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_error_data.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::RequestError = #context.get_request_error_data();
@@ -328,7 +328,7 @@ pub(crate) fn route_param_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_param: MultiRouteParamData = parse_macro_input!(attr as MultiRouteParamData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: Option<std::string::String> = #context.try_get_route_param(#key_name);
@@ -358,7 +358,7 @@ pub(crate) fn route_param_macro(
     position: Position,
 ) -> TokenStream {
     let multi_param: MultiRouteParamData = parse_macro_input!(attr as MultiRouteParamData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_param.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: std::string::String = #context.get_route_param(#key_name);
@@ -388,7 +388,7 @@ pub(crate) fn route_params_macro(
     position: Position,
 ) -> TokenStream {
     let multi_route_params: MultiRouteParamsData = parse_macro_input!(attr as MultiRouteParamsData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_route_params.variables.iter().map(|variable| {
             quote! {
@@ -419,7 +419,7 @@ pub(crate) fn request_query_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_query: MultiQueryData = parse_macro_input!(attr as MultiQueryData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: Option<::hyperlane::RequestQuerysValue> = #context.get_request().try_get_query(#key_name);
@@ -449,7 +449,7 @@ pub(crate) fn request_query_macro(
     position: Position,
 ) -> TokenStream {
     let multi_query: MultiQueryData = parse_macro_input!(attr as MultiQueryData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_query.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::RequestQuerysValue = #context.get_request().get_query(#key_name);
@@ -479,7 +479,7 @@ pub(crate) fn request_querys_macro(
     position: Position,
 ) -> TokenStream {
     let multi_querys: MultiQuerysData = parse_macro_input!(attr as MultiQuerysData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_querys.variables.iter().map(|variable| {
             quote! {
@@ -510,7 +510,7 @@ pub(crate) fn request_header_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_header: MultiHeaderData = parse_macro_input!(attr as MultiHeaderData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: Option<::hyperlane::RequestHeadersValueItem> = #context.get_request().try_get_header_back(#key_name);
@@ -540,7 +540,7 @@ pub(crate) fn request_header_macro(
     position: Position,
 ) -> TokenStream {
     let multi_header: MultiHeaderData = parse_macro_input!(attr as MultiHeaderData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_header.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::RequestHeadersValueItem = #context.get_request().get_header_back(#key_name);
@@ -570,7 +570,7 @@ pub(crate) fn request_headers_macro(
     position: Position,
 ) -> TokenStream {
     let multi_headers: MultiHeadersData = parse_macro_input!(attr as MultiHeadersData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_headers.variables.iter().map(|variable| {
             quote! {
@@ -601,7 +601,7 @@ pub(crate) fn request_cookie_option_macro(
     position: Position,
 ) -> TokenStream {
     let multi_cookie: MultiCookieData = parse_macro_input!(attr as MultiCookieData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: Option<::hyperlane::CookieValue> = #context.get_request().try_get_cookie(#key_name);
@@ -631,7 +631,7 @@ pub(crate) fn request_cookie_macro(
     position: Position,
 ) -> TokenStream {
     let multi_cookie: MultiCookieData = parse_macro_input!(attr as MultiCookieData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_cookie.params.iter().map(|(key_name, variable)| {
             quote! {
                 let #variable: ::hyperlane::CookieValue = #context.get_request().get_cookie(#key_name);
@@ -661,7 +661,7 @@ pub(crate) fn request_cookies_macro(
     position: Position,
 ) -> TokenStream {
     let multi_cookies: MultiCookiesData = parse_macro_input!(attr as MultiCookiesData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let statements = multi_cookies.variables.iter().map(|variable| {
             quote! {
                 let #variable: ::hyperlane::Cookies = #context.get_request().get_cookies();
@@ -692,7 +692,7 @@ pub(crate) fn request_version_macro(
 ) -> TokenStream {
     let multi_version: MultiRequestVersionData =
         parse_macro_input!(attr as MultiRequestVersionData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_version.variables.iter().map(|variable| {
             quote! {
@@ -723,7 +723,7 @@ pub(crate) fn request_path_macro(
     position: Position,
 ) -> TokenStream {
     let multi_path: MultiRequestPathData = parse_macro_input!(attr as MultiRequestPathData);
-    inject(position, item, |context, _| {
+    inject(position, item, |context: &Ident, _: &Ident| {
         let new_context: TokenStream2 = leak_context(context);
         let statements = multi_path.variables.iter().map(|variable| {
             quote! {
