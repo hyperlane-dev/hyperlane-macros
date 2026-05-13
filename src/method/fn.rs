@@ -100,13 +100,13 @@ macro_rules! impl_http_method_macro {
     };
 }
 
-impl_http_method_macro!(get_method_handler, get_method, get);
-impl_http_method_macro!(post_method_handler, post_method, post);
-impl_http_method_macro!(put_method_handler, put_method, put);
-impl_http_method_macro!(delete_method_handler, delete_method, delete);
-impl_http_method_macro!(patch_method_handler, patch_method, patch);
-impl_http_method_macro!(head_method_handler, head_method, head);
-impl_http_method_macro!(options_method_handler, options_method, options);
-impl_http_method_macro!(connect_method_handler, connect_method, connect);
-impl_http_method_macro!(trace_method_handler, trace_method, trace);
-impl_http_method_macro!(unknown_method_handler, unknown_method, unknown);
+impl_http_method_macro!(is_get_method_handler, is_get_method, get);
+impl_http_method_macro!(is_post_method_handler, is_post_method, post);
+impl_http_method_macro!(is_put_method_handler, is_put_method, put);
+impl_http_method_macro!(is_delete_method_handler, is_delete_method, delete);
+impl_http_method_macro!(is_patch_method_handler, is_patch_method, patch);
+impl_http_method_macro!(is_head_method_handler, is_head_method, head);
+impl_http_method_macro!(is_options_method_handler, is_options_method, options);
+impl_http_method_macro!(is_connect_method_handler, is_connect_method, connect);
+impl_http_method_macro!(is_trace_method_handler, is_trace_method, trace);
+impl_http_method_macro!(is_unknown_method_handler, is_unknown_method, unknown);

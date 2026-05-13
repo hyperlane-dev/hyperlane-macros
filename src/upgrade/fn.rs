@@ -49,7 +49,11 @@ macro_rules! impl_protocol_check_macro {
     };
 }
 
-impl_protocol_check_macro!(ws_upgrade_type_macro, ws_upgrade_type, ws);
-impl_protocol_check_macro!(h2c_upgrade_type_macro, h2c_upgrade_type, h2c);
-impl_protocol_check_macro!(tls_upgrade_type_macro, tls_upgrade_type, tls);
-impl_protocol_check_macro!(unknown_upgrade_type_macro, unknown_upgrade_type, unknown);
+impl_protocol_check_macro!(is_ws_upgrade_type_macro, is_ws_upgrade_type, ws);
+impl_protocol_check_macro!(is_h2c_upgrade_type_macro, is_h2c_upgrade_type, h2c);
+impl_protocol_check_macro!(is_tls_upgrade_type_macro, is_tls_upgrade_type, tls);
+impl_protocol_check_macro!(
+    is_unknown_upgrade_type_macro,
+    is_unknown_upgrade_type,
+    unknown
+);

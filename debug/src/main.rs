@@ -97,7 +97,7 @@ impl ServerHook for UpgradeHook {
     }
 
     #[epilogue_macros(
-        ws_upgrade_type,
+        is_ws_upgrade_type,
         response_body(Vec::new()),
         response_status_code(101),
         response_header(UPGRADE => WEBSOCKET),
@@ -170,7 +170,7 @@ impl ServerHook for ResponseMiddleware3 {
     }
 
     #[prologue_macros(
-        ws_upgrade_type,
+        is_ws_upgrade_type,
         response_header(STEP => "response_middleware_3")
     )]
     #[epilogue_macros(try_send, flush)]
@@ -186,8 +186,8 @@ impl ServerHook for PrologueHooks {
         Self
     }
 
-    #[get_method]
-    #[http_version]
+    #[is_get_method]
+    #[is_http_version]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -241,7 +241,7 @@ impl ServerHook for ConnectMethod {
         Self
     }
 
-    #[prologue_macros(connect_method, response_body("connect"))]
+    #[prologue_macros(is_connect_method, response_body("connect"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -255,7 +255,7 @@ impl ServerHook for DeleteMethod {
         Self
     }
 
-    #[prologue_macros(delete_method, response_body("delete"))]
+    #[prologue_macros(is_delete_method, response_body("delete"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -269,7 +269,7 @@ impl ServerHook for HeadMethod {
         Self
     }
 
-    #[prologue_macros(head_method, response_body("head"))]
+    #[prologue_macros(is_head_method, response_body("head"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -283,7 +283,7 @@ impl ServerHook for OptionsMethod {
         Self
     }
 
-    #[prologue_macros(options_method, response_body("options"))]
+    #[prologue_macros(is_options_method, response_body("options"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -297,7 +297,7 @@ impl ServerHook for PatchMethod {
         Self
     }
 
-    #[prologue_macros(patch_method, response_body("patch"))]
+    #[prologue_macros(is_patch_method, response_body("patch"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -311,7 +311,7 @@ impl ServerHook for PutMethod {
         Self
     }
 
-    #[prologue_macros(put_method, response_body("put"))]
+    #[prologue_macros(is_put_method, response_body("put"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -325,7 +325,7 @@ impl ServerHook for TraceMethod {
         Self
     }
 
-    #[prologue_macros(trace_method, response_body("trace"))]
+    #[prologue_macros(is_trace_method, response_body("trace"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -341,7 +341,7 @@ impl ServerHook for GetPostMethod {
 
     #[closed]
     #[prologue_macros(
-        http_version,
+        is_http_version,
         methods(get, post),
         response_body("get_post_method"),
         response_status_code(200),
@@ -352,7 +352,7 @@ impl ServerHook for GetPostMethod {
     }
 }
 
-#[route("/get_method")]
+#[route("/is_get_method")]
 struct GetMethod;
 
 impl ServerHook for GetMethod {
@@ -360,13 +360,13 @@ impl ServerHook for GetMethod {
         Self
     }
 
-    #[prologue_macros(ws_upgrade_type, get_method, response_body("get_method"))]
+    #[prologue_macros(is_ws_upgrade_type, is_get_method, response_body("is_get_method"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/post_method")]
+#[route("/is_post_method")]
 struct PostMethod;
 
 impl ServerHook for PostMethod {
@@ -374,13 +374,13 @@ impl ServerHook for PostMethod {
         Self
     }
 
-    #[prologue_macros(post_method, response_body("post_method"), try_send)]
+    #[prologue_macros(is_post_method, response_body("is_post_method"), try_send)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/unknown_method")]
+#[route("/is_unknown_method")]
 struct UnknownMethod;
 
 impl ServerHook for UnknownMethod {
@@ -388,13 +388,13 @@ impl ServerHook for UnknownMethod {
         Self
     }
 
-    #[prologue_macros(unknown_method, response_body("unknown_method"), try_send)]
+    #[prologue_macros(is_unknown_method, response_body("is_unknown_method"), try_send)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http0_9_version")]
+#[route("/is_http0_9_version")]
 struct Http09Version;
 
 impl ServerHook for Http09Version {
@@ -402,13 +402,13 @@ impl ServerHook for Http09Version {
         Self
     }
 
-    #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
+    #[prologue_macros(is_http0_9_version, response_body("is_http0_9_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http1_0_version")]
+#[route("/is_http1_0_version")]
 struct Http10Version;
 
 impl ServerHook for Http10Version {
@@ -416,13 +416,13 @@ impl ServerHook for Http10Version {
         Self
     }
 
-    #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
+    #[prologue_macros(is_http1_0_version, response_body("is_http1_0_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http1_1_version")]
+#[route("/is_http1_1_version")]
 struct Http11Version;
 
 impl ServerHook for Http11Version {
@@ -430,13 +430,13 @@ impl ServerHook for Http11Version {
         Self
     }
 
-    #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
+    #[prologue_macros(is_http1_1_version, response_body("is_http1_1_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http2_version")]
+#[route("/is_http2_version")]
 struct Http2Version;
 
 impl ServerHook for Http2Version {
@@ -444,13 +444,13 @@ impl ServerHook for Http2Version {
         Self
     }
 
-    #[prologue_macros(http2_version, response_body("http2_version"))]
+    #[prologue_macros(is_http2_version, response_body("is_http2_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http3_version")]
+#[route("/is_http3_version")]
 struct Http3Version;
 
 impl ServerHook for Http3Version {
@@ -458,13 +458,13 @@ impl ServerHook for Http3Version {
         Self
     }
 
-    #[prologue_macros(http3_version, response_body("http3_version"))]
+    #[prologue_macros(is_http3_version, response_body("is_http3_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http1_1_or_higher_version")]
+#[route("/is_http1_1_or_higher_version")]
 struct Http11OrHigher;
 
 impl ServerHook for Http11OrHigher {
@@ -472,13 +472,16 @@ impl ServerHook for Http11OrHigher {
         Self
     }
 
-    #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
+    #[prologue_macros(
+        is_http1_1_or_higher_version,
+        response_body("is_http1_1_or_higher_version")
+    )]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/http_version")]
+#[route("/is_http_version")]
 struct HttpAllVersion;
 
 impl ServerHook for HttpAllVersion {
@@ -486,13 +489,13 @@ impl ServerHook for HttpAllVersion {
         Self
     }
 
-    #[prologue_macros(http_version, response_body("http_version"))]
+    #[prologue_macros(is_http_version, response_body("is_http_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/unknown_version")]
+#[route("/is_unknown_version")]
 struct UnknownVersion;
 
 impl ServerHook for UnknownVersion {
@@ -500,13 +503,13 @@ impl ServerHook for UnknownVersion {
         Self
     }
 
-    #[prologue_macros(unknown_version, response_body("unknown_version"))]
+    #[prologue_macros(is_unknown_version, response_body("is_unknown_version"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/ws_upgrade_type")]
+#[route("/is_ws_upgrade_type")]
 struct WsUpgradeType;
 
 impl ServerHook for WsUpgradeType {
@@ -514,13 +517,13 @@ impl ServerHook for WsUpgradeType {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/h2c_upgrade_type")]
+#[route("/is_h2c_upgrade_type")]
 struct H2cUpgradeType;
 
 impl ServerHook for H2cUpgradeType {
@@ -528,13 +531,13 @@ impl ServerHook for H2cUpgradeType {
         Self
     }
 
-    #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
+    #[prologue_macros(is_h2c_upgrade_type, response_body("is_h2c_upgrade_type"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/tls_upgrade_type")]
+#[route("/is_tls_upgrade_type")]
 struct Tls;
 
 impl ServerHook for Tls {
@@ -542,13 +545,13 @@ impl ServerHook for Tls {
         Self
     }
 
-    #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
+    #[prologue_macros(is_tls_upgrade_type, response_body("is_tls_upgrade_type"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 }
 
-#[route("/unknown_upgrade_type")]
+#[route("/is_unknown_upgrade_type")]
 struct UnknownUpgradeType;
 
 impl ServerHook for UnknownUpgradeType {
@@ -556,7 +559,7 @@ impl ServerHook for UnknownUpgradeType {
         Self
     }
 
-    #[prologue_macros(unknown_upgrade_type, response_body("unknown_upgrade_type"))]
+    #[prologue_macros(is_unknown_upgrade_type, response_body("is_unknown_upgrade_type"))]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -570,7 +573,7 @@ impl ServerHook for Websocket1 {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     #[try_get_websocket_request(body)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -586,7 +589,7 @@ impl ServerHook for Websocket2 {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     #[try_get_websocket_request(request)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
@@ -602,7 +605,7 @@ impl ServerHook for Websocket3 {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     #[try_get_websocket_request(request)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
@@ -618,7 +621,7 @@ impl ServerHook for Websocket4 {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     #[try_get_websocket_request(request)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
@@ -634,7 +637,7 @@ impl ServerHook for Websocket5 {
         Self
     }
 
-    #[ws_upgrade_type]
+    #[is_ws_upgrade_type]
     #[try_get_websocket_request(body)]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -1053,8 +1056,8 @@ impl ServerHook for RequestVersionTest {
         Self
     }
 
-    #[response_body(&format!("HTTP Version: {http_version}"))]
-    #[request_version(http_version)]
+    #[response_body(&format!("HTTP Version: {is_http_version}"))]
+    #[request_version(is_http_version)]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -1128,7 +1131,7 @@ impl InjectResponseBody {
     }
 }
 
-#[route("/inject/post_method")]
+#[route("/inject/is_post_method")]
 struct InjectPostMethod;
 
 impl ServerHook for InjectPostMethod {
@@ -1142,7 +1145,7 @@ impl ServerHook for InjectPostMethod {
 }
 
 impl InjectPostMethod {
-    #[prologue_macros(post_method, response_body("post method with ref self"))]
+    #[prologue_macros(is_post_method, response_body("post method with ref self"))]
     async fn post_method_with_ref_self(&self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -1215,7 +1218,7 @@ impl InjectMultipleMethods {
         Status::Continue
     }
 
-    #[unknown_method]
+    #[is_unknown_method]
     async fn unknown_method_with_ref_self(
         &self,
         _stream: &mut Stream,
@@ -1281,8 +1284,8 @@ impl ServerHook for InjectComplexPost {
 
 impl InjectComplexPost {
     #[prologue_macros(
-        post_method,
-        http_version,
+        is_post_method,
+        is_http_version,
         request_body(raw_body),
         response_status_code(201),
         response_header(CONTENT_TYPE => APPLICATION_JSON),
@@ -1299,12 +1302,12 @@ impl InjectComplexPost {
 }
 
 impl InjectComplexPost {
-    #[post_method]
+    #[is_post_method]
     async fn test_with_bool_param(_a: bool, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
 
-    #[get_method]
+    #[is_get_method]
     async fn test_with_multiple_params(
         _a: bool,
         _stream: &mut Stream,
@@ -1324,7 +1327,7 @@ impl ServerHook for TestSend {
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
         response_body("Test send operation")
@@ -1344,7 +1347,7 @@ impl ServerHook for TestTrySend {
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
         response_body("Test try send operation")
@@ -1364,7 +1367,7 @@ impl ServerHook for TestTryFlush {
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
         response_body("Test try flush operation")
@@ -1384,7 +1387,7 @@ impl ServerHook for TestClosed {
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
         response_body("Test closed operation")
@@ -1404,7 +1407,7 @@ impl ServerHook for TestFlush {
     }
 
     #[prologue_macros(
-        get_method,
+        is_get_method,
         response_status_code(200),
         response_header(CONTENT_TYPE => TEXT_PLAIN),
         response_body("Test flush operation")
@@ -1420,7 +1423,7 @@ async fn standalone_response_body_handler(_stream: &mut Stream, ctx: &mut Contex
     Status::Continue
 }
 
-#[prologue_macros(get_method, response_body("standalone get handler"))]
+#[prologue_macros(is_get_method, response_body("standalone get handler"))]
 async fn standalone_get_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
@@ -1462,8 +1465,8 @@ async fn standalone_try_flush_handler(stream: &mut Stream, _ctx: &mut Context) -
 }
 
 #[prologue_macros(
-    get_method,
-    http_version,
+    is_get_method,
+    is_http_version,
     response_status_code(200),
     response_header(CONTENT_TYPE => TEXT_PLAIN),
     response_body("standalone complex handler")
@@ -1617,42 +1620,42 @@ async fn standalone_response_version_handler(_stream: &mut Stream, ctx: &mut Con
     Status::Continue
 }
 
-#[connect_method]
+#[is_connect_method]
 async fn standalone_connect_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[delete_method]
+#[is_delete_method]
 async fn standalone_delete_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[head_method]
+#[is_head_method]
 async fn standalone_head_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[options_method]
+#[is_options_method]
 async fn standalone_options_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[patch_method]
+#[is_patch_method]
 async fn standalone_patch_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[put_method]
+#[is_put_method]
 async fn standalone_put_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[trace_method]
+#[is_trace_method]
 async fn standalone_trace_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[get_method]
+#[is_get_method]
 async fn standalone_get_handler_with_param(
     _a: bool,
     _stream: &mut Stream,
@@ -1661,7 +1664,7 @@ async fn standalone_get_handler_with_param(
     Status::Continue
 }
 
-#[unknown_method]
+#[is_unknown_method]
 async fn standalone_unknown_method_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
@@ -1671,32 +1674,32 @@ async fn standalone_methods_multiple_handler(_stream: &mut Stream, ctx: &mut Con
     Status::Continue
 }
 
-#[http0_9_version]
+#[is_http0_9_version]
 async fn standalone_http0_9_version_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[http1_0_version]
+#[is_http1_0_version]
 async fn standalone_http1_0_version_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[http1_1_version]
+#[is_http1_1_version]
 async fn standalone_http1_1_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[http2_version]
+#[is_http2_version]
 async fn standalone_http2_version_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[http3_version]
+#[is_http3_version]
 async fn standalone_http3_version_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[http1_1_or_higher_version]
+#[is_http1_1_or_higher_version]
 async fn standalone_http1_1_or_higher_version_handler(
     _stream: &mut Stream,
     ctx: &mut Context,
@@ -1704,27 +1707,27 @@ async fn standalone_http1_1_or_higher_version_handler(
     Status::Continue
 }
 
-#[unknown_version]
+#[is_unknown_version]
 async fn standalone_unknown_version_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[h2c_upgrade_type]
+#[is_h2c_upgrade_type]
 async fn standalone_h2c_upgrade_type_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[tls_upgrade_type]
+#[is_tls_upgrade_type]
 async fn standalone_tls_upgrade_type_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[ws_upgrade_type]
+#[is_ws_upgrade_type]
 async fn standalone_ws_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
-#[unknown_upgrade_type]
+#[is_unknown_upgrade_type]
 async fn standalone_unknown_upgrade_type_handler(
     _stream: &mut Stream,
     ctx: &mut Context,
@@ -1950,7 +1953,7 @@ async fn standalone_clear_response_headers_handler(
 }
 
 #[prologue_macros(
-    get_method,
+    is_get_method,
     response_status_code(200),
     response_header(CONTENT_TYPE => TEXT_PLAIN),
     response_body("prologue macros test")
@@ -1994,7 +1997,7 @@ impl ServerHook for HooksExpression {
         Self
     }
 
-    #[get_method]
+    #[is_get_method]
     #[prologue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
     #[epilogue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
     #[response_body("hooks expression test")]
@@ -2021,7 +2024,7 @@ impl ServerHook for MultiServerConfig {
         Self
     }
 
-    #[get_method]
+    #[is_get_method]
     #[response_body("multi server config test")]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue

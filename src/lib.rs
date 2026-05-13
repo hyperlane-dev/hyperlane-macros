@@ -1,4 +1,4 @@
-//! hyperlane-macros
+﻿//! hyperlane-macros
 //!
 //! A comprehensive collection of procedural macros for building
 //! HTTP servers with enhanced functionality. This crate provides
@@ -70,7 +70,7 @@ use {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws_upgrade_type")]
+/// #[route("/is_ws_upgrade_type")]
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
@@ -78,7 +78,7 @@ use {
 ///         Self
 ///     }
 ///
-///     #[ws_upgrade_type]
+///     #[is_ws_upgrade_type]
 ///     #[try_get_websocket_request(body)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -93,7 +93,7 @@ use {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws_upgrade_type")]
+/// #[route("/is_ws_upgrade_type")]
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
@@ -101,7 +101,7 @@ use {
 ///         Self
 ///     }
 ///
-///     #[ws_upgrade_type]
+///     #[is_ws_upgrade_type]
 ///     #[try_get_websocket_request(request)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&request);
@@ -200,7 +200,7 @@ pub fn try_get_http_request(attr: TokenStream, item: TokenStream) -> TokenStream
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/get_method")]
+/// #[route("/is_get_method")]
 /// struct Get;
 ///
 /// impl ServerHook for Get {
@@ -208,24 +208,24 @@ pub fn try_get_http_request(attr: TokenStream, item: TokenStream) -> TokenStream
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(get_method, response_body("get_method"))]
+///     #[prologue_macros(is_get_method, response_body("is_get_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Get {
-///     #[get_method]
+///     #[is_get_method]
 ///     async fn get_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[get_method]
+/// #[is_get_method]
 /// async fn standalone_get_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    get_method_handler(item, Position::Prologue)
+pub fn is_get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_get_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP POST requests only.
@@ -239,7 +239,7 @@ pub fn get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/post_method")]
+/// #[route("/is_post_method")]
 /// struct Post;
 ///
 /// impl ServerHook for Post {
@@ -247,24 +247,24 @@ pub fn get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(post_method, response_body("post_method"))]
+///     #[prologue_macros(is_post_method, response_body("is_post_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Post {
-///     #[post_method]
+///     #[is_post_method]
 ///     async fn post_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[post_method]
+/// #[is_post_method]
 /// async fn standalone_post_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    post_method_handler(item, Position::Prologue)
+pub fn is_post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_post_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP PUT requests only.
@@ -278,7 +278,7 @@ pub fn post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/put_method")]
+/// #[route("/is_put_method")]
 /// struct Put;
 ///
 /// impl ServerHook for Put {
@@ -286,24 +286,24 @@ pub fn post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(put_method, response_body("put_method"))]
+///     #[prologue_macros(is_put_method, response_body("is_put_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Put {
-///     #[put_method]
+///     #[is_put_method]
 ///     async fn put_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[put_method]
+/// #[is_put_method]
 /// async fn standalone_put_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    put_method_handler(item, Position::Prologue)
+pub fn is_put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_put_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP DELETE requests only.
@@ -317,7 +317,7 @@ pub fn put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/delete_method")]
+/// #[route("/is_delete_method")]
 /// struct Delete;
 ///
 /// impl ServerHook for Delete {
@@ -325,24 +325,24 @@ pub fn put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(delete_method, response_body("delete_method"))]
+///     #[prologue_macros(is_delete_method, response_body("is_delete_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Delete {
-///     #[delete_method]
+///     #[is_delete_method]
 ///     async fn delete_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[delete_method]
+/// #[is_delete_method]
 /// async fn standalone_delete_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    delete_method_handler(item, Position::Prologue)
+pub fn is_delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_delete_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP PATCH requests only.
@@ -356,7 +356,7 @@ pub fn delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/patch_method")]
+/// #[route("/is_patch_method")]
 /// struct Patch;
 ///
 /// impl ServerHook for Patch {
@@ -364,24 +364,24 @@ pub fn delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(patch_method, response_body("patch_method"))]
+///     #[prologue_macros(is_patch_method, response_body("is_patch_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Patch {
-///     #[patch_method]
+///     #[is_patch_method]
 ///     async fn patch_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[patch_method]
+/// #[is_patch_method]
 /// async fn standalone_patch_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    patch_method_handler(item, Position::Prologue)
+pub fn is_patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_patch_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP HEAD requests only.
@@ -395,7 +395,7 @@ pub fn patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/head_method")]
+/// #[route("/is_head_method")]
 /// struct Head;
 ///
 /// impl ServerHook for Head {
@@ -403,24 +403,24 @@ pub fn patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(head_method, response_body("head_method"))]
+///     #[prologue_macros(is_head_method, response_body("is_head_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Head {
-///     #[head_method]
+///     #[is_head_method]
 ///     async fn head_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[head_method]
+/// #[is_head_method]
 /// async fn standalone_head_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    head_method_handler(item, Position::Prologue)
+pub fn is_head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_head_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP OPTIONS requests only.
@@ -434,7 +434,7 @@ pub fn head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/options_method")]
+/// #[route("/is_options_method")]
 /// struct Options;
 ///
 /// impl ServerHook for Options {
@@ -442,24 +442,24 @@ pub fn head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(options_method, response_body("options_method"))]
+///     #[prologue_macros(is_options_method, response_body("is_options_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Options {
-///     #[options_method]
+///     #[is_options_method]
 ///     async fn options_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[options_method]
+/// #[is_options_method]
 /// async fn standalone_options_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    options_method_handler(item, Position::Prologue)
+pub fn is_options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_options_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP CONNECT requests only.
@@ -473,7 +473,7 @@ pub fn options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/connect_method")]
+/// #[route("/is_connect_method")]
 /// struct Connect;
 ///
 /// impl ServerHook for Connect {
@@ -481,24 +481,24 @@ pub fn options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(connect_method, response_body("connect_method"))]
+///     #[prologue_macros(is_connect_method, response_body("is_connect_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Connect {
-///     #[connect_method]
+///     #[is_connect_method]
 ///     async fn connect_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[connect_method]
+/// #[is_connect_method]
 /// async fn standalone_connect_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    connect_method_handler(item, Position::Prologue)
+pub fn is_connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_connect_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP TRACE requests only.
@@ -512,7 +512,7 @@ pub fn connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/trace_method")]
+/// #[route("/is_trace_method")]
 /// struct Trace;
 ///
 /// impl ServerHook for Trace {
@@ -520,24 +520,24 @@ pub fn connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(trace_method, response_body("trace_method"))]
+///     #[prologue_macros(is_trace_method, response_body("is_trace_method"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Trace {
-///     #[trace_method]
+///     #[is_trace_method]
 ///     async fn trace_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[trace_method]
+/// #[is_trace_method]
 /// async fn standalone_trace_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    trace_method_handler(item, Position::Prologue)
+pub fn is_trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_trace_method_handler(item, Position::Prologue)
 }
 
 /// Restricts function execution to unknown HTTP methods only.
@@ -552,7 +552,7 @@ pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/unknown_method")]
+/// #[route("/is_unknown_method")]
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
@@ -563,25 +563,25 @@ pub fn trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     #[prologue_macros(
 ///         clear_response_headers,
 ///         filter(ctx.get_request().get_method().is_unknown()),
-///         response_body("unknown_method")
+///         response_body("is_unknown_method")
 ///     )]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownMethod {
-///     #[unknown_method]
+///     #[is_unknown_method]
 ///     async fn unknown_method_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[unknown_method]
-/// async fn standalone_unknown_method_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+/// #[is_unknown_method]
+/// async fn standalone_is_unknown_method_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    unknown_method_handler(item, Position::Prologue)
+pub fn is_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_unknown_method_handler(item, Position::Prologue)
 }
 
 /// Allows function to handle multiple HTTP methods.
@@ -604,7 +604,7 @@ pub fn unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         http_version,
+///         is_http_version,
 ///         methods(get, post),
 ///         response_body("methods")
 ///     )]
@@ -638,7 +638,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http0_9_version")]
+/// #[route("/is_http0_9_version")]
 /// struct Http09;
 ///
 /// impl ServerHook for Http09 {
@@ -646,24 +646,24 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http0_9_version, response_body("http0_9_version"))]
+///     #[prologue_macros(is_http0_9_version, response_body("is_http0_9_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http09 {
-///     #[http0_9_version]
+///     #[is_http0_9_version]
 ///     async fn http0_9_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http0_9_version]
+/// #[is_http0_9_version]
 /// async fn standalone_http0_9_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http0_9_version_macro(item, Position::Prologue)
+pub fn is_http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http0_9_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.0 requests only.
@@ -677,7 +677,7 @@ pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http1_0_version")]
+/// #[route("/is_http1_0_version")]
 /// struct Http10;
 ///
 /// impl ServerHook for Http10 {
@@ -685,24 +685,24 @@ pub fn http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http1_0_version, response_body("http1_0_version"))]
+///     #[prologue_macros(is_http1_0_version, response_body("is_http1_0_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http10 {
-///     #[http1_0_version]
+///     #[is_http1_0_version]
 ///     async fn http1_0_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http1_0_version]
+/// #[is_http1_0_version]
 /// async fn standalone_http1_0_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_0_version_macro(item, Position::Prologue)
+pub fn is_http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http1_0_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.1 requests only.
@@ -716,7 +716,7 @@ pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http1_1_version")]
+/// #[route("/is_http1_1_version")]
 /// struct Http11;
 ///
 /// impl ServerHook for Http11 {
@@ -724,24 +724,24 @@ pub fn http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http1_1_version, response_body("http1_1_version"))]
+///     #[prologue_macros(is_http1_1_version, response_body("is_http1_1_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http11 {
-///     #[http1_1_version]
+///     #[is_http1_1_version]
 ///     async fn http1_1_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http1_1_version]
+/// #[is_http1_1_version]
 /// async fn standalone_http1_1_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_version_macro(item, Position::Prologue)
+pub fn is_http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http1_1_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/2 requests only.
@@ -755,7 +755,7 @@ pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http2_version")]
+/// #[route("/is_http2_version")]
 /// struct Http2;
 ///
 /// impl ServerHook for Http2 {
@@ -763,24 +763,24 @@ pub fn http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http2_version, response_body("http2_version"))]
+///     #[prologue_macros(is_http2_version, response_body("is_http2_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http2 {
-///     #[http2_version]
+///     #[is_http2_version]
 ///     async fn http2_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http2_version]
+/// #[is_http2_version]
 /// async fn standalone_http2_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http2_version_macro(item, Position::Prologue)
+pub fn is_http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http2_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/3 requests only.
@@ -794,7 +794,7 @@ pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http3_version")]
+/// #[route("/is_http3_version")]
 /// struct Http3;
 ///
 /// impl ServerHook for Http3 {
@@ -802,24 +802,24 @@ pub fn http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http3_version, response_body("http3_version"))]
+///     #[prologue_macros(is_http3_version, response_body("is_http3_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http3 {
-///     #[http3_version]
+///     #[is_http3_version]
 ///     async fn http3_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http3_version]
+/// #[is_http3_version]
 /// async fn standalone_http3_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http3_version_macro(item, Position::Prologue)
+pub fn is_http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http3_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to HTTP/1.1 or higher protocol versions.
@@ -833,7 +833,7 @@ pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/http1_1_or_higher_version")]
+/// #[route("/is_http1_1_or_higher_version")]
 /// struct Http11OrHigher;
 ///
 /// impl ServerHook for Http11OrHigher {
@@ -841,24 +841,24 @@ pub fn http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http1_1_or_higher_version, response_body("http1_1_or_higher_version"))]
+///     #[prologue_macros(is_http1_1_or_higher_version, response_body("is_http1_1_or_higher_version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Http11OrHigher {
-///     #[http1_1_or_higher_version]
+///     #[is_http1_1_or_higher_version]
 ///     async fn http1_1_or_higher_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http1_1_or_higher_version]
+/// #[is_http1_1_or_higher_version]
 /// async fn standalone_http1_1_or_higher_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http1_1_or_higher_version_macro(item, Position::Prologue)
+pub fn is_http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http1_1_or_higher_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to standard HTTP requests only.
@@ -880,24 +880,24 @@ pub fn http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> Token
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(http_version, response_body("http"))]
+///     #[prologue_macros(is_http_version, response_body("http"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl HttpOnly {
-///     #[http_version]
+///     #[is_http_version]
 ///     async fn http_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[http_version]
+/// #[is_http_version]
 /// async fn standalone_http_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    http_version_macro(item, Position::Prologue)
+pub fn is_http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_http_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to requests with unknown HTTP versions only.
@@ -911,7 +911,7 @@ pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/unknown_version")]
+/// #[route("/is_unknown_version")]
 /// struct UnknownVersionHandler;
 ///
 /// impl ServerHook for UnknownVersionHandler {
@@ -919,24 +919,24 @@ pub fn http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(unknown_version, response_body("unknown version"))]
+///     #[prologue_macros(is_unknown_version, response_body("unknown version"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownVersionHandler {
-///     #[unknown_version]
+///     #[is_unknown_version]
 ///     async fn handle_unknown_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[unknown_version]
+/// #[is_unknown_version]
 /// async fn standalone_unknown_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    unknown_version_macro(item, Position::Prologue)
+pub fn is_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_unknown_version_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to WebSocket upgrade requests only.
@@ -950,7 +950,7 @@ pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/ws_upgrade_type")]
+/// #[route("/is_ws_upgrade_type")]
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
@@ -958,7 +958,7 @@ pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[ws_upgrade_type]
+///     #[is_ws_upgrade_type]
 ///     #[try_get_websocket_request(body)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
 ///         let body_list: Vec<ResponseBody> = WebSocketFrame::create_frame_list(&body);
@@ -967,25 +967,25 @@ pub fn unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 ///
 /// impl Websocket {
-///     #[ws_upgrade_type]
+///     #[is_ws_upgrade_type]
 ///     async fn ws_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[ws_upgrade_type]
+/// #[is_ws_upgrade_type]
 /// async fn standalone_ws_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    ws_upgrade_type_macro(item, Position::Prologue)
+pub fn is_ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_ws_upgrade_type_macro(item, Position::Prologue)
 }
 
-/// Restricts function execution to HTTP/2 Cleartext (h2c_upgrade_type) requests only.
+/// Restricts function execution to HTTP/2 Cleartext (is_h2c_upgrade_type) requests only.
 ///
 /// This attribute macro ensures the decorated function only executes for HTTP/2 cleartext
-/// requests that use the h2c_upgrade_type upgrade mechanism.
+/// requests that use the is_h2c_upgrade_type upgrade mechanism.
 ///
 /// # Usage
 ///
@@ -993,7 +993,7 @@ pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/h2c_upgrade_type")]
+/// #[route("/is_h2c_upgrade_type")]
 /// struct H2c;
 ///
 /// impl ServerHook for H2c {
@@ -1001,24 +1001,24 @@ pub fn ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(h2c_upgrade_type, response_body("h2c_upgrade_type"))]
+///     #[prologue_macros(is_h2c_upgrade_type, response_body("is_h2c_upgrade_type"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl H2c {
-///     #[h2c_upgrade_type]
+///     #[is_h2c_upgrade_type]
 ///     async fn h2c_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[h2c_upgrade_type]
+/// #[is_h2c_upgrade_type]
 /// async fn standalone_h2c_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    h2c_upgrade_type_macro(item, Position::Prologue)
+pub fn is_h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_h2c_upgrade_type_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to TLS-encrypted requests only.
@@ -1032,7 +1032,7 @@ pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/tls_upgrade_type")]
+/// #[route("/is_tls_upgrade_type")]
 /// struct Tls;
 ///
 /// impl ServerHook for Tls {
@@ -1040,24 +1040,24 @@ pub fn h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(tls_upgrade_type, response_body("tls_upgrade_type"))]
+///     #[prologue_macros(is_tls_upgrade_type, response_body("is_tls_upgrade_type"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Tls {
-///     #[tls_upgrade_type]
+///     #[is_tls_upgrade_type]
 ///     async fn tls_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[tls_upgrade_type]
+/// #[is_tls_upgrade_type]
 /// async fn standalone_tls_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    tls_upgrade_type_macro(item, Position::Prologue)
+pub fn is_tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_tls_upgrade_type_macro(item, Position::Prologue)
 }
 
 /// Restricts function execution to requests with unknown protocol upgrade types only.
@@ -1071,7 +1071,7 @@ pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/unknown_upgrade_type")]
+/// #[route("/is_unknown_upgrade_type")]
 /// struct UnknownUpgrade;
 ///
 /// impl ServerHook for UnknownUpgrade {
@@ -1079,24 +1079,24 @@ pub fn tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(unknown_upgrade_type, response_body("unknown upgrade type"))]
+///     #[prologue_macros(is_unknown_upgrade_type, response_body("unknown upgrade type"))]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl UnknownUpgrade {
-///     #[unknown_upgrade_type]
+///     #[is_unknown_upgrade_type]
 ///     async fn unknown_upgrade_type_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[unknown_upgrade_type]
+/// #[is_unknown_upgrade_type]
 /// async fn standalone_unknown_upgrade_type_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro takes no parameters and should be applied directly to async functions
 /// that accept a `&mut Context` parameter.
 #[proc_macro_attribute]
-pub fn unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    unknown_upgrade_type_macro(item, Position::Prologue)
+pub fn is_unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    is_unknown_upgrade_type_macro(item, Position::Prologue)
 }
 
 /// Sets the HTTP status code for the response.
@@ -1413,7 +1413,7 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/unknown_method")]
+/// #[route("/is_unknown_method")]
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
@@ -1423,7 +1423,7 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 ///     #[prologue_macros(
 ///         filter(ctx.get_request().get_method().is_unknown()),
-///         response_body("unknown_method")
+///         response_body("is_unknown_method")
 ///     )]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
@@ -1662,8 +1662,8 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[get_method]
-///     #[http_version]
+///     #[is_get_method]
+///     #[is_http_version]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
@@ -1704,7 +1704,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[get_method]
+///     #[is_get_method]
 ///     #[prologue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
 ///     #[response_body("hooks expression test")]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
@@ -1781,7 +1781,7 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[get_method]
+///     #[is_get_method]
 ///     #[epilogue_hooks(HooksExpression::new_hook, HooksExpression::method_hook)]
 ///     #[response_body("hooks expression test")]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
@@ -3128,17 +3128,17 @@ pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("HTTP Version: {http_version}"))]
-///     #[request_version(http_version)]
+///     #[response_body(&format!("HTTP Version: {is_http_version}"))]
+///     #[request_version(is_http_version)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestVersionTest {
-///     #[request_version(http_version)]
+///     #[request_version(is_http_version)]
 ///     async fn request_version_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[request_version(http_version)]
+/// #[request_version(is_http_version)]
 /// async fn standalone_request_version_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
@@ -3452,7 +3452,7 @@ pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[prologue_macros(post_method, response_body("prologue_macros"), send)]
+///     #[prologue_macros(is_post_method, response_body("prologue_macros"), send)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
