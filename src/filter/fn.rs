@@ -24,7 +24,7 @@ pub(crate) fn filter_macro(
     inject(position, item, |_: &Ident, _: &Ident| {
         quote! {
             if !(#condition) {
-                return ::hyperlane::Status::Reject;
+                return ::hyperlane::Status::Continue;
             }
         }
     })
