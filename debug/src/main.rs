@@ -27,13 +27,13 @@ impl ServerHook for TakPanicHook {
     }
 
     #[prologue_macros(
-        task_panic_data_option(task_panic_data_option),
+        try_get_task_panic_data(try_get_task_panic_data),
         task_panic_data(task_panic_data)
     )]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body(format!("{task_panic_data} {task_panic_data_option:?}")),
+        response_body(format!("{task_panic_data} {try_get_task_panic_data:?}")),
         send
     )]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -52,13 +52,13 @@ impl ServerHook for RequestErrorHook {
     }
 
     #[prologue_macros(
-        request_error_data_option(request_error_data_option),
+        try_get_request_error_data(try_get_request_error_data),
         request_error_data(request_error_data)
     )]
     #[epilogue_macros(
         response_version(HttpVersion::Http1_1),
         response_status_code(500),
-        response_body(format!("{request_error_data} {request_error_data_option:?}")),
+        response_body(format!("{request_error_data} {try_get_request_error_data:?}")),
         send
     )]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -688,7 +688,7 @@ impl ServerHook for RouteParams {
     }
 }
 
-#[route("/route_param_option/:test")]
+#[route("/try_get_route_param/:test")]
 struct RouteParamOption;
 
 impl ServerHook for RouteParamOption {
@@ -696,9 +696,9 @@ impl ServerHook for RouteParamOption {
         Self
     }
 
-    #[response_body(&format!("route param: {request_route_param_option1:?} {request_route_param_option2:?} {request_route_param_option3:?}"))]
-    #[route_param_option("test1" => request_route_param_option1)]
-    #[route_param_option("test2" => request_route_param_option2, "test3" => request_route_param_option3)]
+    #[response_body(&format!("route param: {request_try_get_route_param1:?} {request_try_get_route_param2:?} {request_try_get_route_param3:?}"))]
+    #[try_get_route_param("test1" => request_try_get_route_param1)]
+    #[try_get_route_param("test2" => request_try_get_route_param2, "test3" => request_try_get_route_param3)]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -736,7 +736,7 @@ impl ServerHook for Host {
     }
 }
 
-#[route("/request_query_option")]
+#[route("/try_get_request_query")]
 struct RequestQueryOption;
 
 impl ServerHook for RequestQueryOption {
@@ -745,13 +745,13 @@ impl ServerHook for RequestQueryOption {
     }
 
     #[epilogue_macros(
-        request_query_option("test" => request_query_option),
-        response_body(&format!("request query: {request_query_option:?}")),
+        try_get_request_query("test" => try_get_request_query),
+        response_body(&format!("request query: {try_get_request_query:?}")),
         send
     )]
     #[prologue_macros(
-        request_query_option("test" => request_query_option),
-        response_body(&format!("request query: {request_query_option:?}")),
+        try_get_request_query("test" => try_get_request_query),
+        response_body(&format!("request query: {try_get_request_query:?}")),
         send
     )]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -782,7 +782,7 @@ impl ServerHook for RequestQuery {
     }
 }
 
-#[route("/request_header_option")]
+#[route("/try_get_request_header")]
 struct RequestHeaderOption;
 
 impl ServerHook for RequestHeaderOption {
@@ -791,13 +791,13 @@ impl ServerHook for RequestHeaderOption {
     }
 
     #[epilogue_macros(
-        request_header_option(HOST => request_header_option),
-        response_body(&format!("request header: {request_header_option:?}")),
+        try_get_request_header(HOST => try_get_request_header),
+        response_body(&format!("request header: {try_get_request_header:?}")),
         send
     )]
     #[prologue_macros(
-        request_header_option(HOST => request_header_option),
-        response_body(&format!("request header: {request_header_option:?}")),
+        try_get_request_header(HOST => try_get_request_header),
+        response_body(&format!("request header: {try_get_request_header:?}")),
         send
     )]
     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
@@ -906,7 +906,7 @@ impl ServerHook for RejectHost {
     }
 }
 
-#[route("/attribute_option")]
+#[route("/try_get_attribute")]
 struct AttributeOption;
 
 impl ServerHook for AttributeOption {
@@ -914,8 +914,8 @@ impl ServerHook for AttributeOption {
         Self
     }
 
-    #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
-    #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+    #[response_body(&format!("request attribute: {request_try_get_attribute:?}"))]
+    #[try_get_attribute(TEST_ATTRIBUTE_KEY => request_try_get_attribute: TestData)]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -1015,7 +1015,7 @@ impl ServerHook for Cookies {
     }
 }
 
-#[route("/request_cookie_option")]
+#[route("/try_get_request_cookie")]
 struct CookieOption;
 
 impl ServerHook for CookieOption {
@@ -1024,7 +1024,7 @@ impl ServerHook for CookieOption {
     }
 
     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-    #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+    #[try_get_request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
     async fn handle(self, _stream: &mut Stream, ctx: &mut Context) -> Status {
         Status::Continue
     }
@@ -1216,7 +1216,11 @@ impl InjectMultipleMethods {
     }
 
     #[unknown_method]
-    async fn unknown_method_with_ref_self(&self, _stream: &mut Stream, ctx: &mut Context) -> Status {
+    async fn unknown_method_with_ref_self(
+        &self,
+        _stream: &mut Stream,
+        ctx: &mut Context,
+    ) -> Status {
         Status::Continue
     }
 }
@@ -1580,7 +1584,10 @@ async fn test_multi_hyperlane() {
 }
 
 #[response_status_code(200)]
-async fn standalone_response_status_code_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
+async fn standalone_response_status_code_handler(
+    _stream: &mut Stream,
+    ctx: &mut Context,
+) -> Status {
     Status::Continue
 }
 
@@ -1718,7 +1725,10 @@ async fn standalone_ws_handler(_stream: &mut Stream, ctx: &mut Context) -> Statu
 }
 
 #[unknown_upgrade_type]
-async fn standalone_unknown_upgrade_type_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
+async fn standalone_unknown_upgrade_type_handler(
+    _stream: &mut Stream,
+    ctx: &mut Context,
+) -> Status {
     Status::Continue
 }
 
@@ -1752,8 +1762,11 @@ async fn standalone_request_query_handler(_stream: &mut Stream, ctx: &mut Contex
     Status::Continue
 }
 
-#[request_query_option("optional_param" => _optional_value)]
-async fn standalone_request_query_option_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
+#[try_get_request_query("optional_param" => _optional_value)]
+async fn standalone_try_get_request_query_handler(
+    _stream: &mut Stream,
+    ctx: &mut Context,
+) -> Status {
     Status::Continue
 }
 
@@ -1762,8 +1775,8 @@ async fn standalone_request_header_handler(_stream: &mut Stream, ctx: &mut Conte
     Status::Continue
 }
 
-#[request_header_option(USER_AGENT => _user_agent)]
-async fn standalone_request_header_option_handler(
+#[try_get_request_header(USER_AGENT => _user_agent)]
+async fn standalone_try_get_request_header_handler(
     _stream: &mut Stream,
     ctx: &mut Context,
 ) -> Status {
@@ -1790,8 +1803,8 @@ async fn standalone_request_cookie_handler(_stream: &mut Stream, ctx: &mut Conte
     Status::Continue
 }
 
-#[request_cookie_option("optional_cookie" => _optional_cookie)]
-async fn standalone_request_cookie_option_handler(
+#[try_get_request_cookie("optional_cookie" => _optional_cookie)]
+async fn standalone_try_get_request_cookie_handler(
     _stream: &mut Stream,
     ctx: &mut Context,
 ) -> Status {
@@ -1813,8 +1826,8 @@ async fn standalone_attribute_handler(_stream: &mut Stream, ctx: &mut Context) -
     Status::Continue
 }
 
-#[attribute_option("optional_key" => _optional_attr: String)]
-async fn standalone_attribute_option_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
+#[try_get_attribute("optional_key" => _optional_attr: String)]
+async fn standalone_try_get_attribute_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 
@@ -1833,8 +1846,8 @@ async fn standalone_route_param_handler(_stream: &mut Stream, ctx: &mut Context)
     Status::Continue
 }
 
-#[route_param_option("optional_param" => _optional_param_value)]
-async fn standalone_route_param_option_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
+#[try_get_route_param("optional_param" => _optional_param_value)]
+async fn standalone_try_get_route_param_handler(_stream: &mut Stream, ctx: &mut Context) -> Status {
     Status::Continue
 }
 

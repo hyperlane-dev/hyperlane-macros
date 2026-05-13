@@ -105,7 +105,7 @@ pub(crate) fn request_body_json_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with attribute extraction.
-pub(crate) fn attribute_option_macro(
+pub(crate) fn try_get_attribute_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -202,7 +202,7 @@ pub(crate) fn attributes_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with panic data extraction.
-pub(crate) fn task_panic_data_option_macro(
+pub(crate) fn try_get_task_panic_data_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -262,7 +262,7 @@ pub(crate) fn task_panic_data_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with request error data extraction.
-pub(crate) fn request_error_data_option_macro(
+pub(crate) fn try_get_request_error_data_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -322,7 +322,7 @@ pub(crate) fn request_error_data_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with route param extraction.
-pub(crate) fn route_param_option_macro(
+pub(crate) fn try_get_route_param_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -413,7 +413,7 @@ pub(crate) fn route_params_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with query param extraction.
-pub(crate) fn request_query_option_macro(
+pub(crate) fn try_get_request_query_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -504,7 +504,7 @@ pub(crate) fn request_querys_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with header extraction.
-pub(crate) fn request_header_option_macro(
+pub(crate) fn try_get_request_header_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,
@@ -595,7 +595,7 @@ pub(crate) fn request_headers_macro(
 /// # Returns
 ///
 /// - `TokenStream` - The expanded token stream with cookie extraction.
-pub(crate) fn request_cookie_option_macro(
+pub(crate) fn try_get_request_cookie_macro(
     attr: TokenStream,
     item: TokenStream,
     position: Position,

@@ -117,8 +117,8 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
         handler: Handler::WithAttrPosition(request_body_json_macro),
     },
     InjectableMacro {
-        name: "attribute_option",
-        handler: Handler::WithAttrPosition(attribute_option_macro),
+        name: "try_get_attribute",
+        handler: Handler::WithAttrPosition(try_get_attribute_macro),
     },
     InjectableMacro {
         name: "attribute",
@@ -129,24 +129,24 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
         handler: Handler::WithAttrPosition(attributes_macro),
     },
     InjectableMacro {
-        name: "task_panic_data_option",
-        handler: Handler::WithAttrPosition(task_panic_data_option_macro),
+        name: "try_get_task_panic_data",
+        handler: Handler::WithAttrPosition(try_get_task_panic_data_macro),
     },
     InjectableMacro {
         name: "task_panic_data",
         handler: Handler::WithAttrPosition(task_panic_data_macro),
     },
     InjectableMacro {
-        name: "request_error_data_option",
-        handler: Handler::WithAttrPosition(request_error_data_option_macro),
+        name: "try_get_request_error_data",
+        handler: Handler::WithAttrPosition(try_get_request_error_data_macro),
     },
     InjectableMacro {
         name: "request_error_data",
         handler: Handler::WithAttrPosition(request_error_data_macro),
     },
     InjectableMacro {
-        name: "route_param_option",
-        handler: Handler::WithAttrPosition(route_param_option_macro),
+        name: "try_get_route_param",
+        handler: Handler::WithAttrPosition(try_get_route_param_macro),
     },
     InjectableMacro {
         name: "route_param",
@@ -157,8 +157,8 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
         handler: Handler::WithAttrPosition(route_params_macro),
     },
     InjectableMacro {
-        name: "request_query_option",
-        handler: Handler::WithAttrPosition(request_query_option_macro),
+        name: "try_get_request_query",
+        handler: Handler::WithAttrPosition(try_get_request_query_macro),
     },
     InjectableMacro {
         name: "request_query",
@@ -169,8 +169,8 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
         handler: Handler::WithAttrPosition(request_querys_macro),
     },
     InjectableMacro {
-        name: "request_header_option",
-        handler: Handler::WithAttrPosition(request_header_option_macro),
+        name: "try_get_request_header",
+        handler: Handler::WithAttrPosition(try_get_request_header_macro),
     },
     InjectableMacro {
         name: "request_header",
@@ -181,8 +181,8 @@ pub(crate) static INJECTABLE_MACROS: &[InjectableMacro] = &[
         handler: Handler::WithAttrPosition(request_headers_macro),
     },
     InjectableMacro {
-        name: "request_cookie_option",
-        handler: Handler::WithAttrPosition(request_cookie_option_macro),
+        name: "try_get_request_cookie",
+        handler: Handler::WithAttrPosition(try_get_request_cookie_macro),
     },
     InjectableMacro {
         name: "request_cookie",

@@ -108,8 +108,8 @@ cargo add hyperlane-macros
 
 ### Attribute Macros
 
-- `#[attribute_option(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
-- `#[attribute_option("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
+- `#[try_get_attribute(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
+- `#[try_get_attribute("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
 - `#[attribute(key => variable_name: type)]` - Extract a specific attribute by key into a typed variable
 - `#[attribute("key1" => var1: Type1, "key2" => var2: Type2, ...)]` - Supports multiple attribute extraction
 
@@ -120,22 +120,22 @@ cargo add hyperlane-macros
 
 ### Panic Data Macros
 
-- `#[task_panic_data_option(variable_name)]` - Extract panic data into a variable wrapped in Option type
-- `#[task_panic_data_option(var1, var2, ...)]` - Supports multiple panic data variables
+- `#[try_get_task_panic_data(variable_name)]` - Extract panic data into a variable wrapped in Option type
+- `#[try_get_task_panic_data(var1, var2, ...)]` - Supports multiple panic data variables
 - `#[task_panic_data(variable_name)]` - Extract panic data into a variable with panic on missing value
 - `#[task_panic_data(var1, var2, ...)]` - Supports multiple panic data variables
 
 ### Request Error Data Macros
 
-- `#[request_error_data_option(variable_name)]` - Extract request error data into a variable wrapped in Option type
-- `#[request_error_data_option(var1, var2, ...)]` - Supports multiple request error data variables
+- `#[try_get_request_error_data(variable_name)]` - Extract request error data into a variable wrapped in Option type
+- `#[try_get_request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
 - `#[request_error_data(variable_name)]` - Extract request error data into a variable with panic on missing value
 - `#[request_error_data(var1, var2, ...)]` - Supports multiple request error data variables
 
 ### Route Param Macros
 
-- `#[route_param_option(key => variable_name)]` - Extract a specific route parameter by key into a variable
-- `#[route_param_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
+- `#[try_get_route_param(key => variable_name)]` - Extract a specific route parameter by key into a variable
+- `#[try_get_route_param("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
 - `#[route_param(key => variable_name)]` - Extract a specific route parameter by key into a variable
 - `#[route_param("key1" => var1, "key2" => var2, ...)]` - Supports multiple route parameter extraction
 
@@ -146,8 +146,8 @@ cargo add hyperlane-macros
 
 ### Request Query Macros
 
-- `#[request_query_option(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
-- `#[request_query_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
+- `#[try_get_request_query(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
+- `#[try_get_request_query("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
 - `#[request_query(key => variable_name)]` - Extract a specific query parameter by key from the URL query string
 - `#[request_query("key1" => var1, "key2" => var2, ...)]` - Supports multiple query parameter extraction
 
@@ -158,8 +158,8 @@ cargo add hyperlane-macros
 
 ### Request Header Macros
 
-- `#[request_header_option(key => variable_name)]` - Extract a specific HTTP header by name from the request
-- `#[request_header_option(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
+- `#[try_get_request_header(key => variable_name)]` - Extract a specific HTTP header by name from the request
+- `#[try_get_request_header(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
 - `#[request_header(key => variable_name)]` - Extract a specific HTTP header by name from the request
 - `#[request_header(KEY1 => var1, KEY2 => var2, ...)]` - Supports multiple header extraction
 
@@ -170,8 +170,8 @@ cargo add hyperlane-macros
 
 ### Request Cookie Macros
 
-- `#[request_cookie_option(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
-- `#[request_cookie_option("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
+- `#[try_get_request_cookie(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
+- `#[try_get_request_cookie("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
 - `#[request_cookie(key => variable_name)]` - Extract a specific cookie value by key from the request cookie header
 - `#[request_cookie("key1" => var1, "key2" => var2, ...)]` - Supports multiple cookie extraction
 

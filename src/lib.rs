@@ -2041,7 +2041,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     age: u32,
 /// }
 ///
-/// #[route("/attribute_option")]
+/// #[route("/try_get_attribute")]
 /// struct Attribute;
 ///
 /// impl ServerHook for Attribute {
@@ -2049,17 +2049,17 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("request attribute: {request_attribute_option:?}"))]
-///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     #[response_body(&format!("request attribute: {request_try_get_attribute:?}"))]
+///     #[try_get_attribute(TEST_ATTRIBUTE_KEY => request_try_get_attribute: TestData)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Attribute {
-///     #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+///     #[try_get_attribute(TEST_ATTRIBUTE_KEY => request_try_get_attribute: TestData)]
 ///     async fn attribute_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[attribute_option(TEST_ATTRIBUTE_KEY => request_attribute_option: TestData)]
+/// #[try_get_attribute(TEST_ATTRIBUTE_KEY => request_try_get_attribute: TestData)]
 /// async fn standalone_attribute_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
@@ -2072,7 +2072,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/attribute_option")]
+/// #[route("/try_get_attribute")]
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
@@ -2081,15 +2081,15 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("attrs: {attr1:?}, {attr2:?}"))]
-///     #[attribute_option("key1" => attr1: String, "key2" => attr2: i32)]
+///     #[try_get_attribute("key1" => attr1: String, "key2" => attr2: i32)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
 /// The macro accepts multiple `key => variable_name: Type` tuples separated by commas.
 #[proc_macro_attribute]
-pub fn attribute_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    attribute_option_macro(attr, item, Position::Prologue)
+pub fn try_get_attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_attribute_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific attribute value into a variable with panic on missing value.
@@ -2242,7 +2242,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/task_panic_data_option")]
+/// #[route("/try_get_task_panic_data")]
 /// struct PanicDataOptionTest;
 ///
 /// impl ServerHook for PanicDataOptionTest {
@@ -2250,18 +2250,18 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Panic data: {task_panic_data_option:?}"))]
-///     #[task_panic_data_option(task_panic_data_option)]
+///     #[response_body(&format!("Panic data: {try_get_task_panic_data:?}"))]
+///     #[try_get_task_panic_data(try_get_task_panic_data)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl PanicDataOptionTest {
-///     #[task_panic_data_option(task_panic_data_option)]
-///     async fn task_panic_data_option_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+///     #[try_get_task_panic_data(try_get_task_panic_data)]
+///     async fn try_get_task_panic_data_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[task_panic_data_option(task_panic_data_option)]
-/// async fn standalone_task_panic_data_option_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+/// #[try_get_task_panic_data(try_get_task_panic_data)]
+/// async fn standalone_try_get_task_panic_data_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the panic data.
@@ -2273,7 +2273,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/task_panic_data_option")]
+/// #[route("/try_get_task_panic_data")]
 /// struct MultiPanicDataOption;
 ///
 /// impl ServerHook for MultiPanicDataOption {
@@ -2282,15 +2282,15 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("panic1: {panic1:?}, panic2: {panic2:?}"))]
-///     #[task_panic_data_option(panic1, panic2)]
+///     #[try_get_task_panic_data(panic1, panic2)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
 /// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
-pub fn task_panic_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    task_panic_data_option_macro(attr, item, Position::Prologue)
+pub fn try_get_task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_task_panic_data_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts panic data into a variable with panic on missing value.
@@ -2372,7 +2372,7 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data_option")]
+/// #[route("/try_get_request_error_data")]
 /// struct RequestErrorDataOptionTest;
 ///
 /// impl ServerHook for RequestErrorDataOptionTest {
@@ -2380,18 +2380,18 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///         Self
 ///     }
 ///
-///     #[response_body(&format!("Request error data: {request_error_data_option:?}"))]
-///     #[request_error_data_option(request_error_data_option)]
+///     #[response_body(&format!("Request error data: {try_get_request_error_data:?}"))]
+///     #[try_get_request_error_data(try_get_request_error_data)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestErrorDataOptionTest {
-///     #[request_error_data_option(request_error_data_option)]
-///     async fn request_error_data_option_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+///     #[try_get_request_error_data(try_get_request_error_data)]
+///     async fn try_get_request_error_data_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[request_error_data_option(request_error_data_option)]
-/// async fn standalone_request_error_data_option_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
+/// #[try_get_request_error_data(try_get_request_error_data)]
+/// async fn standalone_try_get_request_error_data_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a variable name that will contain the request error data.
@@ -2403,7 +2403,7 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_error_data_option")]
+/// #[route("/try_get_request_error_data")]
 /// struct MultiRequestErrorDataOption;
 ///
 /// impl ServerHook for MultiRequestErrorDataOption {
@@ -2412,15 +2412,15 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("error1: {error1:?}, error2: {error2:?}"))]
-///     #[request_error_data_option(error1, error2)]
+///     #[try_get_request_error_data(error1, error2)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
 /// The macro accepts multiple variable names separated by commas.
 #[proc_macro_attribute]
-pub fn request_error_data_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_error_data_option_macro(attr, item, Position::Prologue)
+pub fn try_get_request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_request_error_data_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts request error data into a variable with panic on missing value.
@@ -2502,7 +2502,7 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/route_param_option/:test")]
+/// #[route("/try_get_route_param/:test")]
 /// struct RouteParam;
 ///
 /// impl ServerHook for RouteParam {
@@ -2511,16 +2511,16 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("route param: {request_route_param:?}"))]
-///     #[route_param_option("test" => request_route_param)]
+///     #[try_get_route_param("test" => request_route_param)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RouteParam {
-///     #[route_param_option("test" => request_route_param)]
+///     #[try_get_route_param("test" => request_route_param)]
 ///     async fn route_param_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[route_param_option("test" => request_route_param)]
+/// #[try_get_route_param("test" => request_route_param)]
 /// async fn standalone_route_param_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
@@ -2542,15 +2542,15 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("id: {id:?}, name: {name:?}"))]
-///     #[route_param_option("id" => id, "name" => name)]
+///     #[try_get_route_param("id" => id, "name" => name)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 ///
 /// The macro accepts multiple `"key" => variable_name` pairs separated by commas.
 #[proc_macro_attribute]
-pub fn route_param_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    route_param_option_macro(attr, item, Position::Prologue)
+pub fn try_get_route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_route_param_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific route parameter into a variable with panic on missing value.
@@ -2695,7 +2695,7 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_query_option")]
+/// #[route("/try_get_request_query")]
 /// struct RequestQuery;
 ///
 /// impl ServerHook for RequestQuery {
@@ -2704,29 +2704,29 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         request_query_option("test" => request_query_option),
-///         response_body(&format!("request query: {request_query_option:?}")),
+///         try_get_request_query("test" => try_get_request_query),
+///         response_body(&format!("request query: {try_get_request_query:?}")),
 ///         send
 ///     )]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestQuery {
-///     #[request_query_option("test" => request_query_option)]
+///     #[try_get_request_query("test" => try_get_request_query)]
 ///     async fn request_query_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[request_query_option("test" => request_query_option)]
+/// #[try_get_request_query("test" => try_get_request_query)]
 /// async fn standalone_request_query_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a key-to-variable mapping in the format `"key" => variable_name`.
 /// The variable will be available as an `Option<RequestQuerysValue>` in the function scope.
 ///
-/// Supports multiple parameters: `#[request_query_option("k1" => v1, "k2" => v2)]`
+/// Supports multiple parameters: `#[try_get_request_query("k1" => v1, "k2" => v2)]`
 #[proc_macro_attribute]
-pub fn request_query_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_query_option_macro(attr, item, Position::Prologue)
+pub fn try_get_request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_request_query_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific request query parameter into a variable with panic on missing value.
@@ -2836,7 +2836,7 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
-/// #[route("/request_header_option")]
+/// #[route("/try_get_request_header")]
 /// struct RequestHeader;
 ///
 /// impl ServerHook for RequestHeader {
@@ -2845,27 +2845,27 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[prologue_macros(
-///         request_header_option(HOST => request_header_option),
-///         response_body(&format!("request header: {request_header_option:?}")),
+///         try_get_request_header(HOST => try_get_request_header),
+///         response_body(&format!("request header: {try_get_request_header:?}")),
 ///         send
 ///     )]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl RequestHeader {
-///     #[request_header_option(HOST => request_header_option)]
+///     #[try_get_request_header(HOST => try_get_request_header)]
 ///     async fn request_header_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
-/// #[request_header_option(HOST => request_header_option)]
+/// #[try_get_request_header(HOST => try_get_request_header)]
 /// async fn standalone_request_header_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// The macro accepts a request header name-to-variable mapping in the format `HEADER_NAME => variable_name`
 /// or `"Header-Name" => variable_name`. The variable will be available as an `Option<RequestHeadersValueItem>`.
 #[proc_macro_attribute]
-pub fn request_header_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_header_option_macro(attr, item, Position::Prologue)
+pub fn try_get_request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_request_header_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific HTTP request header into a variable with panic on missing value.
@@ -2980,26 +2980,26 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 ///
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+///     #[try_get_request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// impl Cookie {
 ///     #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-///     #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+///     #[try_get_request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 ///     async fn request_cookie_with_ref_self(&self, stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 ///
 /// #[response_body(&format!("Session cookie: {session_cookie1_option:?}, {session_cookie2_option:?}"))]
-/// #[request_cookie_option("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
+/// #[try_get_request_cookie("test1" => session_cookie1_option, "test2" => session_cookie2_option)]
 /// async fn standalone_request_cookie_handler(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// ```
 ///
 /// For specific cookie extraction, the variable will be available as `Option<String>`.
 /// For all cookies extraction, the variable will be available as `String`.
 #[proc_macro_attribute]
-pub fn request_cookie_option(attr: TokenStream, item: TokenStream) -> TokenStream {
-    request_cookie_option_macro(attr, item, Position::Prologue)
+pub fn try_get_request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
+    try_get_request_cookie_macro(attr, item, Position::Prologue)
 }
 
 /// Extracts a specific cookie value or all cookies into a variable with panic on missing value.
