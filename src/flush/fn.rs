@@ -11,7 +11,7 @@ use crate::*;
 ///
 /// - `TokenStream` - The expanded token stream with try_flush call.
 pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |_, stream| {
+    inject(position, item, |_: &Ident, stream: &Ident| {
         quote! {
             let _ = #stream.try_flush().await;
         }
@@ -29,7 +29,7 @@ pub(crate) fn try_flush_macro(item: TokenStream, position: Position) -> TokenStr
 ///
 /// - `TokenStream` - The expanded token stream with flush call.
 pub(crate) fn flush_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |_, stream| {
+    inject(position, item, |_: &Ident, stream: &Ident| {
         quote! {
             #stream.flush().await;
         }

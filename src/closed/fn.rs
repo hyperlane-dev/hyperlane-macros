@@ -16,7 +16,7 @@ use crate::*;
 ///
 /// Returns the expanded `TokenStream` with the closed call inserted.
 pub(crate) fn closed_macro(item: TokenStream, position: Position) -> TokenStream {
-    inject(position, item, |_, stream| {
+    inject(position, item, |_: &Ident, stream: &Ident| {
         quote! {
             #stream.set_closed(true);
         }
