@@ -14,9 +14,9 @@ fn inject_at_start(
     input: TokenStream,
     before_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
 ) -> TokenStream {
-    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &mut Signature = &mut input_fn.sig;
+    let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_signature(sig) {
@@ -49,9 +49,9 @@ fn inject_at_end(
     input: TokenStream,
     after_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
 ) -> TokenStream {
-    let mut input_fn: ItemFn = parse_macro_input!(input as ItemFn);
+    let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &mut Signature = &mut input_fn.sig;
+    let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_context_from_signature(sig) {
@@ -192,35 +192,31 @@ fn is_stream_type(ty: &Type) -> bool {
 /// 1. Methods with self: Searches from the second parameter onwards
 /// 2. Functions without self: Searches from the first parameter onwards
 /// 3. Context parameter can be at any position
-/// 4. Anonymous `_` parameters cause a compile error
+/// 4. Anonymous `_` parameters are returned as-is
 ///
 /// # Arguments
 ///
-/// - `&mut Signature` - The function signature to parse.
+/// - `&Signature` - The function signature to parse.
 ///
 /// # Returns
 ///
 /// - `syn::Result<Ident>` - Returns the context identifier or an error.
-pub(crate) fn parse_context_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
+pub(crate) fn parse_context_from_signature(sig: &Signature) -> syn::Result<Ident> {
     for arg in sig.inputs.iter() {
         if let FnArg::Typed(pat_type) = arg
             && is_context_type(&pat_type.ty)
         {
-            match &*pat_type.pat {
-                Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
-                Pat::Wild(_) => {
-                    return Err(syn::Error::new_spanned(
-                        &pat_type.pat,
-                        "anonymous `_` parameter is not allowed for context; please use a named identifier like `ctx`",
-                    ));
-                }
+            let ident: Ident = match &*pat_type.pat {
+                Pat::Ident(pat_ident) => pat_ident.ident.clone(),
+                Pat::Wild(_) => Ident::new("_", Span::call_site()),
                 _ => {
                     return Err(syn::Error::new_spanned(
                         &pat_type.pat,
                         "expected identifier for context parameter",
                     ));
                 }
-            }
+            };
+            return Ok(ident);
         }
     }
     Err(syn::Error::new_spanned(
@@ -236,35 +232,31 @@ pub(crate) fn parse_context_from_signature(sig: &mut Signature) -> syn::Result<I
 /// 1. Methods with self: Searches from the second parameter onwards
 /// 2. Functions without self: Searches from the first parameter onwards
 /// 3. Stream parameter can be at any position
-/// 4. Anonymous `_` parameters cause a compile error
+/// 4. Anonymous `_` parameters are returned as-is
 ///
 /// # Arguments
 ///
-/// - `&mut Signature` - The function signature to parse.
+/// - `&Signature` - The function signature to parse.
 ///
 /// # Returns
 ///
 /// - `syn::Result<Ident>` - Returns the stream identifier or an error.
-pub(crate) fn parse_stream_from_signature(sig: &mut Signature) -> syn::Result<Ident> {
+pub(crate) fn parse_stream_from_signature(sig: &Signature) -> syn::Result<Ident> {
     for arg in sig.inputs.iter() {
         if let FnArg::Typed(pat_type) = arg
             && is_stream_type(&pat_type.ty)
         {
-            match &*pat_type.pat {
-                Pat::Ident(pat_ident) => return Ok(pat_ident.ident.clone()),
-                Pat::Wild(_) => {
-                    return Err(syn::Error::new_spanned(
-                        &pat_type.pat,
-                        "anonymous `_` parameter is not allowed for stream; please use a named identifier like `stream`",
-                    ));
-                }
+            let ident: Ident = match &*pat_type.pat {
+                Pat::Ident(pat_ident) => pat_ident.ident.clone(),
+                Pat::Wild(_) => Ident::new("_", Span::call_site()),
                 _ => {
                     return Err(syn::Error::new_spanned(
                         &pat_type.pat,
                         "expected identifier for stream parameter",
                     ));
                 }
-            }
+            };
+            return Ok(ident);
         }
     }
     Err(syn::Error::new_spanned(
@@ -315,14 +307,26 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 ///
 /// # Arguments
 ///
+/// - `bool` - Whether to use `unsafe` or not.
 /// - `&Ident` - The context variable identifier.
 ///
 /// # Returns
 ///
 /// - `TokenStream2` - The token stream calling `#context.leak_mut()`.
-pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
-    quote! {
-        unsafe { #context.leak_mut() }
+///
+/// # Safety
+///
+/// - The address is guaranteed to be a valid `Self` instance
+///   that was previously converted from a reference and is managed by the runtime.
+pub(crate) fn leak_mut_context(is_unsafe_error: bool, context: &Ident) -> TokenStream2 {
+    if is_unsafe_error {
+        quote! {
+          #context.leak_mut()
+        }
+    } else {
+        quote! {
+            unsafe { #context.leak_mut() }
+        }
     }
 }
 
@@ -335,8 +339,19 @@ pub(crate) fn leak_mut_context(context: &Ident) -> TokenStream2 {
 /// # Returns
 ///
 /// - `TokenStream2` - The token stream calling `#context.leak()`.
-pub(crate) fn leak_context(context: &Ident) -> TokenStream2 {
-    quote! {
-        unsafe { #context.leak() }
+///
+/// # Safety
+///
+/// - The address is guaranteed to be a valid `Self` instance
+///   that was previously converted from a reference and is managed by the runtime.
+pub(crate) fn leak_context(is_unsafe_error: bool, context: &Ident) -> TokenStream2 {
+    if is_unsafe_error {
+        quote! {
+          #context.leak()
+        }
+    } else {
+        quote! {
+            unsafe { #context.leak() }
+        }
     }
 }

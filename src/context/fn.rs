@@ -29,6 +29,11 @@ pub(crate) fn is_mutable_reference_type(ty: &Type) -> bool {
 /// # Returns
 ///
 /// - `TokenStream` - The generated let statement binding the variable to the converted context reference.
+///
+/// # Safety
+///
+/// - The address is guaranteed to be a valid `Self` instance
+///   that was previously converted from a reference and is managed by the runtime.
 pub(crate) fn context_macro(input: TokenStream) -> TokenStream {
     let context_input: ContextInput = match parse(input) {
         Ok(input) => input,
@@ -40,8 +45,8 @@ pub(crate) fn context_macro(input: TokenStream) -> TokenStream {
         .as_ref()
         .is_some_and(is_mutable_reference_type);
     if is_mut {
-        leak_mut_context(&source_ctx).into()
+        leak_mut_context(true, &source_ctx).into()
     } else {
-        leak_context(&source_ctx).into()
+        leak_context(true, &source_ctx).into()
     }
 }

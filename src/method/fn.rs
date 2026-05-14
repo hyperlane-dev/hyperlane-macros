@@ -43,8 +43,8 @@ pub(crate) fn methods_macro(
     position: Position,
 ) -> TokenStream {
     let methods: RequestMethods = parse_macro_input!(attr as RequestMethods);
-    let mut input_fn: ItemFn = parse_macro_input!(item as ItemFn);
-    let sig: &mut Signature = &mut input_fn.sig;
+    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
+    let sig: &Signature = &input_fn.sig;
     match parse_context_from_signature(sig) {
         Ok(context) => {
             let method_checks = methods.methods.iter().map(|method| {

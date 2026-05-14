@@ -74,7 +74,7 @@ use {
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -97,7 +97,7 @@ use {
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -149,7 +149,7 @@ pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenS
 /// struct HttpFromStreamTest;
 ///
 /// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -168,7 +168,7 @@ pub fn try_get_websocket_request(attr: TokenStream, item: TokenStream) -> TokenS
 /// struct HttpFromStreamTest;
 ///
 /// impl ServerHook for HttpFromStreamTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -204,7 +204,7 @@ pub fn try_get_http_request(attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct Get;
 ///
 /// impl ServerHook for Get {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -243,7 +243,7 @@ pub fn is_get_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Post;
 ///
 /// impl ServerHook for Post {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -282,7 +282,7 @@ pub fn is_post_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Put;
 ///
 /// impl ServerHook for Put {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -321,7 +321,7 @@ pub fn is_put_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Delete;
 ///
 /// impl ServerHook for Delete {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -360,7 +360,7 @@ pub fn is_delete_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Patch;
 ///
 /// impl ServerHook for Patch {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -399,7 +399,7 @@ pub fn is_patch_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Head;
 ///
 /// impl ServerHook for Head {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -438,7 +438,7 @@ pub fn is_head_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Options;
 ///
 /// impl ServerHook for Options {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -477,7 +477,7 @@ pub fn is_options_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Connect;
 ///
 /// impl ServerHook for Connect {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -516,7 +516,7 @@ pub fn is_connect_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Trace;
 ///
 /// impl ServerHook for Trace {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -556,7 +556,7 @@ pub fn is_trace_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -599,7 +599,7 @@ pub fn is_unknown_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct GetPost;
 ///
 /// impl ServerHook for GetPost {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -642,7 +642,7 @@ pub fn methods(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http09;
 ///
 /// impl ServerHook for Http09 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -681,7 +681,7 @@ pub fn is_http0_9_version(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct Http10;
 ///
 /// impl ServerHook for Http10 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -720,7 +720,7 @@ pub fn is_http1_0_version(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct Http11;
 ///
 /// impl ServerHook for Http11 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -759,7 +759,7 @@ pub fn is_http1_1_version(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct Http2;
 ///
 /// impl ServerHook for Http2 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -798,7 +798,7 @@ pub fn is_http2_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http3;
 ///
 /// impl ServerHook for Http3 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -837,7 +837,7 @@ pub fn is_http3_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Http11OrHigher;
 ///
 /// impl ServerHook for Http11OrHigher {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -876,7 +876,7 @@ pub fn is_http1_1_or_higher_version(_attr: TokenStream, item: TokenStream) -> To
 /// struct HttpOnly;
 ///
 /// impl ServerHook for HttpOnly {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -915,7 +915,7 @@ pub fn is_http_version(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownVersionHandler;
 ///
 /// impl ServerHook for UnknownVersionHandler {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -954,7 +954,7 @@ pub fn is_unknown_version(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct Websocket;
 ///
 /// impl ServerHook for Websocket {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -997,7 +997,7 @@ pub fn is_ws_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct H2c;
 ///
 /// impl ServerHook for H2c {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1036,7 +1036,7 @@ pub fn is_h2c_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct Tls;
 ///
 /// impl ServerHook for Tls {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1075,7 +1075,7 @@ pub fn is_tls_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct UnknownUpgrade;
 ///
 /// impl ServerHook for UnknownUpgrade {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1116,7 +1116,7 @@ pub fn is_unknown_upgrade_type(_attr: TokenStream, item: TokenStream) -> TokenSt
 /// struct ResponseStatusCode;
 ///
 /// impl ServerHook for ResponseStatusCode {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1157,7 +1157,7 @@ pub fn response_status_code(attr: TokenStream, item: TokenStream) -> TokenStream
 /// struct ResponseReason;
 ///
 /// impl ServerHook for ResponseReason {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1200,7 +1200,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct ResponseHeader;
 ///
 /// impl ServerHook for ResponseHeader {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1217,7 +1217,7 @@ pub fn response_reason_phrase(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct ResponseHeaderTest;
 ///
 /// impl ServerHook for ResponseHeaderTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1256,7 +1256,7 @@ pub fn response_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseBody;
 ///
 /// impl ServerHook for ResponseBody {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1294,7 +1294,7 @@ pub fn response_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ClearResponseHeaders;
 ///
 /// impl ServerHook for ClearResponseHeaders {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1336,7 +1336,7 @@ pub fn clear_response_headers(_attr: TokenStream, item: TokenStream) -> TokenStr
 /// struct RequestMiddleware;
 ///
 /// impl ServerHook for RequestMiddleware {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1379,7 +1379,7 @@ pub fn response_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ClosedTest;
 ///
 /// impl ServerHook for ClosedTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1417,7 +1417,7 @@ pub fn closed(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct UnknownMethod;
 ///
 /// impl ServerHook for UnknownMethod {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1455,7 +1455,7 @@ pub fn filter(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware2;
 ///
 /// impl ServerHook for ResponseMiddleware2 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1493,7 +1493,7 @@ pub fn reject(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Host;
 ///
 /// impl ServerHook for Host {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1533,7 +1533,7 @@ pub fn host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RejectHost;
 ///
 /// impl ServerHook for RejectHost {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1575,7 +1575,7 @@ pub fn reject_host(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Referer;
 ///
 /// impl ServerHook for Referer {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1617,7 +1617,7 @@ pub fn referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RejectReferer;
 ///
 /// impl ServerHook for RejectReferer {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1658,7 +1658,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PrologueHooks;
 ///
 /// impl ServerHook for PrologueHooks {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1676,7 +1676,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Hook;
 ///
 /// impl ServerHook for Hook {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1700,7 +1700,7 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct HooksExpression;
 ///
 /// impl ServerHook for HooksExpression {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1711,9 +1711,9 @@ pub fn reject_referer(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 ///
 /// impl HooksExpression {
-///     async fn new_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
+///     async fn new_hook(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 ///
-///     async fn method_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
+///     async fn method_hook(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1735,7 +1735,7 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct EpilogueHooks;
 ///
 /// impl ServerHook for EpilogueHooks {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1752,7 +1752,7 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Hook;
 ///
 /// impl ServerHook for Hook {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1777,7 +1777,7 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct HooksExpression;
 ///
 /// impl ServerHook for HooksExpression {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1788,9 +1788,9 @@ pub fn prologue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 ///
 /// impl HooksExpression {
-///     async fn new_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
+///     async fn new_hook(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 ///
-///     async fn method_hook(_: &mut Stream, _: &mut Context) -> Status { Status::Continue }
+///     async fn method_hook(stream: &mut Stream, ctx: &mut Context) -> Status { Status::Continue }
 /// }
 /// ```
 #[proc_macro_attribute]
@@ -1813,7 +1813,7 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestBodyRoute;
 ///
 /// impl ServerHook for RequestBodyRoute {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1841,7 +1841,7 @@ pub fn epilogue_hooks(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiBody;
 ///
 /// impl ServerHook for MultiBody {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1881,7 +1881,7 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestBodyJson;
 ///
 /// impl ServerHook for RequestBodyJson {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1920,7 +1920,7 @@ pub fn request_body(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TestData;
 ///
 /// impl ServerHook for TestData {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1960,7 +1960,7 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// struct RequestBodyJson;
 ///
 /// impl ServerHook for RequestBodyJson {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -1999,7 +1999,7 @@ pub fn request_body_json_result(attr: TokenStream, item: TokenStream) -> TokenSt
 /// struct TestData;
 ///
 /// impl ServerHook for TestData {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2045,7 +2045,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attribute;
 ///
 /// impl ServerHook for Attribute {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2076,7 +2076,7 @@ pub fn request_body_json(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2117,7 +2117,7 @@ pub fn try_get_attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attribute;
 ///
 /// impl ServerHook for Attribute {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2148,7 +2148,7 @@ pub fn try_get_attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttr;
 ///
 /// impl ServerHook for MultiAttr {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2183,7 +2183,7 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Attributes;
 ///
 /// impl ServerHook for Attributes {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2214,7 +2214,7 @@ pub fn attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiAttrs;
 ///
 /// impl ServerHook for MultiAttrs {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2246,7 +2246,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PanicDataOptionTest;
 ///
 /// impl ServerHook for PanicDataOptionTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2277,7 +2277,7 @@ pub fn attributes(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiPanicDataOption;
 ///
 /// impl ServerHook for MultiPanicDataOption {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2309,7 +2309,7 @@ pub fn try_get_task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStr
 /// struct PanicDataTest;
 ///
 /// impl ServerHook for PanicDataTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2340,7 +2340,7 @@ pub fn try_get_task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStr
 /// struct MultiPanicData;
 ///
 /// impl ServerHook for MultiPanicData {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2376,7 +2376,7 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestErrorDataOptionTest;
 ///
 /// impl ServerHook for RequestErrorDataOptionTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2407,7 +2407,7 @@ pub fn task_panic_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiRequestErrorDataOption;
 ///
 /// impl ServerHook for MultiRequestErrorDataOption {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2439,7 +2439,7 @@ pub fn try_get_request_error_data(attr: TokenStream, item: TokenStream) -> Token
 /// struct RequestErrorDataTest;
 ///
 /// impl ServerHook for RequestErrorDataTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2470,7 +2470,7 @@ pub fn try_get_request_error_data(attr: TokenStream, item: TokenStream) -> Token
 /// struct MultiRequestErrorData;
 ///
 /// impl ServerHook for MultiRequestErrorData {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2506,7 +2506,7 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RouteParam;
 ///
 /// impl ServerHook for RouteParam {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2537,7 +2537,7 @@ pub fn request_error_data(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiParam;
 ///
 /// impl ServerHook for MultiParam {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2569,7 +2569,7 @@ pub fn try_get_route_param(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct RouteParam;
 ///
 /// impl ServerHook for RouteParam {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2601,7 +2601,7 @@ pub fn try_get_route_param(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct MultiParam;
 ///
 /// impl ServerHook for MultiParam {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2636,7 +2636,7 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RouteParams;
 ///
 /// impl ServerHook for RouteParams {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2667,7 +2667,7 @@ pub fn route_param(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiParams;
 ///
 /// impl ServerHook for MultiParams {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2699,7 +2699,7 @@ pub fn route_params(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestQuery;
 ///
 /// impl ServerHook for RequestQuery {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2745,7 +2745,7 @@ pub fn try_get_request_query(attr: TokenStream, item: TokenStream) -> TokenStrea
 /// struct RequestQuery;
 ///
 /// impl ServerHook for RequestQuery {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2794,7 +2794,7 @@ pub fn request_query(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestQuerys;
 ///
 /// impl ServerHook for RequestQuerys {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2840,7 +2840,7 @@ pub fn request_querys(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestHeader;
 ///
 /// impl ServerHook for RequestHeader {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2884,7 +2884,7 @@ pub fn try_get_request_header(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct RequestHeader;
 ///
 /// impl ServerHook for RequestHeader {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2931,7 +2931,7 @@ pub fn request_header(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestHeaders;
 ///
 /// impl ServerHook for RequestHeaders {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -2975,7 +2975,7 @@ pub fn request_headers(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Cookie;
 ///
 /// impl ServerHook for Cookie {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3018,7 +3018,7 @@ pub fn try_get_request_cookie(attr: TokenStream, item: TokenStream) -> TokenStre
 /// struct Cookie;
 ///
 /// impl ServerHook for Cookie {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3064,7 +3064,7 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Cookies;
 ///
 /// impl ServerHook for Cookies {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3095,7 +3095,7 @@ pub fn request_cookie(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct MultiCookies;
 ///
 /// impl ServerHook for MultiCookies {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3124,7 +3124,7 @@ pub fn request_cookies(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestVersionTest;
 ///
 /// impl ServerHook for RequestVersionTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3164,7 +3164,7 @@ pub fn request_version(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestPathTest;
 ///
 /// impl ServerHook for RequestPathTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3261,7 +3261,7 @@ pub fn hyperlane(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct Response;
 ///
 /// impl ServerHook for Response {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3301,7 +3301,7 @@ pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestMiddleware;
 ///
 /// impl ServerHook for RequestMiddleware {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3341,7 +3341,7 @@ pub fn request_middleware(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware1;
 ///
 /// impl ServerHook for ResponseMiddleware1 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3378,7 +3378,7 @@ pub fn response_middleware(attr: TokenStream, item: TokenStream) -> TokenStream 
 /// struct PanicHook;
 ///
 /// impl ServerHook for PanicHook {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3416,7 +3416,7 @@ pub fn task_panic(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct RequestErrorHook;
 ///
 /// impl ServerHook for RequestErrorHook {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3448,7 +3448,7 @@ pub fn request_error(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct PrologueMacros;
 ///
 /// impl ServerHook for PrologueMacros {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3476,7 +3476,7 @@ pub fn prologue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct ResponseMiddleware2;
 ///
 /// impl ServerHook for ResponseMiddleware2 {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3507,7 +3507,7 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TrySendTest;
 ///
 /// impl ServerHook for TrySendTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3534,7 +3534,7 @@ pub fn epilogue_macros(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TrySendWithDataTest;
 ///
 /// impl ServerHook for TrySendWithDataTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3568,7 +3568,7 @@ pub fn try_send(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct SendTest;
 ///
 /// impl ServerHook for SendTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3595,7 +3595,7 @@ pub fn try_send(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct SendWithDataTest;
 ///
 /// impl ServerHook for SendWithDataTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3630,7 +3630,7 @@ pub fn send(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct TryFlushTest;
 ///
 /// impl ServerHook for TryFlushTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3669,7 +3669,7 @@ pub fn try_flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// struct FlushTest;
 ///
 /// impl ServerHook for FlushTest {
-///     async fn new(_: &mut Stream, _: &mut Context) -> Self {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
 ///         Self
 ///     }
 ///
@@ -3725,9 +3725,24 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/context_mut")]
+/// struct ContextMut;
+///
+/// impl ServerHook for ContextMut {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
+///         Self
+///     }
+///
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+///         let new_ctx: &mut Context = unsafe { context!(ctx: &mut Context) };
+///         let _ = new_ctx.get_mut_response();
+///         Status::Continue
+///     }
+/// }
+///
 /// async fn example(stream: &mut Stream, ctx: &mut Context) {
-///     let new_: &mut Context = context!(ctx: &mut Context);
-///     let _ = new_.get_mut_response();
+///     let new_ctx: &mut Context = unsafe { context!(ctx: &mut Context) };
+///     let _ = new_ctx.get_mut_response();
 /// }
 /// ```
 ///
@@ -3736,9 +3751,24 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/context_ref")]
+/// struct ContextRef;
+///
+/// impl ServerHook for ContextRef {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
+///         Self
+///     }
+///
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+///         let new_ctx: &::hyperlane::Context = unsafe { context!(ctx: &::hyperlane::Context) };
+///         let _ = new_ctx.get_request();
+///         Status::Continue
+///     }
+/// }
+///
 /// async fn example(stream: &mut Stream, ctx: &mut Context) {
-///     let new_: &::hyperlane::Context = context!(ctx: &::hyperlane::Context);
-///     let _ = new_.get_request();
+///     let new_ctx: &::hyperlane::Context = unsafe { context!(ctx: &::hyperlane::Context) };
+///     let _ = new_ctx.get_request();
 /// }
 /// ```
 ///
@@ -3747,11 +3777,31 @@ pub fn flush(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use hyperlane::*;
 /// use hyperlane_macros::*;
 ///
+/// #[route("/context_default")]
+/// struct ContextDefault;
+///
+/// impl ServerHook for ContextDefault {
+///     async fn new(stream: &mut Stream, ctx: &mut Context) -> Self {
+///         Self
+///     }
+///
+///     async fn handle(self, stream: &mut Stream, ctx: &mut Context) -> Status {
+///         let new_ctx = unsafe { context!(ctx) };
+///         let _ = new_ctx.get_request();
+///         Status::Continue
+///     }
+/// }
+///
 /// async fn example(stream: &mut Stream, ctx: &mut Context) {
-///     let new_ = context!(ctx);
-///     let _ = new_.get_request();
+///     let new_ctx = unsafe { context!(ctx) };
+///     let _ = new_ctx.get_request();
 /// }
 /// ```
+///
+/// # Safety
+///
+/// - The address is guaranteed to be a valid `Self` instance
+///   that was previously converted from a reference and is managed by the runtime.
 #[proc_macro]
 pub fn context(input: TokenStream) -> TokenStream {
     context_macro(input)

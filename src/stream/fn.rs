@@ -106,9 +106,9 @@ pub(crate) fn generate_websocket_stream(
 /// - `TokenStream` - The expanded token stream with HTTP stream processing.
 pub(crate) fn try_get_http_request_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let data: FromStreamData = parse_macro_input!(attr as FromStreamData);
-    let mut input_fn: ItemFn = parse_macro_input!(item as ItemFn);
+    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &mut Signature = &mut input_fn.sig;
+    let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_stream_from_signature(sig) {
@@ -148,9 +148,9 @@ pub(crate) fn try_get_http_request_macro(attr: TokenStream, item: TokenStream) -
 /// - `TokenStream` - The expanded token stream with WebSocket stream processing.
 pub(crate) fn try_get_websocket_request_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let data: FromStreamData = parse_macro_input!(attr as FromStreamData);
-    let mut input_fn: ItemFn = parse_macro_input!(item as ItemFn);
+    let input_fn: ItemFn = parse_macro_input!(item as ItemFn);
     let vis: &Visibility = &input_fn.vis;
-    let sig: &mut Signature = &mut input_fn.sig;
+    let sig: &Signature = &input_fn.sig;
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     match parse_stream_from_signature(sig) {
