@@ -25,7 +25,7 @@ pub(crate) fn task_panic_macro(attr: TokenStream, item: TokenStream) -> TokenStr
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookType::TaskPanic(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
+            ::hyperlane::HookType::TaskPanic(#order, || ::hyperlane::Hook::factory::<#struct_name>())
         }
     };
     gen_code.into()
@@ -55,7 +55,7 @@ pub(crate) fn request_error_macro(attr: TokenStream, item: TokenStream) -> Token
     let gen_code: TokenStream2 = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
-            ::hyperlane::HookType::RequestError(#order, || ::hyperlane::server_hook_factory::<#struct_name>())
+            ::hyperlane::HookType::RequestError(#order, || ::hyperlane::Hook::factory::<#struct_name>())
         }
     };
     gen_code.into()

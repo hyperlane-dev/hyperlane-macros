@@ -1,6 +1,6 @@
 [package]
 name = "hyperlane-macros"
-version = "23.0.12"
+version = "23.0.13"
 readme = "README.md"
 edition = "2024"
 authors = ["root@ltpp.vip"]
@@ -24,10 +24,10 @@ exclude = [
 proc-macro = true
 
 [dependencies]
-quote = "1.0.45"
-hyperlane = "21.2.9"
+quote = "1.0.46"
+hyperlane = "21.2.10"
 proc-macro2 = "1.0.106"
-syn = { version = "2.0.117", features = ["full"] }
+syn = { version = "2.0.118", features = ["full"] }
 
 [dev-dependencies]
 serde = { version = "1.0.228", features = ["derive"] }
