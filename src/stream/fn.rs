@@ -1,5 +1,4 @@
-use crate::*;
-use syn::Ident;
+use super::*;
 
 /// Generates stream processing loop for HTTP stream.
 ///

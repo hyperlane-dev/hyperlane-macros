@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Implementation of the `Parse` trait for `MultiHyperlaneAttr`.
 ///

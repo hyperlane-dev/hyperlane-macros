@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a protocol check function for protocol upgrade type validation.
 ///

@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Expands macro with code inserted before method body, providing both context and stream identifiers.
 ///

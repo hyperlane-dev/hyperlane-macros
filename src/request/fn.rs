@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Gets raw request body and assigns to specified variable.
 /// Supports both single and multiple variable extraction.

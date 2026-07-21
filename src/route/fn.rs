@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Internal implementation for the `route` attribute macro.
 ///

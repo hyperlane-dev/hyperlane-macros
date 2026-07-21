@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Filters requests matching the specified Referer header.
 /// Supports both single and multiple referer value checks.

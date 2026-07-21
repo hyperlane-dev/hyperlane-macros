@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Rejects requests based on a boolean condition.
 ///

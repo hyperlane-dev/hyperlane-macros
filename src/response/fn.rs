@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Sets response status code from macro input.
 ///

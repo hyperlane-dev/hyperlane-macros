@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Filters requests matching the specified host.
 /// Supports both single and multiple host value checks.

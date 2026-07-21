@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a version check function for HTTP version validation.
 ///

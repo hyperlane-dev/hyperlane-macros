@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Creates a method check function for HTTP request validation.
 ///

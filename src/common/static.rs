@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Static array of all injectable macros.
 ///

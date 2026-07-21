@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Expands macro to generate async try_flush call on stream.
 ///

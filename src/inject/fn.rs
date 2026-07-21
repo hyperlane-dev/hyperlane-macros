@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Applies a macro to a token stream.
 ///

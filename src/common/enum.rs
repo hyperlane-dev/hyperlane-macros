@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Defines the type of macro handler.
 ///

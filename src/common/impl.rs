@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Parses the attributes for the `OrderAttr` macro.
 ///

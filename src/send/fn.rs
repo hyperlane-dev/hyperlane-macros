@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Tries to send data via stream after function execution.
 ///

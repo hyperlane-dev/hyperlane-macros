@@ -1,4 +1,4 @@
-use crate::*;
+use super::*;
 
 /// Expands the macro to generate an asynchronous closed call.
 ///
