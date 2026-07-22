@@ -25,7 +25,7 @@ pub(crate) fn route_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let path: &Expr = &route_attr.path;
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
     let struct_name: &Ident = &input_struct.ident;
-    let gen_code: TokenStream2 = quote! {
+    let gen_code: proc_macro2::TokenStream = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
             ::hyperlane::HookType::Route(#path, || ::hyperlane::Hook::factory::<#struct_name>())

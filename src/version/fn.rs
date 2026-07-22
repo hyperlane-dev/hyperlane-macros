@@ -11,7 +11,7 @@ use super::*;
 /// Returns a closure that generates the version check code.
 pub(crate) fn create_version_check(
     version: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream {
     let version_str: String = version.to_string();
     move |context: &Ident, _: &Ident| {
         let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{version_str}"), context.span());

@@ -1937,11 +1937,11 @@ async fn standalone_epilogue_hooks_handler(stream: &mut Stream, ctx: &mut Contex
 #[closed]
 async fn context_macro(stream: &mut Stream, ctx: &mut Context) -> Status {
     let new_ctx: &Context = unsafe { context!(ctx) };
-    let _ = new_ctx.get_response();
+    let _: &Response = new_ctx.get_response();
     let new_ctx: &Context = unsafe { context!(ctx: &Context) };
-    let _ = new_ctx.get_response();
+    let _: &Response = new_ctx.get_response();
     let new_ctx: &mut Context = unsafe { context!(ctx: &mut Context) };
-    let _ = new_ctx.get_mut_response();
+    let _: &mut Response = new_ctx.get_mut_response();
     Status::Continue
 }
 

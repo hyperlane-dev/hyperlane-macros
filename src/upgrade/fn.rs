@@ -11,7 +11,7 @@ use super::*;
 /// Returns a closure that generates the protocol check code.
 pub(crate) fn create_protocol_check(
     upgrade_type: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream {
     let upgrade_type_str: String = upgrade_type.to_string();
     move |context: &Ident, _: &Ident| {
         let check_fn: proc_macro2::Ident =

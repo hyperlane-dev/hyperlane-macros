@@ -28,12 +28,12 @@ pub(crate) fn try_send_macro(
     inject(position, item, |context, stream| match data_expr {
         Some(expr) => {
             quote! {
-                let _ = #stream.try_send(#expr).await;
+                let _: ::std::result::Result<(), ::hyperlane::ResponseError> = #stream.try_send(#expr).await;
             }
         }
         None => {
             quote! {
-                let _ = #stream.try_send(#context.get_mut_response().build()).await;
+                let _: ::std::result::Result<(), ::hyperlane::ResponseError> = #stream.try_send(#context.get_mut_response().build()).await;
             }
         }
     })

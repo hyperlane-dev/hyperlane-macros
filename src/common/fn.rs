@@ -12,7 +12,7 @@ use super::*;
 /// - `TokenStream` - The expanded token stream with inserted code.
 fn inject_at_start(
     input: TokenStream,
-    before_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
+    before_fn: impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream,
 ) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
@@ -22,9 +22,9 @@ fn inject_at_start(
     match parse_context_from_signature(sig) {
         Ok(context) => match parse_stream_from_signature(sig) {
             Ok(stream) => {
-                let before_code: TokenStream2 = before_fn(&context, &stream);
+                let before_code: proc_macro2::TokenStream = before_fn(&context, &stream);
                 let stmts: &Vec<Stmt> = &block.stmts;
-                let gen_code: TokenStream2 = quote! {
+                let gen_code: proc_macro2::TokenStream = quote! {
                     #(#attrs)*
                     #vis #sig {
                         #before_code
@@ -47,7 +47,7 @@ fn inject_at_start(
 /// - `FnOnce(&Ident, &Ident) -> TokenStream2` - A closure that takes context and stream identifiers and returns a `TokenStream` to be inserted at the end of the method.
 fn inject_at_end(
     input: TokenStream,
-    after_fn: impl FnOnce(&Ident, &Ident) -> TokenStream2,
+    after_fn: impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream,
 ) -> TokenStream {
     let input_fn: ItemFn = parse_macro_input!(input as ItemFn);
     let vis: &Visibility = &input_fn.vis;
@@ -57,7 +57,7 @@ fn inject_at_end(
     match parse_context_from_signature(sig) {
         Ok(context) => match parse_stream_from_signature(sig) {
             Ok(stream) => {
-                let after_code: TokenStream2 = after_fn(&context, &stream);
+                let after_code: proc_macro2::TokenStream = after_fn(&context, &stream);
                 let stmts: &Vec<Stmt> = &block.stmts;
                 let (leading_stmts, tail_expr) = if let Some((last, leading)) = stmts.split_last() {
                     match last {
@@ -67,14 +67,14 @@ fn inject_at_end(
                 } else {
                     (stmts.as_slice(), None)
                 };
-                let normalized_leading: Vec<TokenStream2> = leading_stmts
+                let normalized_leading: Vec<proc_macro2::TokenStream> = leading_stmts
                     .iter()
                     .map(|stmt| match stmt {
                         Stmt::Expr(expr, None) => quote! { #expr; },
                         _ => quote! { #stmt },
                     })
                     .collect();
-                let gen_code: TokenStream2 = match tail_expr {
+                let gen_code: proc_macro2::TokenStream = match tail_expr {
                     Some(expr) => quote! {
                         #(#attrs)*
                         #vis #sig {
@@ -113,7 +113,7 @@ fn inject_at_end(
 pub(crate) fn inject(
     position: Position,
     input: TokenStream,
-    hook: impl FnOnce(&Ident, &Ident) -> TokenStream2,
+    hook: impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream,
 ) -> TokenStream {
     match position {
         Position::Prologue => inject_at_start(input, hook),
@@ -280,7 +280,7 @@ pub(crate) fn parse_stream_from_signature(sig: &Signature) -> syn::Result<Ident>
 /// # Returns
 ///
 /// - `TokenStream` - A `TokenStream2` representing `Some(isize)` for supported literals, or `None` otherwise.
-pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
+pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> proc_macro2::TokenStream {
     match opt_expr {
         Some(expr) => match expr {
             Expr::Lit(ExprLit {
@@ -318,7 +318,7 @@ pub(crate) fn expr_to_isize(opt_expr: &Option<Expr>) -> TokenStream2 {
 ///
 /// - The address is guaranteed to be a valid `Self` instance
 ///   that was previously converted from a reference and is managed by the runtime.
-pub(crate) fn leak_mut_context(is_unsafe_error: bool, context: &Ident) -> TokenStream2 {
+pub(crate) fn leak_mut_context(is_unsafe_error: bool, context: &Ident) -> proc_macro2::TokenStream {
     if is_unsafe_error {
         quote! {
           #context.leak_mut()
@@ -344,7 +344,7 @@ pub(crate) fn leak_mut_context(is_unsafe_error: bool, context: &Ident) -> TokenS
 ///
 /// - The address is guaranteed to be a valid `Self` instance
 ///   that was previously converted from a reference and is managed by the runtime.
-pub(crate) fn leak_context(is_unsafe_error: bool, context: &Ident) -> TokenStream2 {
+pub(crate) fn leak_context(is_unsafe_error: bool, context: &Ident) -> proc_macro2::TokenStream {
     if is_unsafe_error {
         quote! {
           #context.leak()

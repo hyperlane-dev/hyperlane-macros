@@ -22,7 +22,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
     let block: &Block = &input_fn.block;
     let attrs: &Vec<Attribute> = &input_fn.attrs;
     let stmts: &Vec<Stmt> = &block.stmts;
-    let mut init_statements: Vec<TokenStream2> = Vec::new();
+    let mut init_statements: Vec<proc_macro2::TokenStream> = Vec::new();
     for (var_name, type_name) in &multi_hyperlane.params {
         init_statements.push(quote! {
             let mut #var_name: #type_name = #type_name::default();
@@ -38,7 +38,7 @@ pub(crate) fn hyperlane_macro(attr: TokenStream, item: TokenStream) -> TokenStre
             });
         }
     }
-    let gen_code: TokenStream2 = quote! {
+    let gen_code: proc_macro2::TokenStream = quote! {
         #(#attrs)*
         #vis #sig {
             #(#init_statements)*

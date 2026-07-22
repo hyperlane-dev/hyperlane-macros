@@ -20,7 +20,7 @@ pub(crate) fn generate_http_stream(
     context: &Ident,
     data: &FromStreamData,
     stmts: &[Stmt],
-) -> TokenStream2 {
+) -> proc_macro2::TokenStream {
     let method_ident: Ident = Ident::new("try_get_http_request", Span::call_site());
     match data.variable_name.clone() {
         Some(variable_name) => {
@@ -64,7 +64,7 @@ pub(crate) fn generate_websocket_stream(
     context: &Ident,
     data: &FromStreamData,
     stmts: &[Stmt],
-) -> TokenStream2 {
+) -> proc_macro2::TokenStream {
     let method_ident: Ident = Ident::new("try_get_websocket_request", Span::call_site());
     match data.variable_name.clone() {
         Some(variable_name) => {
@@ -114,7 +114,7 @@ pub(crate) fn try_get_http_request_macro(attr: TokenStream, item: TokenStream) -
         Ok(stream) => match parse_context_from_signature(sig) {
             Ok(context) => {
                 let stmts: &Vec<Stmt> = &block.stmts;
-                let loop_stream: TokenStream2 =
+                let loop_stream: proc_macro2::TokenStream =
                     generate_http_stream(&stream, &context, &data, stmts);
                 quote! {
                     #(#attrs)*
@@ -156,7 +156,7 @@ pub(crate) fn try_get_websocket_request_macro(attr: TokenStream, item: TokenStre
         Ok(stream) => match parse_context_from_signature(sig) {
             Ok(context) => {
                 let stmts: &Vec<Stmt> = &block.stmts;
-                let loop_stream: TokenStream2 =
+                let loop_stream: proc_macro2::TokenStream =
                     generate_websocket_stream(&stream, &context, &data, stmts);
                 quote! {
                     #(#attrs)*

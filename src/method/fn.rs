@@ -11,7 +11,7 @@ use super::*;
 /// Returns a closure that generates the method check code.
 pub(crate) fn create_method_check(
     method: &proc_macro2::Ident,
-) -> impl FnOnce(&Ident, &Ident) -> TokenStream2 {
+) -> impl FnOnce(&Ident, &Ident) -> proc_macro2::TokenStream {
     let method_str: String = method.to_string();
     move |context: &Ident, _: &Ident| {
         let check_fn: proc_macro2::Ident = Ident::new(&format!("is_{method_str}"), context.span());

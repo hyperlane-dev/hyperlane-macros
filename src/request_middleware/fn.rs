@@ -19,10 +19,10 @@ use super::*;
 /// - `TokenStream` - The expanded token stream with the middleware registration.
 pub(crate) fn request_middleware_macro(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_args: OrderAttr = parse_macro_input!(attr as OrderAttr);
-    let order: TokenStream2 = expr_to_isize(&attr_args.order);
+    let order: proc_macro2::TokenStream = expr_to_isize(&attr_args.order);
     let input_struct: ItemStruct = parse_macro_input!(item as ItemStruct);
     let struct_name: &Ident = &input_struct.ident;
-    let gen_code: TokenStream2 = quote! {
+    let gen_code: proc_macro2::TokenStream = quote! {
         #input_struct
         ::hyperlane::inventory::submit! {
             ::hyperlane::HookType::RequestMiddleware(#order, || ::hyperlane::Hook::factory::<#struct_name>())
